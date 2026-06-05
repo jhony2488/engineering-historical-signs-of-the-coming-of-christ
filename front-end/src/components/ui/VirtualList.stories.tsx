@@ -18,7 +18,7 @@ export const ListaLonga: Story = {
     items,
     itemHeight: 48,
     height: 240,
-    renderItem: (item, _index) => (
+    renderItem: (item) => (
       <div className="px-3 py-2 border-b border-ink-700/40 text-sm">{String(item)}</div>
     ),
   },
