@@ -13,6 +13,8 @@ from motor.ml.graph import PropheticGraph
 from motor.ml.spiritual_tone import SpiritualToneAnalyzer
 from motor.pipeline.correlation.engine import CorrelationEngine
 from motor.pipeline.embeddings.service import EmbeddingService
+from motor.pipeline.fulfillment_tracker import FulfillmentTracker
+from motor.pipeline.historical_baseline import HistoricalBaselineService
 from motor.pipeline.ingestion.collector import IngestionCollector
 from motor.pipeline.llm.layers import LLMPipeline
 from motor.pipeline.preprocessing.processor import Preprocessor
@@ -135,6 +137,9 @@ class DailyOrchestrator:
             latest = self.db.get_latest_resultado()
             return latest or {}
 
+        # Camada 0 — Baseline histórico (profecias cumpridas antes do 1º run diário)
+        baseline = HistoricalBaselineService(self.db).ensure_initialized()
+
         # Camada 1 — Ingestão
         docs = await self.collector.collect_all()
         saved_docs = self.collector.persist(self.db, docs) if docs else []
@@ -212,6 +217,16 @@ class DailyOrchestrator:
         # Rankings
         ranking_mar, ranking_terra = self._build_rankings(ref_date)
 
+        # Camada 8b — Detecção de profecias recém-cumpridas
+        novas_cumpridas = FulfillmentTracker(self.db).detect_and_record(
+            ref_date,
+            events,
+            interpretation,
+            correlacao["fase"],
+            correlacao["confianca"],
+        )
+        baseline = HistoricalBaselineService(self.db).get_overview() or baseline
+
         # Camada 9 — Relatório
         transicao = correlacao.get("transicao_fase", {})
         needs_review = (
@@ -220,6 +235,16 @@ class DailyOrchestrator:
 
         payload: dict[str, Any] = {
             "schema_version": "1.0.0",
+            "baseline_historico": {
+                "estatisticas": baseline.get("estatisticas"),
+                "overview_resumo": baseline.get("overview", {}).get("resumo"),
+                "marco_zero_deslocamento": baseline.get("marco_zero_deslocamento"),
+                "profecias_pendentes": baseline.get("estatisticas", {}).get(
+                    "profecias_pendentes", 20
+                ),
+                "novas_cumpridas_hoje": novas_cumpridas,
+                "atualizacoes_recentes": (baseline.get("atualizacoes") or [])[:5],
+            },
             "data_referencia": ref_date.isoformat(),
             "fase_atual": correlacao["fase"],
             "probabilidade_fase": correlacao["probabilidade_hmm"].get(

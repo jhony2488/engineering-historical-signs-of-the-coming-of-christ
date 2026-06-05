@@ -88,6 +88,21 @@ def ingest_only() -> None:
     typer.echo(f"Ingeridos {len(saved)} documentos.")
 
 
+@app.command("seed-baseline")
+def seed_baseline(
+    force: bool = typer.Option(False, "--force", help="Reaplica seed do baseline histórico"),
+) -> None:
+    """Camada 0 — overview de profecias cumpridas antes do monitoramento diário."""
+    from motor.pipeline.historical_baseline import HistoricalBaselineService
+
+    result = HistoricalBaselineService().ensure_initialized(force=force)
+    stats = result.get("estatisticas", {})
+    typer.echo(
+        f"Baseline OK — {stats.get('profecias_cumpridas', 0)}/{stats.get('total_profecias_biblicas', 0)} "
+        f"profecias cumpridas; {stats.get('profecias_pendentes', 0)} pendentes."
+    )
+
+
 @app.command("validate-schemas")
 def validate_schemas() -> None:
     """Valida schemas JSON com payloads de exemplo."""

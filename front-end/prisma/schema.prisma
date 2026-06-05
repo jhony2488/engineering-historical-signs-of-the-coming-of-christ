@@ -94,3 +94,38 @@ model GrafoAresta {
 
   @@map("grafo_arestas")
 }
+
+model BaselineEscatologico {
+  id                 String   @id @default("global")
+  versao             String
+  estatisticas       Json
+  overview           Json
+  categorias         Json     @default("[]")
+  profeciasPendentes Json     @default("[]") @map("profecias_pendentes")
+  sinaisGerais       Json     @default("[]") @map("sinais_gerais")
+  atualizacoes       Json     @default("[]")
+  createdAt          DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt          DateTime @default(now()) @map("updated_at") @db.Timestamptz(6)
+
+  @@map("baseline_escatologico")
+}
+
+model ArquivoProfetico {
+  id                  String    @id
+  titulo              String
+  status              String
+  categoria           String
+  referencias         Json      @default("[]")
+  periodoCumprimento  String?   @map("periodo_cumprimento")
+  faseEscatologica    String?   @map("fase_escatologica")
+  energia             String?
+  dimensao            String?
+  descricao           String?
+  dados               Json      @default("{}")
+  cumpridaEm          DateTime? @map("cumprida_em") @db.Date
+  createdAt           DateTime  @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt           DateTime? @map("updated_at") @db.Timestamptz(6)
+
+  @@index([status])
+  @@map("arquivo_profetico")
+}

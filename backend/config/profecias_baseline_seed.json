@@ -1,0 +1,406 @@
+{
+  "schema_version": "1.0.0",
+  "versao": "2026.06.05",
+  "fonte": "Panorama escatológico conservador — contagem clássica (J. Barton Payne, Encyclopedia of Biblical Prophecy)",
+  "estatisticas": {
+    "total_profecias_biblicas": 1817,
+    "eventos_principais_mapeados": 600,
+    "profecias_cumpridas": 1797,
+    "profecias_pendentes": 20,
+    "eventos_cumpridos": 580,
+    "eventos_pendentes": 20,
+    "taxa_cumprimento_profecias": 0.989,
+    "taxa_cumprimento_eventos": 0.967
+  },
+  "overview": {
+    "titulo": "Overview geral — promessas e profecias já cumpridas",
+    "resumo": "Antes do primeiro run diário de monitoramento, o motor ancora a linha do tempo na massa de profecias bíblicas já verificadas historicamente. Das ~1.817 profecias ligadas a ~600 eventos principais, a literatura de referência aponta ~20 profecias/eventos escatológicos finais ainda pendentes. O índice diário mede convergência a partir deste marco zero, não a partir do vácuo histórico.",
+    "marco_zero": "Cumprimento messiânico (encarnação, morte, ressurreição, ascensão) e era apostólica como pivô de validação profética.",
+    "nota_metodologica": "Contagens variam por escola hermenêutica; este baseline é versionado e auditável. Eventos abaixo são amostra representativa das 600 categorias — o catálogo completo expande via arquivo_profetico."
+  },
+  "categorias": [
+    {
+      "id": "messianicas",
+      "titulo": "Profecias messiânicas",
+      "eventos_estimados": 120,
+      "status": "cumprida",
+      "descricao": "Nascimento virginal, genealogia, ministério, Paixão, ressurreição e ascensão cumpridas em Cristo."
+    },
+    {
+      "id": "israel_nacoes",
+      "titulo": "Israel e nações",
+      "eventos_estimados": 95,
+      "status": "cumprida_parcial",
+      "descricao": "Exílio, dispersão, restauração parcial (1948), tensões do Oriente Médio em curso."
+    },
+    {
+      "id": "igreja_era",
+      "titulo": "Era da Igreja",
+      "eventos_estimados": 80,
+      "status": "cumprida_parcial",
+      "descricao": "Evangelização global, apostasia crescente, falsos mestres — padrões já observáveis."
+    },
+    {
+      "id": "tribulacao_final",
+      "titulo": "Tribulação e Dia do Senhor",
+      "eventos_estimados": 85,
+      "status": "pendente",
+      "descricao": "Maioria dos eventos finais ainda não cumpridos integralmente."
+    },
+    {
+      "id": "reino_milennial",
+      "titulo": "Reino e restauração cósmica",
+      "eventos_estimados": 70,
+      "status": "pendente",
+      "descricao": "Milênio, juízo final, novos céus e nova terra — futuro escatológico."
+    }
+  ],
+  "eventos_cumpridos": [
+    {
+      "id": "prof_messias_nascimento",
+      "titulo": "Messias nasceria de uma virgem",
+      "categoria": "messianicas",
+      "referencias": ["Is 7:14", "Mt 1:23"],
+      "periodo_cumprimento": "~4 a.C.–0",
+      "fase_escatologica": "FASE_I",
+      "energia": "expansao",
+      "dimensao": "macro",
+      "descricao": "Cumprimento no nascimento de Jesus."
+    },
+    {
+      "id": "prof_messias_belem",
+      "titulo": "Messias nasceria em Belém",
+      "categoria": "messianicas",
+      "referencias": ["Mq 5:2", "Mt 2:1-6"],
+      "periodo_cumprimento": "~4 a.C.",
+      "fase_escatologica": "FASE_I",
+      "energia": "expansao",
+      "dimensao": "micro"
+    },
+    {
+      "id": "prof_messias_paixao",
+      "titulo": "Messias seria traído e crucificado",
+      "categoria": "messianicas",
+      "referencias": ["Sl 22", "Is 53", "Mt 27"],
+      "periodo_cumprimento": "~30 d.C.",
+      "fase_escatologica": "FASE_I",
+      "energia": "misto",
+      "dimensao": "macro"
+    },
+    {
+      "id": "prof_messias_ressurreicao",
+      "titulo": "Ressurreição ao terceiro dia",
+      "categoria": "messianicas",
+      "referencias": ["Sl 16:10", "1Co 15:4"],
+      "periodo_cumprimento": "~30 d.C.",
+      "fase_escatologica": "FASE_I",
+      "energia": "expansao",
+      "dimensao": "macro"
+    },
+    {
+      "id": "prof_destruicao_templo_70",
+      "titulo": "Destruição do templo de Jerusalém",
+      "categoria": "israel_nacoes",
+      "referencias": ["Mt 24:2", "Lc 21:6"],
+      "periodo_cumprimento": "70 d.C.",
+      "fase_escatologica": "FASE_I",
+      "energia": "contracao",
+      "dimensao": "macro"
+    },
+    {
+      "id": "prof_dispersao_judaica",
+      "titulo": "Dispersão judaica entre as nações",
+      "categoria": "israel_nacoes",
+      "referencias": ["Dt 28:64", "Lc 21:24"],
+      "periodo_cumprimento": "séc. I–XX",
+      "fase_escatologica": "FASE_I",
+      "energia": "contracao",
+      "dimensao": "macro"
+    },
+    {
+      "id": "prof_restauracao_israel",
+      "titulo": "Restauração de Israel como nação",
+      "categoria": "israel_nacoes",
+      "referencias": ["Ez 37", "Is 66:8"],
+      "periodo_cumprimento": "1948",
+      "fase_escatologica": "FASE_II",
+      "energia": "misto",
+      "dimensao": "macro",
+      "status": "parcial"
+    },
+    {
+      "id": "prof_guerras_rumores",
+      "titulo": "Guerras e rumores de guerras",
+      "categoria": "igreja_era",
+      "referencias": ["Mt 24:6-7", "Mc 13:7"],
+      "periodo_cumprimento": "séc. I–XXI",
+      "fase_escatologica": "FASE_I",
+      "energia": "contracao",
+      "dimensao": "macro"
+    },
+    {
+      "id": "prof_terremotos_fomes",
+      "titulo": "Terremotos, fomes e pestes",
+      "categoria": "igreja_era",
+      "referencias": ["Mt 24:7", "Lc 21:11"],
+      "periodo_cumprimento": "séc. I–XXI",
+      "fase_escatologica": "FASE_I",
+      "energia": "contracao",
+      "dimensao": "macro"
+    },
+    {
+      "id": "prof_evangelho_nacoes",
+      "titulo": "Evangelho pregado em todas as nações",
+      "categoria": "igreja_era",
+      "referencias": ["Mt 24:14", "Mc 13:10"],
+      "periodo_cumprimento": "séc. I–XXI",
+      "fase_escatologica": "FASE_I",
+      "energia": "expansao",
+      "dimensao": "macro",
+      "status": "parcial"
+    },
+    {
+      "id": "prof_apostasia",
+      "titulo": "Grande apostasia",
+      "categoria": "igreja_era",
+      "referencias": ["2Ts 2:3", "1Tm 4:1"],
+      "periodo_cumprimento": "séc. II–XXI",
+      "fase_escatologica": "FASE_II",
+      "energia": "contracao",
+      "dimensao": "macro",
+      "status": "parcial"
+    },
+    {
+      "id": "prof_falsos_cristos",
+      "titulo": "Falsos cristos e falsos profetas",
+      "categoria": "igreja_era",
+      "referencias": ["Mt 24:5", "Mt 24:24"],
+      "periodo_cumprimento": "séc. I–XXI",
+      "fase_escatologica": "FASE_II",
+      "energia": "contracao",
+      "dimensao": "micro"
+    },
+    {
+      "id": "prof_perseguicao_santos",
+      "titulo": "Perseguição aos santos",
+      "categoria": "igreja_era",
+      "referencias": ["Mt 24:9", "Ap 6:9-11"],
+      "periodo_cumprimento": "séc. I–XXI",
+      "fase_escatologica": "FASE_II",
+      "energia": "contracao",
+      "dimensao": "micro"
+    },
+    {
+      "id": "prof_roma_imperio",
+      "titulo": "Quarta besta / império fragmentado",
+      "categoria": "israel_nacoes",
+      "referencias": ["Dn 2", "Dn 7"],
+      "periodo_cumprimento": "séc. I–V",
+      "fase_escatologica": "FASE_I",
+      "energia": "contracao",
+      "dimensao": "macro"
+    },
+    {
+      "id": "prof_tiro_sidon",
+      "titulo": "Julgamento de Tiro",
+      "categoria": "israel_nacoes",
+      "referencias": ["Ez 26-28"],
+      "periodo_cumprimento": "séc. IV a.C.",
+      "fase_escatologica": "FASE_I",
+      "energia": "contracao",
+      "dimensao": "macro"
+    }
+  ],
+  "profecias_pendentes": [
+    {
+      "id": "pend_abominacao_desolacao",
+      "titulo": "Abominação da desolação no santo lugar",
+      "referencias": ["Dn 9:27", "Mt 24:15", "2Ts 2:4"],
+      "fase_alvo": "FASE_III"
+    },
+    {
+      "id": "pend_grande_tribulacao",
+      "titulo": "Grande tribulação sem precedentes",
+      "referencias": ["Mt 24:21", "Dn 12:1"],
+      "fase_alvo": "FASE_III"
+    },
+    {
+      "id": "pend_besta_mar",
+      "titulo": "Besta do mar — governo anticristo global",
+      "referencias": ["Ap 13:1-10", "Dn 7"],
+      "fase_alvo": "FASE_III"
+    },
+    {
+      "id": "pend_besta_terra",
+      "titulo": "Besta da terra — falso profeta",
+      "referencias": ["Ap 13:11-18", "Ap 19:20"],
+      "fase_alvo": "FASE_III"
+    },
+    {
+      "id": "pend_marca_compra_venda",
+      "titulo": "Marca obrigatória para compra e venda",
+      "referencias": ["Ap 13:16-17"],
+      "fase_alvo": "FASE_III"
+    },
+    {
+      "id": "pend_dois_testemunhas",
+      "titulo": "Duas testemunhas em Jerusalém",
+      "referencias": ["Ap 11:3-12"],
+      "fase_alvo": "FASE_III"
+    },
+    {
+      "id": "pend_armagedom",
+      "titulo": "Campo de Armagedom / guerra final",
+      "referencias": ["Ap 16:16", "Jl 3:2"],
+      "fase_alvo": "FASE_IV"
+    },
+    {
+      "id": "pend_segunda_vinda",
+      "titulo": "Segunda vinda visível de Cristo",
+      "referencias": ["Ap 19:11-16", "Mt 24:30"],
+      "fase_alvo": "FASE_IV"
+    },
+    {
+      "id": "pend_milénio",
+      "titulo": "Reino milenar",
+      "referencias": ["Ap 20:1-6", "Is 11"],
+      "fase_alvo": "FASE_IV"
+    },
+    {
+      "id": "pend_juizo_final",
+      "titulo": "Grande trono branco e juízo final",
+      "referencias": ["Ap 20:11-15"],
+      "fase_alvo": "FASE_IV"
+    },
+    {
+      "id": "pend_ceus_nova_terra",
+      "titulo": "Novos céus e nova terra",
+      "referencias": ["Ap 21:1", "Is 65:17"],
+      "fase_alvo": "FASE_IV"
+    },
+    {
+      "id": "pend_sinais_cosmicos_finais",
+      "titulo": "Sinais solares e lunares definitivos",
+      "referencias": ["Mt 24:29", "Jl 2:31"],
+      "fase_alvo": "FASE_IV"
+    },
+    {
+      "id": "pend_arrebatamento",
+      "titulo": "Arrebatamento da Igreja (escatologia pretribulacional)",
+      "referencias": ["1Ts 4:16-17", "1Co 15:52"],
+      "fase_alvo": "FASE_III",
+      "nota": "Interpretação variável entre escolas"
+    },
+    {
+      "id": "pend_templo_restaurado",
+      "titulo": "Templo/restauração cultual em Jerusalém",
+      "referencias": ["2Ts 2:4", "Dn 9:27"],
+      "fase_alvo": "FASE_III",
+      "nota": "Debatido hermeneuticamente"
+    },
+    {
+      "id": "pend_paz_falsa_oriente",
+      "titulo": "Tratado de paz falsa — Oriente Médio",
+      "referencias": ["Dn 9:27", "1Ts 5:3"],
+      "fase_alvo": "FASE_II"
+    },
+    {
+      "id": "pend_elias_preparacao",
+      "titulo": "Elias / preparação final",
+      "referencias": ["Ml 4:5-6", "Mt 17:11"],
+      "fase_alvo": "FASE_III",
+      "nota": "Cumprimento parcial debatido"
+    },
+    {
+      "id": "pend_harmagedon_gog_magog",
+      "titulo": "Gog e Magog",
+      "referencias": ["Ez 38-39", "Ap 20:8"],
+      "fase_alvo": "FASE_IV"
+    },
+    {
+      "id": "pend_babilonia_religiosa",
+      "titulo": "Queda da Babilônia religiosa",
+      "referencias": ["Ap 17-18"],
+      "fase_alvo": "FASE_III"
+    },
+    {
+      "id": "pend_iluminacao_global",
+      "titulo": "Iluminação global da glória do Senhor",
+      "referencias": ["Is 60:1-3", "Hb 2:14"],
+      "fase_alvo": "FASE_IV"
+    },
+    {
+      "id": "pend_parusia",
+      "titulo": "Parusia — consumação escatológica",
+      "referencias": ["Mt 24:37-39", "Ap 22:20"],
+      "fase_alvo": "FASE_IV"
+    }
+  ],
+  "sinais_gerais_ja_ocorridos": [
+    {
+      "id": "sinal_guerras_mundiais",
+      "titulo": "Guerras mundiais e conflitos regionais intensificados",
+      "fase": "FASE_I",
+      "energia": "contracao",
+      "dimensao": "macro",
+      "periodo": "séc. XX–XXI"
+    },
+    {
+      "id": "sinal_globalizacao",
+      "titulo": "Globalização institucional (ONU, blocos, tratados)",
+      "fase": "FASE_II",
+      "energia": "contracao",
+      "dimensao": "macro",
+      "periodo": "séc. XX–XXI"
+    },
+    {
+      "id": "sinal_tecnologia_vigilancia",
+      "titulo": "Vigilância digital e rastreamento em massa",
+      "fase": "FASE_II",
+      "energia": "contracao",
+      "dimensao": "macro",
+      "periodo": "séc. XXI"
+    },
+    {
+      "id": "sinal_cbdc_piloto",
+      "titulo": "Piloto de moedas digitais de banco central",
+      "fase": "FASE_II",
+      "energia": "contracao",
+      "dimensao": "macro",
+      "periodo": "séc. XXI",
+      "status": "parcial"
+    },
+    {
+      "id": "sinal_secularismo",
+      "titulo": "Erosão secular e relativismo cultural",
+      "fase": "FASE_II",
+      "energia": "contracao",
+      "dimensao": "macro",
+      "periodo": "séc. XX–XXI"
+    },
+    {
+      "id": "sinal_missoes",
+      "titulo": "Expansão missionária e traduções bíblicas",
+      "fase": "FASE_I",
+      "energia": "expansao",
+      "dimensao": "macro",
+      "periodo": "séc. I–XXI"
+    },
+    {
+      "id": "sinal_terremotos_freq",
+      "titulo": "Aumento documentado de eventos sísmicos reportados",
+      "fase": "FASE_I",
+      "energia": "contracao",
+      "dimensao": "macro",
+      "periodo": "séc. XX–XXI"
+    },
+    {
+      "id": "sinal_oriente_medio",
+      "titulo": "Tensão persistente Oriente Médio",
+      "fase": "FASE_II",
+      "energia": "contracao",
+      "dimensao": "macro",
+      "periodo": "séc. XX–XXI"
+    }
+  ]
+}

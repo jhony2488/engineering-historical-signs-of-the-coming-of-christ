@@ -22,7 +22,9 @@ from motor.adapters.job_queue import RedisJobQueue
 from motor.adapters.supabase import get_supabase
 from motor.config import get_settings
 from motor.logging_setup import setup_logging
+from motor.pipeline.fulfillment_tracker import FulfillmentTracker
 from motor.pipeline.graph_service import GraphService
+from motor.pipeline.historical_baseline import HistoricalBaselineService
 from motor.pipeline.hybrid_analysis import HybridAnalysisEngine
 from motor.pipeline.orchestrator import DailyOrchestrator
 from motor.pipeline.reports.generator import ReportGenerator
@@ -56,6 +58,38 @@ def verify_admin(x_admin_key: str = Header(default="")) -> None:
 @limiter.limit(settings.api_rate_limit)
 async def health(request: Request) -> dict:
     return {"status": "ok", "service": "motor-escatologico"}
+
+
+@app.get("/api/v1/baseline/historico")
+@limiter.limit(settings.api_rate_limit)
+async def baseline_historico(request: Request) -> dict:
+    """Overview de profecias cumpridas (Camada 0) — 1.817 profecias / ~600 eventos."""
+    overview = HistoricalBaselineService().get_overview()
+    if not overview:
+        overview = HistoricalBaselineService().ensure_initialized()
+    return overview
+
+
+@app.get("/api/v1/baseline/arquivo")
+@limiter.limit(settings.api_rate_limit)
+async def baseline_arquivo(
+    request: Request,
+    status: str | None = Query(None, description="cumprida|parcial|pendente"),
+    limit: int = Query(100, ge=1, le=500),
+) -> list[dict]:
+    db = get_supabase()
+    filters = {"status": status} if status else None
+    return db.select("arquivo_profetico", filters=filters, limit=limit)
+
+
+@app.get("/api/v1/baseline/atualizacoes")
+@limiter.limit(settings.api_rate_limit)
+async def baseline_atualizacoes(
+    request: Request,
+    limit: int = Query(20, ge=1, le=100),
+) -> list[dict]:
+    """Profecias detectadas como cumpridas/parciais após o baseline inicial."""
+    return FulfillmentTracker().get_atualizacoes(limit=limit)
 
 
 @app.get("/api/v1/resultado/atual")
