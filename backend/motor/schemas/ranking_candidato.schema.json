@@ -1,0 +1,24 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "required": [
+    "posicao",
+    "candidato_id",
+    "nome",
+    "personagem",
+    "probabilidade_atual",
+    "tendencia_24h",
+    "fator_principal"
+  ],
+  "properties": {
+    "posicao": { "type": "integer", "minimum": 1, "maximum": 10 },
+    "candidato_id": { "type": "string" },
+    "nome": { "type": "string" },
+    "personagem": { "type": "string", "enum": ["besta_mar", "besta_terra"] },
+    "probabilidade_atual": { "type": "number", "minimum": 0, "maximum": 100 },
+    "tendencia_24h": { "type": "number" },
+    "fator_principal": { "type": "string" },
+    "scores_criterio": { "type": "object" }
+  },
+  "additionalProperties": true
+}

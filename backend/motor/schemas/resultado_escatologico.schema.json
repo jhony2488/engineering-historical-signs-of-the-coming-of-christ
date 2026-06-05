@@ -1,0 +1,34 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "required": [
+    "schema_version",
+    "data_referencia",
+    "fase_atual",
+    "probabilidade_fase",
+    "indice_global",
+    "confianca",
+    "correlacao",
+    "eventos_analisados",
+    "metricas"
+  ],
+  "properties": {
+    "schema_version": { "type": "string" },
+    "data_referencia": { "type": "string", "format": "date" },
+    "fase_atual": { "type": "string", "enum": ["FASE_I", "FASE_II", "FASE_III", "FASE_IV"] },
+    "probabilidade_fase": { "type": "number", "minimum": 0, "maximum": 1 },
+    "indice_global": { "type": "number", "minimum": 0, "maximum": 1 },
+    "confianca": { "type": "number", "minimum": 0, "maximum": 1 },
+    "correlacao": { "type": "object" },
+    "eventos_analisados": { "type": "array" },
+    "metricas": { "type": "object" },
+    "linha_temporal": { "type": "object" },
+    "interpretacao": { "type": "object" },
+    "ranking_mar": { "type": "array" },
+    "ranking_terra": { "type": "array" },
+    "relatorio_html": { "type": "string" },
+    "revisao_humana": { "type": "boolean" },
+    "status": { "type": "string", "enum": ["complete", "partial", "reverted"] }
+  },
+  "additionalProperties": true
+}

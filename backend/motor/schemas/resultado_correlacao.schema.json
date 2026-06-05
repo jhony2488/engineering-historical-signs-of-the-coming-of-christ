@@ -1,0 +1,26 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "required": [
+    "indice_global",
+    "fase",
+    "confianca",
+    "posterior_bayes",
+    "probabilidade_hmm",
+    "score_llm"
+  ],
+  "properties": {
+    "indice_global": { "type": "number", "minimum": 0, "maximum": 1 },
+    "fase": { "type": "string", "enum": ["FASE_I", "FASE_II", "FASE_III", "FASE_IV"] },
+    "confianca": { "type": "number", "minimum": 0, "maximum": 1 },
+    "posterior_bayes": { "type": "number", "minimum": 0, "maximum": 1 },
+    "probabilidade_hmm": { "type": "object" },
+    "score_llm": { "type": "number", "minimum": 0, "maximum": 1 },
+    "alerta_falso_lider": { "type": "boolean" },
+    "score_incongruencia": { "type": "number", "minimum": 0, "maximum": 1 },
+    "score_besta_mar": { "type": "number", "minimum": 0, "maximum": 1 },
+    "score_besta_terra": { "type": "number", "minimum": 0, "maximum": 1 },
+    "justificativa": { "type": "string" }
+  },
+  "additionalProperties": true
+}

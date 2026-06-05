@@ -1,0 +1,16 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "required": ["evento", "regiao", "grau_tensao", "impacto_global", "energia", "dimensao"],
+  "properties": {
+    "evento": { "type": "string", "minLength": 1 },
+    "regiao": { "type": "string", "minLength": 1 },
+    "grau_tensao": { "type": "number", "minimum": 0, "maximum": 1 },
+    "impacto_global": { "type": "number", "minimum": 0, "maximum": 1 },
+    "energia": { "type": "string", "enum": ["expansao", "contracao"] },
+    "dimensao": { "type": "string", "enum": ["macro", "micro"] },
+    "descricao": { "type": "string" },
+    "fonte_id": { "type": "string" }
+  },
+  "additionalProperties": true
+}

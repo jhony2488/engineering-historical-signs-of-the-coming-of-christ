@@ -1,0 +1,11 @@
+[project]
+id = "motor-escatologico"
+name = "Motor Escatológico"
+
+[api]
+enabled = true
+port = 54321
+
+[db]
+port = 54322
+major_version = 15
