@@ -72,11 +72,15 @@ export default function RevisaoPage() {
             Carregando pendências…
           </div>
         )}
-        {error && <p className="text-rose-300 text-sm">{error}</p>}
-        {!loading && items.length === 0 && (
-          <p className="text-slate-400 text-sm">Nenhuma revisão pendente.</p>
+        {error && (
+          <p className="text-rose-300 text-sm" role="alert" aria-live="assertive">
+            {error}
+          </p>
         )}
-        <ul className="space-y-4 stagger-children">
+        {!loading && items.length === 0 && (
+          <p className="text-slate-400 text-sm" role="status">Nenhuma revisão pendente.</p>
+        )}
+        <ul className="space-y-4 stagger-children" aria-label="Resultados aguardando revisão humana">
           {items.map((item) => (
             <li key={item.id} className="card-interactive p-5">
               <div className="flex flex-wrap items-start justify-between gap-4">
@@ -97,6 +101,8 @@ export default function RevisaoPage() {
                   type="button"
                   disabled={approving === item.data_referencia}
                   onClick={() => approve(item.data_referencia)}
+                  aria-busy={approving === item.data_referencia}
+                  aria-label={`Aprovar publicação do resultado de ${item.data_referencia}`}
                   className="btn-primary text-sm"
                 >
                   {approving === item.data_referencia ? "Aprovando…" : "Aprovar publicação"}

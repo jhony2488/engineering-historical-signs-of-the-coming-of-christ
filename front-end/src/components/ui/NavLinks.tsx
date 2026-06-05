@@ -20,6 +20,7 @@ export function NavLinks({ links }: NavLinksProps) {
             key={link.href}
             href={link.href}
             className={`nav-link ${active ? "nav-link-active" : ""}`}
+            aria-current={active ? "page" : undefined}
           >
             {link.label}
           </Link>

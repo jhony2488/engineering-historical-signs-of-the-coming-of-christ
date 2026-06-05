@@ -40,6 +40,7 @@ export function ExportPdfButton({
     <button
       type="button"
       onClick={handleExport}
+      aria-label={label}
       className={className || "btn-ghost"}
     >
       {label}

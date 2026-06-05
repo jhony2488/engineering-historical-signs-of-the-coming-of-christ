@@ -1,7 +1,9 @@
 import type { Metadata, Viewport } from "next";
 
 import { GoogleAnalytics } from "@/components/analytics/GoogleAnalytics";
+import { BackgroundAudio } from "@/components/audio/BackgroundAudio";
 import { SplineCompanionLoader } from "@/components/spline/SplineCompanionLoader";
+import { SiteFooter } from "@/components/ui/SiteFooter";
 import { rootMetadata, siteConfig } from "@/lib/seo/metadata";
 import "./globals.css";
 
@@ -34,9 +36,25 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   return (
     <html lang="pt-BR">
       <body className="font-sans antialiased">
-        <GoogleAnalytics />
-        <SplineCompanionLoader />
-        {children}
+        <a href="#main-content" className="skip-link">
+          Ir para o conteúdo principal
+        </a>
+        <video
+          autoPlay
+          loop
+          muted
+          playsInline
+          aria-hidden="true"
+          className="pointer-events-none fixed inset-0 z-0 h-full w-full object-cover opacity-15"
+          src="/cardume.mp4"
+        />
+        <div className="relative z-10">
+          <GoogleAnalytics />
+          <BackgroundAudio />
+          <SplineCompanionLoader />
+          {children}
+          <SiteFooter />
+        </div>
       </body>
     </html>
   );

@@ -8,10 +8,22 @@ import {
   snapshotCacheKeys,
   snapshotHistoricoCacheKeys,
 } from "./cache";
-import { MOCK_RANKING_MAR, MOCK_RANKING_TERRA } from "./mock-rankings";
+import {
+  MOCK_ARQUIVO_PROFETICO,
+  MOCK_BASELINE_ATUALIZACOES,
+  MOCK_BASELINE_HISTORICO,
+} from "./mock-baseline";
+import { MOCK_RANKING_MAR, MOCK_RANKING_TERRA, MOCK_RANKING_FALSO_LIDER } from "./mock-rankings";
 import { getMockSnapshot } from "./mock-snapshots";
 import { MOCK_RESULTADO, generateMockHistorico } from "./mock";
-import type { RankingCandidato, ResultadoEscatologico, SnapshotPeriodo } from "./types";
+import type {
+  ArquivoProfeticoItem,
+  BaselineAtualizacao,
+  BaselineHistorico,
+  RankingCandidato,
+  ResultadoEscatologico,
+  SnapshotPeriodo,
+} from "./types";
 
 type DataSource = "db" | "fastapi";
 
@@ -59,6 +71,15 @@ const PATHS = {
       : `/api/v1/snapshot/${janela}/historico?limit=${limit}`,
   ranking: (personagem: string) =>
     DATA_SOURCE === "db" ? `/ranking/${personagem}` : `/api/v1/ranking/${personagem}`,
+  baselineHistorico: DATA_SOURCE === "db" ? "/baseline/historico" : "/api/v1/baseline/historico",
+  baselineArquivo: (status?: string) => {
+    const q = status ? `?status=${status}` : "";
+    return DATA_SOURCE === "db" ? `/baseline/arquivo${q}` : `/api/v1/baseline/arquivo${q}`;
+  },
+  baselineAtualizacoes: (limit = 20) => {
+    const q = `?limit=${limit}`;
+    return DATA_SOURCE === "db" ? `/baseline/atualizacoes${q}` : `/api/v1/baseline/atualizacoes${q}`;
+  },
 };
 
 export async function fetchResultadoAtual(
@@ -284,7 +305,7 @@ export async function fetchSnapshotHistorico(
 }
 
 export async function fetchRanking(
-  personagem: "besta_mar" | "besta_terra",
+  personagem: "besta_mar" | "besta_terra" | "falso_lider",
   options: { skipCache?: boolean } = {},
 ): Promise<FetchMeta & { data: RankingCandidato[] }> {
   const keys = rankingCacheKeys(personagem);
@@ -297,7 +318,11 @@ export async function fetchRanking(
   }
 
   const mockFallback =
-    personagem === "besta_mar" ? MOCK_RANKING_MAR : MOCK_RANKING_TERRA;
+    personagem === "besta_mar"
+      ? MOCK_RANKING_MAR
+      : personagem === "besta_terra"
+        ? MOCK_RANKING_TERRA
+        : MOCK_RANKING_FALSO_LIDER;
 
   if (USE_MOCK) {
     if (typeof window !== "undefined") {
@@ -321,7 +346,7 @@ export async function fetchRanking(
 }
 
 export async function fetchRankingSWR(
-  personagem: "besta_mar" | "besta_terra",
+  personagem: "besta_mar" | "besta_terra" | "falso_lider",
 ): Promise<FetchMeta & { data: RankingCandidato[] }> {
   const keys = rankingCacheKeys(personagem);
   const stale =
@@ -347,4 +372,116 @@ export function isCacheStale(): boolean {
 
 export function getDataSource(): DataSource {
   return DATA_SOURCE;
+}
+
+export async function fetchBaselineHistorico(
+  options: { skipCache?: boolean } = {},
+): Promise<FetchMeta & { data: BaselineHistorico | null }> {
+  const keys = cacheKeys.baseline;
+  if (!options.skipCache && typeof window !== "undefined") {
+    const cached = getCached<BaselineHistorico>(keys.data, keys.ts);
+    if (cached) return { data: cached, fromCache: true, isMock: false, source: DATA_SOURCE };
+  }
+
+  if (USE_MOCK) {
+    const data = MOCK_BASELINE_HISTORICO;
+    if (typeof window !== "undefined") setCache(keys.data, data, keys.ts);
+    return { data, fromCache: false, isMock: true, source: DATA_SOURCE };
+  }
+
+  try {
+    const data = await fetchJson<BaselineHistorico>(PATHS.baselineHistorico);
+    if (typeof window !== "undefined") setCache(keys.data, data, keys.ts);
+    return { data, fromCache: false, isMock: false, source: DATA_SOURCE };
+  } catch {
+    const data = MOCK_BASELINE_HISTORICO;
+    if (typeof window !== "undefined") setCache(keys.data, data, keys.ts);
+    return { data, fromCache: false, isMock: true, source: DATA_SOURCE };
+  }
+}
+
+export async function fetchBaselineHistoricoSWR(): Promise<
+  FetchMeta & { data: BaselineHistorico | null }
+> {
+  const keys = cacheKeys.baseline;
+  const stale =
+    typeof window !== "undefined" ? getStaleCached<BaselineHistorico>(keys.data) : null;
+  if (stale) {
+    fetchBaselineHistorico({ skipCache: true }).catch(() => undefined);
+    return { data: stale, fromCache: true, isMock: false, source: DATA_SOURCE, revalidating: true };
+  }
+  return fetchBaselineHistorico();
+}
+
+export async function fetchBaselineArquivo(
+  status?: "cumprida" | "parcial" | "pendente",
+  options: { skipCache?: boolean } = {},
+): Promise<FetchMeta & { data: ArquivoProfeticoItem[] }> {
+  const keys = cacheKeys.baselineArquivo;
+  if (!options.skipCache && typeof window !== "undefined") {
+    const cached = getCached<ArquivoProfeticoItem[]>(keys.data, keys.ts);
+    if (cached) return { data: cached, fromCache: true, isMock: false, source: DATA_SOURCE };
+  }
+
+  if (USE_MOCK) {
+    const data = status
+      ? MOCK_ARQUIVO_PROFETICO.filter((i) => i.status === status)
+      : MOCK_ARQUIVO_PROFETICO;
+    if (typeof window !== "undefined") setCache(keys.data, data, keys.ts);
+    return { data, fromCache: false, isMock: true, source: DATA_SOURCE };
+  }
+
+  try {
+    const data = await fetchJson<ArquivoProfeticoItem[]>(PATHS.baselineArquivo(status));
+    if (typeof window !== "undefined") setCache(keys.data, data, keys.ts);
+    return { data, fromCache: false, isMock: false, source: DATA_SOURCE };
+  } catch {
+    const data = status
+      ? MOCK_ARQUIVO_PROFETICO.filter((i) => i.status === status)
+      : MOCK_ARQUIVO_PROFETICO;
+    if (typeof window !== "undefined") setCache(keys.data, data, keys.ts);
+    return { data, fromCache: false, isMock: true, source: DATA_SOURCE };
+  }
+}
+
+export async function fetchBaselineAtualizacoes(
+  limit = 20,
+  options: { skipCache?: boolean } = {},
+): Promise<FetchMeta & { data: BaselineAtualizacao[] }> {
+  const keys = cacheKeys.baselineAtualizacoes;
+  if (!options.skipCache && typeof window !== "undefined") {
+    const cached = getCached<BaselineAtualizacao[]>(keys.data, keys.ts);
+    if (cached) return { data: cached, fromCache: true, isMock: false, source: DATA_SOURCE };
+  }
+
+  const mockData = [...MOCK_BASELINE_ATUALIZACOES, ...(MOCK_BASELINE_HISTORICO.atualizacoes ?? [])];
+
+  if (USE_MOCK) {
+    const data = mockData.slice(0, limit);
+    if (typeof window !== "undefined") setCache(keys.data, data, keys.ts);
+    return { data, fromCache: false, isMock: true, source: DATA_SOURCE };
+  }
+
+  try {
+    const data = await fetchJson<BaselineAtualizacao[]>(PATHS.baselineAtualizacoes(limit));
+    if (typeof window !== "undefined") setCache(keys.data, data, keys.ts);
+    return { data, fromCache: false, isMock: false, source: DATA_SOURCE };
+  } catch {
+    const data = mockData.slice(0, limit);
+    if (typeof window !== "undefined") setCache(keys.data, data, keys.ts);
+    return { data, fromCache: false, isMock: true, source: DATA_SOURCE };
+  }
+}
+
+export async function fetchBaselineAtualizacoesSWR(
+  limit = 20,
+): Promise<FetchMeta & { data: BaselineAtualizacao[] }> {
+  const keys = cacheKeys.baselineAtualizacoes;
+  const stale =
+    typeof window !== "undefined" ? getStaleCached<BaselineAtualizacao[]>(keys.data) : null;
+  if (stale) {
+    fetchBaselineAtualizacoes(limit, { skipCache: true }).catch(() => undefined);
+    return { data: stale, fromCache: true, isMock: false, source: DATA_SOURCE, revalidating: true };
+  }
+  return fetchBaselineAtualizacoes(limit);
 }

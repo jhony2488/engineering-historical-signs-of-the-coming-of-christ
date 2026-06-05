@@ -8,8 +8,8 @@ export function InterpretationPanel({ interpretacao }: InterpretationPanelProps)
   if (!interpretacao) return null;
 
   return (
-    <div className="card-interactive">
-      <h2 className="card-title">Interpretação Hermenêutica</h2>
+    <section className="card-interactive" aria-labelledby="interpretation-title">
+      <h2 id="interpretation-title" className="card-title">Interpretação Hermenêutica</h2>
       {interpretacao.aderencia_profetica !== undefined && (
         <p className="text-sm mb-4">
           Aderência profética:{" "}
@@ -21,7 +21,7 @@ export function InterpretationPanel({ interpretacao }: InterpretationPanelProps)
       {interpretacao.similaridades && interpretacao.similaridades.length > 0 && (
         <div className="mb-3">
           <p className="text-xs text-slate-500 mb-1">Similaridades</p>
-          <ul className="text-sm text-slate-300 list-disc list-inside">
+          <ul className="text-sm text-slate-300 list-disc list-inside" aria-label="Similaridades proféticas">
             {interpretacao.similaridades.map((s) => (
               <li key={s}>{s}</li>
             ))}
@@ -31,7 +31,7 @@ export function InterpretationPanel({ interpretacao }: InterpretationPanelProps)
       {interpretacao.divergencias && interpretacao.divergencias.length > 0 && (
         <div className="mb-3">
           <p className="text-xs text-slate-500 mb-1">Divergências</p>
-          <ul className="text-sm text-slate-400 list-disc list-inside">
+          <ul className="text-sm text-slate-400 list-disc list-inside" aria-label="Divergências proféticas">
             {interpretacao.divergencias.map((d) => (
               <li key={d}>{d}</li>
             ))}
@@ -39,7 +39,7 @@ export function InterpretationPanel({ interpretacao }: InterpretationPanelProps)
         </div>
       )}
       {interpretacao.citacoes && interpretacao.citacoes.length > 0 && (
-        <div className="flex flex-wrap gap-2 mt-2">
+        <div className="flex flex-wrap gap-2 mt-2" role="list" aria-label="Citações bíblicas">
           {interpretacao.citacoes.map((c) => (
             <span
               key={c}
@@ -50,6 +50,6 @@ export function InterpretationPanel({ interpretacao }: InterpretationPanelProps)
           ))}
         </div>
       )}
-    </div>
+    </section>
   );
 }

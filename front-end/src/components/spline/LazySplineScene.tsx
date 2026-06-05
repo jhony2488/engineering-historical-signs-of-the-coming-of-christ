@@ -6,7 +6,12 @@ import { SplineSceneFallback } from "./SplineSceneFallback";
 
 const SplineScene = lazy(() => import("./SplineScene"));
 
-export function LazySplineScene() {
+interface LazySplineSceneProps {
+  scene: string;
+  onError?: () => void;
+}
+
+export function LazySplineScene({ scene, onError }: LazySplineSceneProps) {
   const wrapperRef = useRef<HTMLDivElement>(null);
   const [shouldRender, setShouldRender] = useState(false);
 
@@ -31,7 +36,7 @@ export function LazySplineScene() {
   return (
     <div ref={wrapperRef} className="h-full w-full">
       <Suspense fallback={<SplineSceneFallback />}>
-        {shouldRender ? <SplineScene /> : <SplineSceneFallback />}
+        {shouldRender ? <SplineScene scene={scene} onError={onError} /> : <SplineSceneFallback />}
       </Suspense>
     </div>
   );

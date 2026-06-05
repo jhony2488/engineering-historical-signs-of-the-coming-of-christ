@@ -9,16 +9,13 @@ import {
 import { applySecurityHeaders } from "@/lib/auth/security-headers";
 import { verifySessionToken } from "@/lib/auth/session";
 
-const PUBLIC_FILE = /\.(.*)$/;
+const STATIC_ASSET =
+  /^\/(?:_next\/static|_next\/image|favicon\.ico|.*\.(?:svg|png|jpg|jpeg|gif|webp|ico|wasm|spline|splinecode|txt|webmanifest))$/i;
 
 export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
 
-  if (
-    pathname.startsWith("/_next") ||
-    pathname === "/favicon.ico" ||
-    PUBLIC_FILE.test(pathname)
-  ) {
+  if (STATIC_ASSET.test(pathname)) {
     return NextResponse.next();
   }
 
@@ -50,5 +47,7 @@ export async function middleware(request: NextRequest) {
 }
 
 export const config = {
-  matcher: ["/((?!_next/static|_next/image).*)"],
+  matcher: [
+    "/((?!_next/static|_next/image|favicon\\.ico|.*\\.(?:svg|png|jpg|jpeg|gif|webp|ico|wasm|spline|splinecode|txt|webmanifest)$).*)",
+  ],
 };

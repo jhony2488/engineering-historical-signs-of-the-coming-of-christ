@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { withRateLimit } from "@/lib/api-guard";
 import { getRankingDb } from "@/lib/db/resultados";
 
-const VALID = new Set(["besta_mar", "besta_terra", "mar", "terra"]);
+const VALID = new Set(["besta_mar", "besta_terra", "mar", "terra", "falso_lider"]);
 
 export const dynamic = "force-dynamic";
 
@@ -17,12 +17,17 @@ export async function GET(
     const { personagem } = await params;
     if (!VALID.has(personagem)) {
       return NextResponse.json(
-        { error: "personagem deve ser besta_mar ou besta_terra" },
+        { error: "personagem deve ser besta_mar, besta_terra ou falso_lider" },
         { status: 400 },
       );
     }
 
-    const key = personagem === "mar" || personagem === "besta_mar" ? "besta_mar" : "besta_terra";
+    const key =
+      personagem === "mar" || personagem === "besta_mar"
+        ? "besta_mar"
+        : personagem === "terra" || personagem === "besta_terra"
+          ? "besta_terra"
+          : "falso_lider";
     const dataRef = request.nextUrl.searchParams.get("data") ?? undefined;
     const data = await getRankingDb(key, dataRef);
 

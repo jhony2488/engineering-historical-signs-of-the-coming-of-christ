@@ -2,7 +2,7 @@
 
 import { usePathname } from "next/navigation";
 
-import { HIDDEN_ROUTE_PREFIXES } from "./constants";
+import { HIDDEN_ROUTE_PREFIXES } from "../../lib/utils/constants";
 import { FloatingSplineCompanion } from "./FloatingSplineCompanion";
 
 export default function SplineCompanionRoot() {

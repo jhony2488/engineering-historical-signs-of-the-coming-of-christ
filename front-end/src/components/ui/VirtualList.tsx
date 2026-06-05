@@ -40,6 +40,7 @@ export function VirtualList<T>({
       className={`overflow-y-auto ${className}`}
       style={{ height }}
       role="list"
+      aria-label={`Lista com ${items.length} itens`}
     >
       <div style={{ height: totalHeight, position: "relative" }}>
         {slice.map((item, i) => {
@@ -47,6 +48,7 @@ export function VirtualList<T>({
           return (
             <div
               key={index}
+              role="listitem"
               style={{
                 position: "absolute",
                 top: index * itemHeight,

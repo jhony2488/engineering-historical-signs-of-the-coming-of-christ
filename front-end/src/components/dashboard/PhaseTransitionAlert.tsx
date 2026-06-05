@@ -12,9 +12,14 @@ export function PhaseTransitionAlert({ transicao }: PhaseTransitionAlertProps) {
   const sec = getFase(transicao.fase_secundaria);
 
   return (
-    <div className="card-interactive border-violet-500/40 bg-violet-500/5 animate-glow-pulse hover:border-violet-400/50">
-      <h2 className="card-title flex items-center gap-2">
-        <span className="h-2 w-2 rounded-full bg-violet-400 animate-pulse" />
+    <section
+      className="card-interactive border-violet-500/40 bg-violet-950 animate-glow-pulse hover:border-violet-400/50"
+      role="alert"
+      aria-live="polite"
+      aria-labelledby="phase-transition-title"
+    >
+      <h2 id="phase-transition-title" className="card-title flex items-center gap-2">
+        <span className="h-2 w-2 rounded-full bg-violet-400 animate-pulse" aria-hidden="true" />
         Zona de Transição entre Fases
       </h2>
       <p className="text-sm text-violet-200/90 mb-4">
@@ -23,7 +28,7 @@ export function PhaseTransitionAlert({ transicao }: PhaseTransitionAlertProps) {
       </p>
 
       <div className="flex flex-col sm:flex-row items-stretch gap-3 mb-4">
-        <div className="flex-1 rounded-lg border border-signal-phase/40 bg-signal-phase/10 p-3 text-center">
+        <div className="flex-1 rounded-lg border border-signal-phase/40 bg-violet-900 p-3 text-center">
           <p className="text-xs text-slate-500 mb-1">Mais próxima</p>
           <p className="text-sm font-semibold text-white">{dom.titulo}</p>
           <p className="text-lg font-bold text-gold-400 tabular-nums mt-1">
@@ -41,7 +46,7 @@ export function PhaseTransitionAlert({ transicao }: PhaseTransitionAlertProps) {
           </div>
         </div>
 
-        <div className="flex-1 rounded-lg border border-violet-500/40 bg-violet-500/10 p-3 text-center">
+        <div className="flex-1 rounded-lg border border-violet-500/40 bg-violet-900 p-3 text-center">
           <p className="text-xs text-slate-500 mb-1">Segunda mais próxima</p>
           <p className="text-sm font-semibold text-white">{sec.titulo}</p>
           <p className="text-lg font-bold text-violet-300 tabular-nums mt-1">
@@ -54,6 +59,6 @@ export function PhaseTransitionAlert({ transicao }: PhaseTransitionAlertProps) {
       <p className="text-xs text-slate-600 mt-2 tabular-nums">
         Proximidade relativa: {(transicao.proximidade_secundaria * 100).toFixed(0)}% da fase dominante
       </p>
-    </div>
+    </section>
   );
 }

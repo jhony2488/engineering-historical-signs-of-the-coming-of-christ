@@ -45,7 +45,7 @@ export async function getHistoricoResultados(
 }
 
 export async function getRankingDb(
-  personagem: "besta_mar" | "besta_terra",
+  personagem: "besta_mar" | "besta_terra" | "falso_lider",
   dataRef?: string,
 ): Promise<RankingCandidato[]> {
   const latestDate = dataRef

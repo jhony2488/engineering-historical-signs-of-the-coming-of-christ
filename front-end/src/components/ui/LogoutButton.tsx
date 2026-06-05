@@ -23,6 +23,8 @@ export function LogoutButton() {
       type="button"
       onClick={handleLogout}
       disabled={loading}
+      aria-busy={loading}
+      aria-label={loading ? "Saindo da sessão" : "Sair da área administrativa"}
       className="btn-ghost text-slate-400 hover:text-red-300 hover:border-red-900/50"
     >
       {loading ? "Saindo…" : "Sair"}

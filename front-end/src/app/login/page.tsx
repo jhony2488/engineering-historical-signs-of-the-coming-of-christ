@@ -43,7 +43,7 @@ function LoginForm() {
   }
 
   return (
-    <main className="relative flex min-h-screen items-center justify-center overflow-hidden px-4 py-16">
+    <main id="main-content" className="relative flex min-h-screen items-center justify-center overflow-hidden px-4 py-16" aria-labelledby="login-title">
       <div
         className="pointer-events-none absolute inset-0 opacity-60"
         aria-hidden
@@ -55,13 +55,13 @@ function LoginForm() {
       <div className="card-glow card-interactive relative z-10 w-full max-w-md animate-fade-in-up p-7 sm:p-8">
         <div className="mb-8 text-center sm:text-left">
           <p className="text-xs uppercase tracking-[0.25em] text-gold-400/90">Acesso restrito</p>
-          <h1 className="mt-3 font-display text-2xl text-white">Área administrativa</h1>
+          <h1 id="login-title" className="mt-3 font-display text-2xl text-white">Área administrativa</h1>
           <p className="mt-2 text-sm leading-relaxed text-slate-500">
             Histórico, simulador e grafo exigem autenticação.
           </p>
         </div>
 
-        <form onSubmit={handleSubmit} className="space-y-5" autoComplete="off">
+        <form onSubmit={handleSubmit} className="space-y-5" autoComplete="off" aria-label="Formulário de login administrativo">
           <div className="space-y-1.5">
             <label htmlFor="username" className="block text-xs font-medium text-slate-400">
               Usuário
@@ -102,7 +102,7 @@ function LoginForm() {
             </p>
           )}
 
-          <button type="submit" disabled={loading} className="btn-primary w-full">
+          <button type="submit" disabled={loading} aria-busy={loading} className="btn-primary w-full">
             {loading ? "Entrando…" : "Entrar"}
           </button>
         </form>
@@ -115,8 +115,8 @@ export default function LoginPage() {
   return (
     <Suspense
       fallback={
-        <main className="flex min-h-screen items-center justify-center">
-          <p className="text-slate-500 animate-pulse-soft">Carregando…</p>
+        <main id="main-content" className="flex min-h-screen items-center justify-center">
+          <p className="text-slate-500 animate-pulse-soft" role="status" aria-live="polite">Carregando…</p>
         </main>
       }
     >

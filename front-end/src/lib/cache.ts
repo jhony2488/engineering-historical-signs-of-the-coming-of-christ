@@ -80,7 +80,17 @@ export function snapshotHistoricoCacheKeys(janela: string, limit: number) {
   return { data: key, ts: `${SNAPSHOT_HIST_TS_PREFIX}${janela}_${limit}` };
 }
 
+const BASELINE_KEY = "sinais_baseline_cache";
+const BASELINE_TS_KEY = "sinais_baseline_timestamp";
+const BASELINE_ARQ_KEY = "sinais_baseline_arquivo_cache";
+const BASELINE_ARQ_TS_KEY = "sinais_baseline_arquivo_timestamp";
+const BASELINE_UPD_KEY = "sinais_baseline_atualizacoes_cache";
+const BASELINE_UPD_TS_KEY = "sinais_baseline_atualizacoes_timestamp";
+
 export const cacheKeys = {
   resultado: { data: CACHE_KEY, ts: TIMESTAMP_KEY },
   historico: { data: HISTORICO_KEY, ts: HISTORICO_TS_KEY },
+  baseline: { data: BASELINE_KEY, ts: BASELINE_TS_KEY },
+  baselineArquivo: { data: BASELINE_ARQ_KEY, ts: BASELINE_ARQ_TS_KEY },
+  baselineAtualizacoes: { data: BASELINE_UPD_KEY, ts: BASELINE_UPD_TS_KEY },
 };

@@ -33,8 +33,8 @@ export function PhaseTimeline({
     emTransicao && faseId === transicao?.fase_secundaria;
 
   return (
-    <div className="card-interactive">
-      <h2 className="card-title">Linha do Tempo Escatológica</h2>
+    <section className="card-interactive" aria-labelledby="phase-timeline-title">
+      <h2 id="phase-timeline-title" className="card-title">Linha do Tempo Escatológica</h2>
       {emTransicao ? (
         <p className="text-sm text-violet-300/90 mb-6">
           <span className="font-medium">Transição ativa</span> entre{" "}
@@ -51,7 +51,7 @@ export function PhaseTimeline({
         </p>
       )}
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 relative">
+      <ol className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 relative list-none p-0 m-0" aria-label="Fases escatológicas">
         {FASES.map((fase, idx) => {
           const highlighted = isHighlighted(fase.id);
           const hmmProb = distribuicaoHmm?.[fase.id];
@@ -63,7 +63,12 @@ export function PhaseTimeline({
             FASES[idx + 1]?.id === transicao?.fase_secundaria;
 
           return (
-            <div key={fase.id} className="relative">
+            <li
+              key={fase.id}
+              className="relative"
+              aria-current={highlighted ? "step" : undefined}
+              aria-label={`${fase.titulo}${isDominante(fase.id) ? ", fase dominante" : ""}${isSecundaria(fase.id) ? ", fase secundária" : ""}`}
+            >
               <div
                 className={clsx(
                   "rounded-lg border p-4 transition-all h-full",
@@ -73,7 +78,7 @@ export function PhaseTimeline({
                     "border-violet-500/50 bg-violet-500/10 ring-1 ring-violet-500/25",
                   highlighted && !isDominante(fase.id) && !isSecundaria(fase.id) &&
                     "border-signal-phase/60 bg-signal-phase/10",
-                  !highlighted && "border-ink-700 bg-ink-800/40",
+                  !highlighted && "border-ink-700 bg-ink-800",
                 )}
               >
                 <div className="flex items-center gap-2 mb-2">
@@ -127,12 +132,13 @@ export function PhaseTimeline({
                 <div
                   className="hidden lg:block absolute top-1/2 -right-3 w-6 h-0.5 bg-gradient-to-r from-gold-500 to-violet-500 z-10"
                   title="Zona de transição"
+                  aria-hidden="true"
                 />
               )}
-            </div>
+            </li>
           );
         })}
-      </div>
-    </div>
+      </ol>
+    </section>
   );
 }

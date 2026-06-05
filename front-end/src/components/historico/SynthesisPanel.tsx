@@ -54,7 +54,7 @@ function HybridBlock({ dados }: { dados: Record<string, unknown> }) {
     <div className="mt-4 space-y-3 text-sm">
       <p className="text-slate-300 leading-relaxed">{hibrida.panorama as string}</p>
       {raciocinio && (
-        <div className="rounded-lg bg-ink-800/60 border border-ink-700 p-3 text-xs space-y-2">
+        <div className="rounded-lg bg-ink-800 border border-ink-700 p-3 text-xs space-y-2">
           <p className="text-violet-400">
             Fase emergente: {(raciocinio.fase_emergente as string).replace("FASE_", "")} ·
             convicção {(raciocinio.conviccao_panorama as number).toFixed(2)}
@@ -84,7 +84,7 @@ export function SynthesisPanel({
 }: SynthesisPanelProps) {
   if (loading) {
     return (
-      <div className="card-interactive animate-pulse-soft">
+      <div className="card-interactive animate-pulse-soft" role="status" aria-busy="true">
         <p className="text-slate-500 text-sm">Carregando síntese do período…</p>
       </div>
     );
@@ -92,7 +92,7 @@ export function SynthesisPanel({
 
   if (!snapshot && !hybrid) {
     return (
-      <div className="card-interactive">
+      <div className="card-interactive" role="status">
         <p className="text-slate-500 text-sm">
           Nenhum snapshot de síntese para esta janela. Execute o batch semanal/mensal ou o seed.
         </p>
@@ -103,11 +103,11 @@ export function SynthesisPanel({
   const analise = snapshot?.dados.analise_ia as Record<string, unknown> | undefined;
 
   return (
-    <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+    <div className="grid grid-cols-1 lg:grid-cols-2 gap-4" role="group" aria-label="Painéis de síntese do período">
       {snapshot && (
-        <div className="card-interactive animate-fade-in-up">
+        <section className="card-interactive animate-fade-in-up" aria-labelledby="synthesis-n2-title">
           <p className="text-xs uppercase tracking-wider text-gold-400/70">Motor Nível 2</p>
-          <h3 className="card-title mt-1">{snapshot.label ?? snapshot.janela}</h3>
+          <h3 id="synthesis-n2-title" className="card-title mt-1">{snapshot.label ?? snapshot.janela}</h3>
           {motorLabel && <p className="text-xs text-slate-500 mb-2">{motorLabel}</p>}
           {analise && (
             <>
@@ -122,16 +122,16 @@ export function SynthesisPanel({
             </>
           )}
           <DeltaBlock dados={snapshot.dados} />
-        </div>
+        </section>
       )}
 
       {hybrid && (
-        <div className="card-interactive border-violet-900/40 animate-fade-in-up hover:border-violet-500/50 hover:shadow-[0_8px_32px_-8px_rgba(139,92,246,0.2)]" style={{ animationDelay: "100ms" }}>
+        <section className="card-interactive border-violet-900/40 animate-fade-in-up hover:border-violet-500/50 hover:shadow-[0_8px_32px_-8px_rgba(139,92,246,0.2)]" style={{ animationDelay: "100ms" }} aria-labelledby="synthesis-n3-title">
           <p className="text-xs uppercase tracking-wider text-violet-400/80">Motor Nível 3</p>
-          <h3 className="card-title mt-1">{hybrid.label ?? hybrid.janela}</h3>
+          <h3 id="synthesis-n3-title" className="card-title mt-1">{hybrid.label ?? hybrid.janela}</h3>
           <p className="text-xs text-slate-500">Análise híbrida — panorama cruzado de sub-janelas</p>
           <HybridBlock dados={hybrid.dados} />
-        </div>
+        </section>
       )}
     </div>
   );

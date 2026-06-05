@@ -7,7 +7,7 @@ interface EventsListProps {
 
 function EventoItem({ ev }: { ev: EventoEstruturado }) {
   return (
-    <div className="rounded-lg border border-ink-700/60 bg-ink-800/30 p-3 h-full">
+    <article className="rounded-lg border border-ink-700/60 bg-ink-800 p-3 h-full">
       <div className="flex flex-wrap items-center gap-2 mb-1">
         <span className="text-sm font-medium text-white">{ev.evento.replace(/_/g, " ")}</span>
         <span className="text-xs text-slate-500">{ev.regiao}</span>
@@ -21,7 +21,7 @@ function EventoItem({ ev }: { ev: EventoEstruturado }) {
         <span>Tensão: {(ev.grau_tensao * 100).toFixed(0)}%</span>
         <span>Impacto: {(ev.impacto_global * 100).toFixed(0)}%</span>
       </div>
-    </div>
+    </article>
   );
 }
 
@@ -29,10 +29,10 @@ export function EventsList({ eventos }: EventsListProps) {
   const useVirtual = eventos.length > 12;
 
   return (
-    <div className="card-interactive">
-      <h2 className="card-title">Arquivo Cronológico — Últimas 24h</h2>
+    <section className="card-interactive" aria-labelledby="events-list-title">
+      <h2 id="events-list-title" className="card-title">Arquivo Cronológico — Últimas 24h</h2>
       {eventos.length === 0 ? (
-        <p className="text-sm text-slate-500 text-center py-4">Nenhum evento processado</p>
+        <p className="text-sm text-slate-500 text-center py-4" role="status">Nenhum evento processado</p>
       ) : useVirtual ? (
         <VirtualList
           items={eventos}
@@ -42,7 +42,7 @@ export function EventsList({ eventos }: EventsListProps) {
           renderItem={(ev) => <EventoItem ev={ev} />}
         />
       ) : (
-        <ul className="space-y-3">
+        <ul className="space-y-3" aria-label={`${eventos.length} eventos recentes`}>
           {eventos.map((ev, i) => (
             <li key={`${ev.evento}-${i}`}>
               <EventoItem ev={ev} />
@@ -50,6 +50,6 @@ export function EventsList({ eventos }: EventsListProps) {
           ))}
         </ul>
       )}
-    </div>
+    </section>
   );
 }

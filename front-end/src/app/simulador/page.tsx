@@ -112,7 +112,7 @@ export default function SimuladorPage() {
 
             <ExportPdfButton />
 
-            <Link href="/grafo" className="btn-ghost">
+            <Link href="/grafo" className="btn-ghost" aria-label="Abrir página do grafo profético completo">
 
               Ver grafo completo
 
@@ -173,6 +173,8 @@ export default function SimuladorPage() {
 
                       onChange={() => toggleNo(no.id)}
 
+                      aria-label={`Ativar nó ${no.label}`}
+
                       className="rounded border-ink-600 accent-signal-phase"
 
                     />
@@ -219,7 +221,7 @@ export default function SimuladorPage() {
 
                     key={c.id}
 
-                    className="rounded-lg border border-ink-700 bg-ink-800/40 p-3 text-sm transition-all duration-200 hover:border-violet-500/30 hover:bg-ink-800/70 hover:-translate-y-0.5 animate-fade-in-up"
+                    className="rounded-lg border border-ink-700 bg-ink-800 p-3 text-sm transition-all duration-200 hover:border-violet-500/30 hover:bg-ink-800 hover:-translate-y-0.5 animate-fade-in-up"
 
                     style={{ animationDelay: `${i * 50}ms` }}
 

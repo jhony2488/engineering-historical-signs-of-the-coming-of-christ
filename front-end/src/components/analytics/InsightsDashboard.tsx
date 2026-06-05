@@ -40,8 +40,10 @@ function StatusPill({ ok, label }: { ok: boolean; label: string }) {
           ? "bg-emerald-500/15 text-emerald-300 border border-emerald-500/30"
           : "bg-amber-500/15 text-amber-300 border border-amber-500/30"
       }`}
+      role="status"
+      aria-label={label}
     >
-      <span className={`h-1.5 w-1.5 rounded-full ${ok ? "bg-emerald-400" : "bg-amber-400"}`} />
+      <span className={`h-1.5 w-1.5 rounded-full ${ok ? "bg-emerald-400" : "bg-amber-400"}`} aria-hidden="true" />
       {label}
     </span>
   );
@@ -87,7 +89,7 @@ export function InsightsDashboard() {
 
   if (error || !data) {
     return (
-      <div className="card-interactive p-6 text-rose-300">
+      <div className="card-interactive p-6 text-rose-300" role="alert" aria-live="assertive">
         Não foi possível carregar os insights: {error ?? "dados indisponíveis"}
       </div>
     );
@@ -193,11 +195,15 @@ export function InsightsDashboard() {
           </section>
 
           {data.daily.length > 0 && (
-            <section className="card-interactive p-5">
-              <h3 className="text-sm uppercase tracking-[0.15em] text-slate-500 mb-4">
+            <section className="card-interactive p-5" aria-labelledby="insights-chart-title">
+              <h3 id="insights-chart-title" className="text-sm uppercase tracking-[0.15em] text-slate-500 mb-4">
                 Visualizações por dia
               </h3>
-              <div className="h-64 w-full">
+              <div
+                className="h-64 w-full"
+                role="img"
+                aria-label="Gráfico de visualizações diárias do site"
+              >
                 <ResponsiveContainer width="100%" height="100%">
                   <AreaChart data={data.daily}>
                     <defs>
@@ -236,17 +242,18 @@ export function InsightsDashboard() {
           )}
 
           {data.topPages.length > 0 && (
-            <section className="card-interactive overflow-hidden">
+            <section className="card-interactive overflow-hidden" aria-labelledby="insights-top-pages-title">
               <div className="px-5 py-4 border-b border-ink-700/60">
-                <h3 className="text-sm uppercase tracking-[0.15em] text-slate-500">
+                <h3 id="insights-top-pages-title" className="text-sm uppercase tracking-[0.15em] text-slate-500">
                   Páginas mais visitadas
                 </h3>
               </div>
-              <table className="w-full text-sm">
+              <table className="w-full text-sm" aria-labelledby="insights-top-pages-title">
+                <caption className="sr-only">Páginas mais visitadas no período</caption>
                 <thead>
                   <tr className="text-left text-xs uppercase tracking-wider text-slate-500 border-b border-ink-700/40">
-                    <th className="px-5 py-3 font-medium">Caminho</th>
-                    <th className="px-5 py-3 font-medium text-right">Views</th>
+                    <th scope="col" className="px-5 py-3 font-medium">Caminho</th>
+                    <th scope="col" className="px-5 py-3 font-medium text-right">Views</th>
                   </tr>
                 </thead>
                 <tbody>

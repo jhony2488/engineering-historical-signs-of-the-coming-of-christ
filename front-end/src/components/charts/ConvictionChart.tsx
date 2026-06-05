@@ -24,9 +24,13 @@ export function ConvictionChart({ historico }: ConvictionChartProps) {
   }));
 
   return (
-    <div className="card-interactive">
-      <h2 className="card-title">Evolução da Convicção</h2>
-      <div className="h-64 w-full">
+    <section className="card-interactive" aria-labelledby="conviction-chart-title">
+      <h2 id="conviction-chart-title" className="card-title">Evolução da Convicção</h2>
+      <div
+        className="h-64 w-full"
+        role="img"
+        aria-label={`Gráfico de evolução da convicção com ${data.length} pontos. Índice e confiança ao longo do tempo.`}
+      >
         <ResponsiveContainer width="100%" height="100%">
           <LineChart data={data} margin={{ top: 5, right: 10, left: 0, bottom: 5 }}>
             <CartesianGrid strokeDasharray="3 3" stroke="#252b3d" />
@@ -59,6 +63,6 @@ export function ConvictionChart({ historico }: ConvictionChartProps) {
           </LineChart>
         </ResponsiveContainer>
       </div>
-    </div>
+    </section>
   );
 }

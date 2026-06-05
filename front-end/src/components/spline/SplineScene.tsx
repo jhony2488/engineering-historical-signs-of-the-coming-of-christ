@@ -3,15 +3,22 @@
 import { Suspense } from "react";
 import Spline from "@splinetool/react-spline";
 
-import { SPLINE_SCENE_PATH } from "./constants";
+import { SplineErrorBoundary } from "./SplineErrorBoundary";
 import { SplineSceneFallback } from "./SplineSceneFallback";
 
-export default function SplineScene() {
+interface SplineSceneProps {
+  scene: string;
+  onError?: () => void;
+}
+
+export default function SplineScene({ scene, onError }: SplineSceneProps) {
   return (
-    <div className="relative h-full w-full overflow-hidden rounded-3xl bg-transparent">
-      <Suspense fallback={<SplineSceneFallback />}>
-        <Spline scene={SPLINE_SCENE_PATH} style={{ width: "100%", height: "100%" }} />
-      </Suspense>
-    </div>
+    <SplineErrorBoundary onError={onError}>
+      <div className="relative h-full w-full overflow-hidden bg-transparent">
+        <Suspense fallback={<SplineSceneFallback />}>
+          <Spline scene={scene} style={{ width: "100%", height: "100%", zIndex: 1000 }} />
+        </Suspense>
+      </div>
+    </SplineErrorBoundary>
   );
 }

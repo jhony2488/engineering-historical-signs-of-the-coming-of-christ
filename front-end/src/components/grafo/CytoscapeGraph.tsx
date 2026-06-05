@@ -74,12 +74,20 @@ export function CytoscapeGraph({
               "text-valign": "bottom",
               "text-margin-y": 6,
               "font-size": 10,
-              color: "#94a3b8",
-              "background-color": "#1e293b",
+              "font-family": "Segoe UI, system-ui, sans-serif",
+              color: "#cbd5e1",
+              "text-outline-color": "#020617",
+              "text-outline-width": 2,
+              "background-color": "#0f172a",
               "border-width": 2,
               "border-color": "#475569",
-              width: 36,
-              height: 36,
+              width: 38,
+              height: 38,
+              "shadow-blur": 16,
+              "shadow-color": "#60a5fa",
+              "shadow-opacity": 0.26,
+              "shadow-offset-x": 0,
+              "shadow-offset-y": 0,
             },
           },
           {
@@ -88,20 +96,38 @@ export function CytoscapeGraph({
               label: "data(label)",
               "text-valign": "center",
               "font-size": 9,
-              color: "#e2e8f0",
-              "background-color": "#312e81",
+              color: "#f8fafc",
+              "text-wrap": "wrap",
+              "text-max-width": 92,
+              "background-color": "#1e1b4b",
               "border-width": 2,
-              "border-color": "#6366f1",
+              "border-color": "#818cf8",
               shape: "round-rectangle",
-              width: 80,
+              width: 88,
               height: 40,
+              "shadow-blur": 18,
+              "shadow-color": "#a78bfa",
+              "shadow-opacity": 0.3,
+              "shadow-offset-x": 0,
+              "shadow-offset-y": 0,
             },
           },
           {
             selector: "node[ativo = true]",
             style: {
               "border-color": "#fbbf24",
-              "background-color": "#422006",
+              "background-color": "#3f1d0f",
+              "border-width": 3,
+              "shadow-color": "#fbbf24",
+              "shadow-opacity": 0.45,
+            },
+          },
+          {
+            selector: "node:hover",
+            style: {
+              "border-color": "#f8fafc",
+              "shadow-opacity": 0.55,
+              "shadow-blur": 22,
             },
           },
           {
@@ -112,6 +138,8 @@ export function CytoscapeGraph({
               "target-arrow-color": "#64748b",
               "target-arrow-shape": "triangle",
               "curve-style": "bezier",
+              "line-cap": "round",
+              opacity: 0.92,
             },
           },
           {
@@ -123,10 +151,22 @@ export function CytoscapeGraph({
               "target-arrow-shape": "vee",
               "curve-style": "bezier",
               "line-style": "dashed",
+              "line-dash-pattern": [8, 6],
+              "line-cap": "round",
+              opacity: 0.92,
+            },
+          },
+          {
+            selector: "edge:hover",
+            style: {
+              width: 3,
+              opacity: 1,
+              "line-color": "#e2e8f0",
+              "target-arrow-color": "#e2e8f0",
             },
           },
         ],
-        layout: { name: "breadthfirst", directed: true, padding: 24, spacingFactor: 1.2 },
+        layout: { name: "breadthfirst", directed: true, padding: 32, spacingFactor: 1.35 },
         minZoom: 0.4,
         maxZoom: 2.5,
       });
@@ -145,7 +185,9 @@ export function CytoscapeGraph({
       ref={containerRef}
       className="graph-frame w-full"
       style={{ height }}
-      aria-label="Grafo de cenários escatológicos"
+      role="application"
+      aria-label="Grafo interativo de cenários escatológicos. Use o mouse ou toque para explorar nós e dependências."
+      tabIndex={0}
     />
   );
 }

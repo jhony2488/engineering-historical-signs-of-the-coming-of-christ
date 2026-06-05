@@ -4,21 +4,29 @@ import { useCallback, useEffect, useRef, useState } from "react";
 
 import {
   PIN_DURATION_MS,
+  SCENE_SIZE,
   SCROLL_DISTANCE_FOR_CENTER,
   SCROLL_STOP_DELAY_MS,
-} from "@/components/spline/constants";
+} from "@/lib/utils/constants";
 import {
   arcPoint,
   footerCenterPoint,
   lateralPoint,
   pointFromMouse,
+  clampPoint,
   type LateralSide,
   type Point,
-} from "@/components/spline/geometry";
+} from "@/lib/utils/geometry";
 
-export function useSplineCompanionPosition() {
+import { SceneSize } from "@/lib/utils/geometry";
+
+export function useSplineCompanionPosition(size: SceneSize = SCENE_SIZE) {
+  const sizeRef = useRef(size);
+  useEffect(() => { sizeRef.current = size; }, [size]);
+
   const [position, setPosition] = useState<Point>({ x: 20, y: 200 });
   const [transitionEnabled, setTransitionEnabled] = useState(false);
+  const [isScrolling, setIsScrolling] = useState(false);
 
   const lateralSideRef = useRef<LateralSide>("left");
   const scrollOriginSideRef = useRef<LateralSide>("left");
@@ -32,14 +40,23 @@ export function useSplineCompanionPosition() {
   const applyLateral = useCallback((side: LateralSide, animate: boolean) => {
     lateralSideRef.current = side;
     setTransitionEnabled(animate);
-    setPosition(lateralPoint(side));
+    setPosition(lateralPoint(side, sizeRef.current));
   }, []);
+
+  const isMobile = useCallback(() => window.innerWidth < 640, []);
 
   const syncInitialPosition = useCallback(() => {
     if (isPinnedRef.current) return;
     setTransitionEnabled(false);
-    setPosition(lateralPoint(lateralSideRef.current));
-  }, []);
+    if (isMobile()) {
+      // Lateral X (esquerda ou direita), Y alinhada ao footer
+      const footer = footerCenterPoint(sizeRef.current);
+      const lateral = lateralPoint(lateralSideRef.current, sizeRef.current);
+      setPosition(clampPoint({ x: lateral.x, y: footer.y }, sizeRef.current));
+    } else {
+      setPosition(lateralPoint(lateralSideRef.current, sizeRef.current));
+    }
+  }, [isMobile]);
 
   useEffect(() => {
     syncInitialPosition();
@@ -56,6 +73,7 @@ export function useSplineCompanionPosition() {
       if (isPinnedRef.current) return;
 
       isScrollingRef.current = false;
+      setIsScrolling(false);
       scrollAccumulatorRef.current = 0;
 
       const nextSide: LateralSide =
@@ -65,6 +83,7 @@ export function useSplineCompanionPosition() {
 
     const onScroll = () => {
       if (isPinnedRef.current) return;
+      if (isMobile()) return;
 
       const currentY = window.scrollY;
       const delta = Math.abs(currentY - lastScrollYRef.current);
@@ -74,14 +93,15 @@ export function useSplineCompanionPosition() {
 
       if (!isScrollingRef.current) {
         isScrollingRef.current = true;
+        setIsScrolling(true);
         scrollOriginSideRef.current = lateralSideRef.current;
         scrollAccumulatorRef.current = 0;
       }
 
       scrollAccumulatorRef.current += delta;
       const progress = Math.min(1, scrollAccumulatorRef.current / SCROLL_DISTANCE_FOR_CENTER);
-      const from = lateralPoint(scrollOriginSideRef.current);
-      const to = footerCenterPoint();
+      const from = lateralPoint(scrollOriginSideRef.current, sizeRef.current);
+      const to = footerCenterPoint(sizeRef.current);
 
       setTransitionEnabled(false);
       setPosition(arcPoint(progress, from, to));
@@ -99,7 +119,7 @@ export function useSplineCompanionPosition() {
       scrollAccumulatorRef.current = 0;
 
       setTransitionEnabled(true);
-      setPosition(pointFromMouse(event.clientX, event.clientY));
+      setPosition(pointFromMouse(event.clientX, event.clientY, sizeRef.current));
 
       pinTimerRef.current = setTimeout(() => {
         isPinnedRef.current = false;
@@ -111,8 +131,8 @@ export function useSplineCompanionPosition() {
       if (isPinnedRef.current) return;
       if (isScrollingRef.current) {
         const progress = Math.min(1, scrollAccumulatorRef.current / SCROLL_DISTANCE_FOR_CENTER);
-        const from = lateralPoint(scrollOriginSideRef.current);
-        const to = footerCenterPoint();
+        const from = lateralPoint(scrollOriginSideRef.current, sizeRef.current);
+        const to = footerCenterPoint(sizeRef.current);
         setPosition(arcPoint(progress, from, to));
         return;
       }
@@ -130,7 +150,7 @@ export function useSplineCompanionPosition() {
       clearScrollStopTimer();
       if (pinTimerRef.current) clearTimeout(pinTimerRef.current);
     };
-  }, [applyLateral, syncInitialPosition]);
+  }, [applyLateral, isMobile, syncInitialPosition]);
 
-  return { position, transitionEnabled };
+  return { position, transitionEnabled, isScrolling };
 }

@@ -1,6 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useState } from "react";
+import { PropheticBaselinePanel } from "@/components/baseline/PropheticBaselinePanel";
 import { BeastScores } from "./BeastScores";
 import { EnergyPanel } from "./EnergyPanel";
 import { EventsList } from "./EventsList";
@@ -14,6 +15,8 @@ import { RankingTable } from "./RankingTable";
 import { ConvictionChart } from "@/components/charts/ConvictionChart";
 import { Header } from "@/components/ui/Header";
 import {
+  fetchBaselineAtualizacoesSWR,
+  fetchBaselineHistoricoSWR,
   fetchHistorico,
   fetchRanking,
   fetchRankingSWR,
@@ -21,7 +24,12 @@ import {
   fetchResultadoAtualSWR,
   getDataSource,
 } from "@/lib/api";
-import type { RankingCandidato, ResultadoEscatologico } from "@/lib/types";
+import type {
+  BaselineAtualizacao,
+  BaselineHistorico,
+  RankingCandidato,
+  ResultadoEscatologico,
+} from "@/lib/types";
 
 export function DashboardClient() {
   const [resultado, setResultado] = useState<ResultadoEscatologico | null>(null);
@@ -33,6 +41,10 @@ export function DashboardClient() {
   const [dataSource, setDataSource] = useState<"db" | "fastapi">(getDataSource());
   const [rankingMar, setRankingMar] = useState<RankingCandidato[]>([]);
   const [rankingTerra, setRankingTerra] = useState<RankingCandidato[]>([]);
+  const [baseline, setBaseline] = useState<BaselineHistorico | null>(null);
+  const [baselineUpdates, setBaselineUpdates] = useState<BaselineAtualizacao[]>([]);
+  const [baselineLoading, setBaselineLoading] = useState(true);
+  const [baselineMock, setBaselineMock] = useState(false);
 
   const refresh = useCallback(async (skipCache = false) => {
     if (!skipCache && !resultado) setLoading(true);
@@ -84,6 +96,27 @@ export function DashboardClient() {
       if (!cancelled) setHistorico(hist.data);
     });
 
+    Promise.all([fetchBaselineHistoricoSWR(), fetchBaselineAtualizacoesSWR(5)]).then(
+      ([hist, upd]) => {
+        if (cancelled) return;
+        setBaseline(hist.data);
+        setBaselineUpdates(upd.data);
+        setBaselineMock(hist.isMock);
+        setBaselineLoading(false);
+        if (hist.revalidating || upd.revalidating) {
+          Promise.all([
+            fetchBaselineHistoricoSWR(),
+            fetchBaselineAtualizacoesSWR(5),
+          ]).then(([freshHist, freshUpd]) => {
+            if (!cancelled) {
+              setBaseline(freshHist.data);
+              setBaselineUpdates(freshUpd.data);
+            }
+          });
+        }
+      },
+    );
+
     Promise.all([fetchRankingSWR("besta_mar"), fetchRankingSWR("besta_terra")]).then(
       ([mar, terra]) => {
         if (cancelled) return;
@@ -111,8 +144,8 @@ export function DashboardClient() {
     return (
       <>
         <Header />
-        <main className="mx-auto max-w-7xl px-4 py-16 text-center text-slate-500">
-          Carregando sinais históricos…
+        <main id="main-content" className="mx-auto max-w-7xl px-4 py-16 text-center text-slate-500" aria-busy="true" aria-live="polite">
+          <p role="status">Carregando sinais históricos…</p>
         </main>
       </>
     );
@@ -122,11 +155,13 @@ export function DashboardClient() {
     return (
       <>
         <Header />
-        <main className="mx-auto max-w-7xl px-4 py-16 text-center">
-          <p className="text-slate-400">Nenhum resultado disponível. Execute o batch diário.</p>
+        <main id="main-content" className="mx-auto max-w-7xl px-4 py-16 text-center">
+          <p className="text-slate-400" role="status">Nenhum resultado disponível. Execute o batch diário.</p>
           <button
+            type="button"
             onClick={() => refresh(true)}
             className="btn-primary mt-4"
+            aria-label="Tentar carregar dados novamente"
           >
             Tentar novamente
           </button>
@@ -147,19 +182,26 @@ export function DashboardClient() {
         isMock={isMock}
         dataSource={dataSource}
       />
-      <main className="page-main">
+      <main id="main-content" className="page-main" aria-labelledby="dashboard-title">
         <header className="page-hero flex flex-wrap items-center justify-between gap-4">
           <div className="relative z-10">
             <p className="text-xs uppercase tracking-[0.2em] text-gold-400/80">Monitor diário</p>
-            <h2 className="page-title mt-1">Painel Escatológico</h2>
-            <p className="page-subtitle text-xs mt-1">
+            <h2 id="dashboard-title" className="page-title mt-1">Painel Escatológico</h2>
+            <p className="page-subtitle text-xs mt-1" aria-live="polite">
               Atualização ~04:00 BRT · 1 proc/dia
               {revalidating && " · revalidando em background"}
             </p>
+            <div className="mt-4 flex flex-wrap gap-2 text-[11px] uppercase tracking-[0.18em] text-slate-500">
+              <span className="rounded-full border border-ink-700/70 bg-ink-950/50 px-3 py-1">Camada viva</span>
+              <span className="rounded-full border border-signal-phase/20 bg-signal-phase/10 px-3 py-1 text-signal-phase">Relé diário</span>
+            </div>
           </div>
           <button
+            type="button"
             onClick={() => refresh(true)}
             disabled={revalidating}
+            aria-busy={revalidating}
+            aria-label={revalidating ? "Atualizando dados" : "Atualizar dados do painel"}
             className="btn-ghost relative z-10"
           >
             Atualizar dados
@@ -171,6 +213,20 @@ export function DashboardClient() {
             <PhaseTransitionAlert transicao={transicao} />
           </div>
         )}
+
+        <div className="animate-fade-in-up">
+          <PropheticBaselinePanel
+            baseline={baseline}
+            atualizacoes={[
+              ...(resultado.baseline_historico?.novas_cumpridas_hoje ?? []),
+              ...(resultado.baseline_historico?.atualizacoes_recentes ?? []),
+              ...baselineUpdates,
+            ]}
+            compact
+            loading={baselineLoading}
+            isMock={baselineMock}
+          />
+        </div>
 
         <PhaseTimeline
           faseAtual={resultado.fase_atual}
@@ -235,12 +291,6 @@ export function DashboardClient() {
           <InterpretationPanel interpretacao={resultado.interpretacao} />
         </div>
       </main>
-      <footer
-        data-site-footer
-        className="border-t border-ink-800 mt-12 py-6 text-center text-xs text-slate-600"
-      >
-        Engenharia de Sinais Históricos — análise interpretativa, não predição de datas.
-      </footer>
     </>
   );
 }
