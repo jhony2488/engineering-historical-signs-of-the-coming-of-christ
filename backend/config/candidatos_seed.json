@@ -1,0 +1,212 @@
+[
+  {
+    "id": "cand-mar-001",
+    "nome": "Coalizão de Mediação Global",
+    "personagem": "besta_mar",
+    "scores_criterio": {
+      "influencia_unificacao": 0.82,
+      "carisma_global": 0.71,
+      "divergencia_valores": 0.58,
+      "centralizacao_estrutural": 0.74
+    }
+  },
+  {
+    "id": "cand-mar-002",
+    "nome": "Líder de Estabilidade Regional",
+    "personagem": "besta_mar",
+    "scores_criterio": {
+      "influencia_unificacao": 0.68,
+      "carisma_global": 0.79,
+      "divergencia_valores": 0.52,
+      "centralizacao_estrutural": 0.61
+    }
+  },
+  {
+    "id": "cand-mar-003",
+    "nome": "Fórum de Reconciliação do Oriente Médio",
+    "personagem": "besta_mar",
+    "scores_criterio": {
+      "influencia_unificacao": 0.76,
+      "carisma_global": 0.64,
+      "divergencia_valores": 0.49,
+      "centralizacao_estrutural": 0.58
+    }
+  },
+  {
+    "id": "cand-mar-004",
+    "nome": "Bloco de Governança Transnacional",
+    "personagem": "besta_mar",
+    "scores_criterio": {
+      "influencia_unificacao": 0.71,
+      "carisma_global": 0.58,
+      "divergencia_valores": 0.61,
+      "centralizacao_estrutural": 0.77
+    }
+  },
+  {
+    "id": "cand-mar-005",
+    "nome": "Iniciativa de Paz Unificada",
+    "personagem": "besta_mar",
+    "scores_criterio": {
+      "influencia_unificacao": 0.65,
+      "carisma_global": 0.72,
+      "divergencia_valores": 0.55,
+      "centralizacao_estrutural": 0.54
+    }
+  },
+  {
+    "id": "cand-mar-006",
+    "nome": "Conselho de Estabilidade Financeira Global",
+    "personagem": "besta_mar",
+    "scores_criterio": {
+      "influencia_unificacao": 0.59,
+      "carisma_global": 0.51,
+      "divergencia_valores": 0.44,
+      "centralizacao_estrutural": 0.81
+    }
+  },
+  {
+    "id": "cand-mar-007",
+    "nome": "Arquiteto do Novo Ordem Econômica",
+    "personagem": "besta_mar",
+    "scores_criterio": {
+      "influencia_unificacao": 0.62,
+      "carisma_global": 0.66,
+      "divergencia_valores": 0.63,
+      "centralizacao_estrutural": 0.69
+    }
+  },
+  {
+    "id": "cand-mar-008",
+    "nome": "Mediador de Crises Multilaterais",
+    "personagem": "besta_mar",
+    "scores_criterio": {
+      "influencia_unificacao": 0.54,
+      "carisma_global": 0.68,
+      "divergencia_valores": 0.47,
+      "centralizacao_estrutural": 0.48
+    }
+  },
+  {
+    "id": "cand-mar-009",
+    "nome": "Coalizão de Resposta Humanitária Unificada",
+    "personagem": "besta_mar",
+    "scores_criterio": {
+      "influencia_unificacao": 0.57,
+      "carisma_global": 0.74,
+      "divergencia_valores": 0.56,
+      "centralizacao_estrutural": 0.52
+    }
+  },
+  {
+    "id": "cand-mar-010",
+    "nome": "Eixo de Mediação Euro-Asiático",
+    "personagem": "besta_mar",
+    "scores_criterio": {
+      "influencia_unificacao": 0.48,
+      "carisma_global": 0.45,
+      "divergencia_valores": 0.38,
+      "centralizacao_estrutural": 0.42
+    }
+  },
+  {
+    "id": "cand-terra-001",
+    "nome": "Plataforma de Narrativa Unificada",
+    "personagem": "besta_terra",
+    "scores_criterio": {
+      "validacao_lider": 0.74,
+      "monopolio_narrativa": 0.86,
+      "prodigios_tecnologicos": 0.68
+    }
+  },
+  {
+    "id": "cand-terra-002",
+    "nome": "Consórcio de IA Global",
+    "personagem": "besta_terra",
+    "scores_criterio": {
+      "validacao_lider": 0.61,
+      "monopolio_narrativa": 0.72,
+      "prodigios_tecnologicos": 0.91
+    }
+  },
+  {
+    "id": "cand-terra-003",
+    "nome": "Rede de Verificação de Conteúdo Planetária",
+    "personagem": "besta_terra",
+    "scores_criterio": {
+      "validacao_lider": 0.58,
+      "monopolio_narrativa": 0.79,
+      "prodigios_tecnologicos": 0.64
+    }
+  },
+  {
+    "id": "cand-terra-004",
+    "nome": "Instituto de Sincronização Ideológica",
+    "personagem": "besta_terra",
+    "scores_criterio": {
+      "validacao_lider": 0.69,
+      "monopolio_narrativa": 0.67,
+      "prodigios_tecnologicos": 0.55
+    }
+  },
+  {
+    "id": "cand-terra-005",
+    "nome": "Aliança de Plataformas Digitais Globais",
+    "personagem": "besta_terra",
+    "scores_criterio": {
+      "validacao_lider": 0.66,
+      "monopolio_narrativa": 0.81,
+      "prodigios_tecnologicos": 0.73
+    }
+  },
+  {
+    "id": "cand-terra-006",
+    "nome": "Projeto Sentinela de Conformidade Social",
+    "personagem": "besta_terra",
+    "scores_criterio": {
+      "validacao_lider": 0.52,
+      "monopolio_narrativa": 0.76,
+      "prodigios_tecnologicos": 0.58
+    }
+  },
+  {
+    "id": "cand-terra-007",
+    "nome": "Laboratório de Experiências Imersivas Sagradas",
+    "personagem": "besta_terra",
+    "scores_criterio": {
+      "validacao_lider": 0.48,
+      "monopolio_narrativa": 0.54,
+      "prodigios_tecnologicos": 0.84
+    }
+  },
+  {
+    "id": "cand-terra-008",
+    "nome": "Hub de Inteligência Narrativa Central",
+    "personagem": "besta_terra",
+    "scores_criterio": {
+      "validacao_lider": 0.71,
+      "monopolio_narrativa": 0.69,
+      "prodigios_tecnologicos": 0.62
+    }
+  },
+  {
+    "id": "cand-terra-009",
+    "nome": "Consórcio de Biometria e Identidade Universal",
+    "personagem": "besta_terra",
+    "scores_criterio": {
+      "validacao_lider": 0.55,
+      "monopolio_narrativa": 0.63,
+      "prodigios_tecnologicos": 0.77
+    }
+  },
+  {
+    "id": "cand-terra-010",
+    "nome": "Movimento de Unificação Espiritual Sintética",
+    "personagem": "besta_terra",
+    "scores_criterio": {
+      "validacao_lider": 0.44,
+      "monopolio_narrativa": 0.58,
+      "prodigios_tecnologicos": 0.49
+    }
+  }
+]

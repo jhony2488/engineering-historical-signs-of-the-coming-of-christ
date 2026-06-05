@@ -1,0 +1,13 @@
+{
+  "version": "1.0.0",
+  "labels": {
+    "expansao": ["esperanca", "fe", "caridade", "despertamento", "evangelho", "unificacao", "sabedoria", "remanescente"],
+    "contracao": ["apostasia", "engano", "perseguicao", "totalitarismo", "vigilancia", "cbdc", "controle", "conflito", "desespero"]
+  },
+  "roberta_mapping": {
+    "positive": { "expansao": 0.75, "contracao": 0.25 },
+    "negative": { "expansao": 0.25, "contracao": 0.75 },
+    "neutral": { "expansao": 0.5, "contracao": 0.5 }
+  },
+  "blend_weights": { "keywords": 0.45, "roberta": 0.55 }
+}
