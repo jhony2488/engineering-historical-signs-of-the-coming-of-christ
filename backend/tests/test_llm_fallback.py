@@ -7,6 +7,7 @@ from motor.adapters.llm_router import LLMRouter
 async def test_groq_fallback_to_dry_run(monkeypatch):
     monkeypatch.setenv("LLM_DRY_RUN", "true")
     from motor.config import get_settings
+
     get_settings.cache_clear()
 
     router = LLMRouter()

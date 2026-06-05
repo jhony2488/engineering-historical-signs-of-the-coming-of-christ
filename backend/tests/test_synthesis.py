@@ -2,7 +2,7 @@
 
 import pytest
 
-from motor.pipeline.synthesis import SynthesisEngine, WINDOW_META
+from motor.pipeline.synthesis import WINDOW_META, SynthesisEngine
 from tests.conftest import FakeSupabase
 
 

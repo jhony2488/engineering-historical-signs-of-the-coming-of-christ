@@ -1,7 +1,7 @@
 """Testes do motor de correlação (Camada 8)."""
 
-from tests.conftest import SAMPLE_EVENTS, SAMPLE_REASONING
 from motor.pipeline.correlation.engine import CorrelationEngine
+from tests.conftest import SAMPLE_EVENTS, SAMPLE_REASONING
 
 
 def test_correlate_returns_required_fields():

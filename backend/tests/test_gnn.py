@@ -1,5 +1,3 @@
-import networkx as nx
-
 from motor.ml.gnn import PropheticGNN
 from motor.ml.graph import PropheticGraph
 

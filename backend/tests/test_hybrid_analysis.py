@@ -5,7 +5,7 @@ import pytest
 os.environ["LLM_DRY_RUN"] = "true"
 
 from motor.config import get_settings
-from motor.pipeline.hybrid_analysis import HybridAnalysisEngine, WINDOW_CONFIG
+from motor.pipeline.hybrid_analysis import WINDOW_CONFIG, HybridAnalysisEngine
 
 get_settings.cache_clear()
 
