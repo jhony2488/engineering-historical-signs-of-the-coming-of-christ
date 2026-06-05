@@ -8,7 +8,7 @@ def test_analyze_expansao_heuristic():
     result = analyzer.analyze("evangelho e despertamento com caridade e fidelidade")
     assert result.energia == "expansao"
     assert result.expansao_score > result.contracao_score
-    assert result.modelo == "heuristic"
+    assert result.modelo == "spiritual_keywords_v1"
 
 
 def test_analyze_contracao_heuristic():

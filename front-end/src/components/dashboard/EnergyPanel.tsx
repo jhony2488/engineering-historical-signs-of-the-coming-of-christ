@@ -8,9 +8,11 @@ interface EnergyPanelProps {
 export function EnergyPanel({ eventos, expansaoRatio }: EnergyPanelProps) {
   const expansao = eventos.filter((e) => e.energia === "expansao").length;
   const contracao = eventos.filter((e) => e.energia === "contracao").length;
-  const total = eventos.length || 1;
-  const expPct = expansaoRatio ?? expansao / total;
-  const conPct = expansaoRatio != null ? 1 - expPct : contracao / total;
+  const totalEvents = eventos.length;
+  const total = totalEvents || 1;
+  const expPct = expansaoRatio ?? (totalEvents === 0 ? 0 : expansao / total);
+  const conPct =
+    expansaoRatio != null ? 1 - expPct : totalEvents === 0 ? 1 : contracao / total;
 
   return (
     <div className="card-interactive">
