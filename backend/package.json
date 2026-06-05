@@ -7,6 +7,7 @@
     "lint": "python -m ruff check motor api tests",
     "lint:fix": "python -m ruff check --fix motor api tests",
     "format": "python -m ruff format motor api tests",
-    "format:check": "python -m ruff format --check motor api tests"
+    "format:check": "python -m ruff format --check motor api tests",
+    "test": "python -m pytest -q"
   }
 }

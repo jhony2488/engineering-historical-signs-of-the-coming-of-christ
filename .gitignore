@@ -19,7 +19,9 @@ htmlcov/
 .idea/
 .vscode/
 models_cache/
+node_modules/
 front-end/node_modules/
 front-end/.next/
 front-end/out/
 *.parquet
+package-lock.json

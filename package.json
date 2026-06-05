@@ -1,0 +1,18 @@
+{
+  "name": "engenharia-sinais-historicos",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Monorepo — hooks Husky para lint (commit) e testes (push) em front-end e backend",
+  "scripts": {
+    "prepare": "husky",
+    "lint": "npm run lint:front && npm run lint:back",
+    "lint:front": "npm run lint --prefix front-end",
+    "lint:back": "npm run lint --prefix backend",
+    "test": "npm run test:front && npm run test:back",
+    "test:front": "npm run test --prefix front-end",
+    "test:back": "npm run test --prefix backend"
+  },
+  "devDependencies": {
+    "husky": "^9.1.7"
+  }
+}
