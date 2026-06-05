@@ -41,8 +41,8 @@ python -m motor.cli run-hybrid-analysis --window annual
 ## Camadas
 
 ### 1 — Ingestão
-- RSS (`config/feeds.yaml`)
-- GDELT API
+- RSS (`config/feeds.yaml`) — geopolítica + UFO/disclosure + engano apocalíptico
+- GDELT API (inclui UAP/disclosure e narrativas de engano)
 - ACLED (stub, API key opcional)
 - Dedup por `content_hash`
 

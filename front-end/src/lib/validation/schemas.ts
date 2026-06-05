@@ -28,3 +28,17 @@ export const snapshotJanelaSchema = z.enum([
   "semiannual_hybrid",
   "annual_hybrid",
 ]);
+
+export const newsletterSubscribeSchema = z.object({
+  email: z.string().email().max(254),
+  source: z.enum(["web", "footer", "profecias", "dashboard", "rankings"]).optional(),
+});
+
+export const newsletterUnsubscribeSchema = z.object({
+  token: z.string().min(32).max(64),
+});
+
+export const newsletterSendSchema = z.object({
+  subject: z.string().min(3).max(200),
+  body: z.string().min(10).max(50_000),
+});

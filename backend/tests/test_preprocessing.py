@@ -34,6 +34,18 @@ def test_infer_topics_oriente_medio():
     assert "oriente_medio" in topics
 
 
+def test_infer_topics_narrativa_extraterrestre():
+    p = Preprocessor()
+    topics = p.infer_topics("Pentagon UFO disclosure hearing on UAP and extraterrestrial craft")
+    assert "narrativa_extraterrestre" in topics
+
+
+def test_infer_topics_engano_apocaliptico():
+    p = Preprocessor()
+    topics = p.infer_topics("False prophet warns of apocalyptic deception and lying signs")
+    assert "engano_apocaliptico" in topics
+
+
 def test_infer_topics_fallback_geral():
     p = Preprocessor()
     topics = p.infer_topics("notícia genérica sem keywords")

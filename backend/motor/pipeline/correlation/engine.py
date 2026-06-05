@@ -4,6 +4,7 @@ from typing import Any
 
 from motor.adapters.supabase import get_supabase
 from motor.config import get_settings
+from motor.domain.apocalyptic_signals import compute_apocalyptic_axis_metrics
 from motor.domain.beasts import compute_beast_scores
 from motor.domain.energies import Energia
 from motor.domain.false_leader import detect_false_leader
@@ -62,6 +63,8 @@ class CorrelationEngine:
         historical_observations: list[int] | None = None,
     ) -> dict[str, Any]:
         metrics = self._aggregate_metrics(events)
+        axis = compute_apocalyptic_axis_metrics(events)
+        metrics.update(axis)
         bayes_events = [
             (min(0.95, e.get("grau_tensao", 0.5)), max(0.05, 0.3 - e.get("grau_tensao", 0.5) * 0.2))
             for e in events[:5]
@@ -94,12 +97,22 @@ class CorrelationEngine:
             metrics["score_expansao_discurso"],
             metrics["score_contracao_estrutura"],
         )
+        prodigios = min(
+            1.0,
+            metrics["avg_impact"]
+            + axis["prodigios_narrativos_score"] * 0.35
+            + axis["engano_apocaliptico_score"] * 0.25,
+        )
+        monopolio = min(
+            1.0,
+            metrics["score_contracao_estrutura"] + axis["narrativa_extraterrestre_ratio"] * 0.2,
+        )
         beasts = compute_beast_scores(
             centralizacao_geopolitica=metrics["macro_ratio"],
             controle_subsistencia=metrics["score_contracao_estrutura"],
             validacao_lider=metrics["expansao_ratio"],
-            monopolio_narrativa=metrics["score_contracao_estrutura"],
-            prodigios_tecnologicos=metrics["avg_impact"],
+            monopolio_narrativa=monopolio,
+            prodigios_tecnologicos=prodigios,
         )
 
         # Fase publicada: combina HMM, LLM e índice

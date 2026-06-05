@@ -62,6 +62,15 @@ class Settings(BaseSettings):
 
     feeds_config_path: Path = Field(default=CONFIG_DIR / "feeds.yaml")
 
+    site_url: str = "http://localhost:3000"
+    email_from: str = ""
+    email_dry_run: bool = True
+    resend_api_key: str = ""
+    smtp_host: str = ""
+    smtp_port: int = 587
+    smtp_user: str = ""
+    smtp_password: str = ""
+
 
 @lru_cache
 def get_settings() -> Settings:

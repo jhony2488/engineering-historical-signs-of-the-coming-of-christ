@@ -82,3 +82,4 @@ def test_admin_run_daily_accepted(admin_headers):
     )
     assert response.status_code == 200
     assert response.json()["data_referencia"] == "2026-06-04"
+

@@ -194,3 +194,17 @@ export interface BaselineHistoricoResumo {
   novas_cumpridas_hoje?: BaselineAtualizacao[];
   atualizacoes_recentes?: BaselineAtualizacao[];
 }
+
+export type NewsletterSource = "web" | "footer" | "profecias" | "dashboard" | "rankings";
+
+export type NewsletterStatus = "active" | "unsubscribed";
+
+export interface NewsletterSubscribeResponse {
+  ok: boolean;
+  status: NewsletterStatus;
+}
+
+export interface NewsletterUnsubscribeResponse {
+  ok: boolean;
+  status: "unsubscribed";
+}

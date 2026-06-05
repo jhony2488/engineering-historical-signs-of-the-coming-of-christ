@@ -5,6 +5,7 @@ export const PRIVATE_PAGE_PREFIXES = [
   "/grafo",
   "/insights",
   "/revisao",
+  "/newsletter",
 ] as const;
 
 /** APIs restritas — snapshots, grafo, cenários, PDF e admin. */

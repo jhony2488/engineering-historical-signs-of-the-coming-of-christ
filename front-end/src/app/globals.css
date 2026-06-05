@@ -539,7 +539,7 @@ body {
 
   .site-footer {
 
-    @apply relative mt-12 border-t border-ink-800/80 py-6 text-center text-xs text-slate-500;
+    @apply relative mt-12 border-t border-ink-800/80 px-4 py-8 text-center text-xs text-slate-500;
 
     background:
 
@@ -598,6 +598,86 @@ body {
     transform: translateY(-1px);
 
     text-shadow: 0 0 14px rgba(96, 165, 250, 0.28);
+
+  }
+
+
+
+  .site-footer-attribution {
+
+    @apply mt-6 text-xs text-slate-500;
+
+  }
+
+
+
+  .newsletter-signup {
+
+    @apply mx-auto max-w-3xl rounded-2xl border border-ink-700/80 bg-ink-900/40 px-4 py-5 text-left sm:px-6;
+
+  }
+
+
+
+  .newsletter-signup--compact .newsletter-signup-title {
+
+    @apply text-sm;
+
+  }
+
+
+
+  .newsletter-signup--compact .newsletter-signup-hint {
+
+    @apply text-[11px];
+
+  }
+
+
+
+  .newsletter-signup-title {
+
+    @apply font-display text-base text-white;
+
+  }
+
+
+
+  .newsletter-signup-description {
+
+    @apply mt-2 text-sm leading-relaxed text-slate-400;
+
+  }
+
+
+
+  .newsletter-signup-form {
+
+    @apply mt-4 flex flex-col gap-3 sm:flex-row sm:items-center;
+
+  }
+
+
+
+  .newsletter-signup-input {
+
+    @apply min-w-0 flex-1;
+
+  }
+
+
+
+  .newsletter-signup-button {
+
+    @apply shrink-0;
+
+  }
+
+
+
+  .newsletter-signup-hint {
+
+    @apply mt-3 text-xs leading-relaxed text-slate-500;
 
   }
 

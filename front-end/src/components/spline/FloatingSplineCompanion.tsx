@@ -2,17 +2,21 @@
 
 import { useEffect, useRef, useState } from "react";
 
+import { useResponsiveSceneSize } from "@/hooks/useResponsiveSceneSize";
+import { useSplineCelebration } from "@/hooks/useSplineCelebration";
 import { useSplineCompanionPosition } from "@/hooks/useSplineCompanionPosition";
 
 import { SCENE_SIZE } from "../../lib/utils/constants";
 import { LazySplineScene } from "./LazySplineScene";
-import { useResponsiveSceneSize } from "@/hooks/useResponsiveSceneSize";
-
 
 export function FloatingSplineCompanion() {
-  const size = useResponsiveSceneSize({ SCENE_SIZE });
-  const { position, transitionEnabled } = useSplineCompanionPosition(size);
-  const isMobile = size.width <= 100;
+  const responsiveSize = useResponsiveSceneSize({ SCENE_SIZE });
+  const celebration = useSplineCelebration(responsiveSize);
+  const activeSize = celebration.active ? celebration.size : responsiveSize;
+  const { position, transitionEnabled } = useSplineCompanionPosition(activeSize);
+  const activePosition = celebration.active ? celebration.position : position;
+
+  const isMobile = activeSize.width <= 100;
   const sceneUrl = isMobile
     ? "/biblically_accurate_angel_eyes_and_rings-2.spline"
     : "/biblically_accurate_angel_eyes_and_rings.spline";
@@ -34,8 +38,12 @@ export function FloatingSplineCompanion() {
     const el = innerRef.current;
     if (!el) return;
 
-    const block = () => { el.style.pointerEvents = "none"; };
-    const unblock = () => { el.style.pointerEvents = "auto"; };
+    const block = () => {
+      el.style.pointerEvents = "none";
+    };
+    const unblock = () => {
+      el.style.pointerEvents = "auto";
+    };
 
     window.addEventListener("scroll", block, { passive: true });
     window.addEventListener("touchstart", block, { passive: true });
@@ -50,20 +58,25 @@ export function FloatingSplineCompanion() {
     };
   }, []);
 
+  const showSoundRings = isPlaying;
+
   return (
     <div
-      className="pointer-events-none fixed z-40 will-change-transform"
+      className={`pointer-events-none fixed will-change-transform ${
+        celebration.active ? "z-50" : "z-40"
+      }`}
       style={{
-        width: size.width,
-        height: size.height,
-        transform: `translate3d(${position.x}px, ${position.y}px, 0)`,
-        transition: transitionEnabled
-          ? "transform 0.9s cubic-bezier(0.22, 1, 0.36, 1)"
-          : "none",
+        width: activeSize.width,
+        height: activeSize.height,
+        transform: `translate3d(${activePosition.x}px, ${activePosition.y}px, 0)`,
+        transition:
+          celebration.active || transitionEnabled
+            ? "transform 0.9s cubic-bezier(0.22, 1, 0.36, 1), width 0.9s cubic-bezier(0.22, 1, 0.36, 1), height 0.9s cubic-bezier(0.22, 1, 0.36, 1)"
+            : "none",
       }}
       aria-hidden
     >
-      {isPlaying && (
+      {showSoundRings && (
         <>
           <span className="sound-ring sound-ring-1" />
           <span className="sound-ring sound-ring-2" />

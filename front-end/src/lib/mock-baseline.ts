@@ -7,19 +7,19 @@ import type {
 export const MOCK_BASELINE_HISTORICO: BaselineHistorico = {
   versao: "2026.06.05",
   estatisticas: {
-    total_profecias_biblicas: 1817,
+    total_profecias_biblicas: 1819,
     eventos_principais_mapeados: 600,
     profecias_cumpridas: 1797,
-    profecias_pendentes: 20,
+    profecias_pendentes: 22,
     eventos_cumpridos: 580,
     eventos_pendentes: 20,
-    taxa_cumprimento_profecias: 0.989,
+    taxa_cumprimento_profecias: 0.988,
     taxa_cumprimento_eventos: 0.967,
   },
   overview: {
     titulo: "Overview geral — promessas e profecias já cumpridas",
     resumo:
-      "Antes do primeiro run diário, o motor ancora a linha do tempo na massa de profecias bíblicas já verificadas historicamente. Das ~1.817 profecias ligadas a ~600 eventos principais, restam ~20 eventos escatológicos finais pendentes.",
+      "Antes do primeiro run diário, o motor ancora a linha do tempo na massa de profecias bíblicas já verificadas historicamente. Das ~1.819 profecias ligadas a ~600 eventos principais (incluindo eixos de engano/UAP), restam ~22 eventos escatológicos finais pendentes.",
     marco_zero: "Cumprimento messiânico e era apostólica como pivô de validação profética.",
     nota_metodologica: "Contagens versionadas e auditáveis; catálogo expande via arquivo_profetico.",
   },
@@ -34,10 +34,13 @@ export const MOCK_BASELINE_HISTORICO: BaselineHistorico = {
     { id: "pend_marca_compra_venda", titulo: "Marca obrigatória para compra e venda", referencias: ["Ap 13:16-17"], fase_alvo: "FASE_III" },
     { id: "pend_paz_falsa_oriente", titulo: "Tratado de paz falsa — Oriente Médio", referencias: ["Dn 9:27"], fase_alvo: "FASE_II" },
     { id: "pend_segunda_vinda", titulo: "Segunda vinda visível de Cristo", referencias: ["Ap 19:11-16"], fase_alvo: "FASE_IV" },
+    { id: "pend_enganos_apocalipse", titulo: "Enganos e sinais enganosos nos últimos dias", referencias: ["Mt 24:24", "2Ts 2:9-11"], fase_alvo: "FASE_III" },
+    { id: "pend_narrativa_extraterrestre", titulo: "Narrativa extraterrestre/UAP", referencias: ["2Ts 2:11", "Ap 13:14"], fase_alvo: "FASE_II" },
   ],
   sinais_gerais: [
     { id: "sinal_cbdc_piloto", titulo: "Piloto de moedas digitais de banco central", fase: "FASE_II", periodo: "séc. XXI", status: "parcial" },
     { id: "sinal_globalizacao", titulo: "Globalização institucional", fase: "FASE_II", periodo: "séc. XX–XXI" },
+    { id: "sinal_narrativa_ufo_disclosure", titulo: "Narrativa UFO/UAP e disclosure", fase: "FASE_II", periodo: "séc. XXI", status: "parcial" },
   ],
   atualizacoes: [],
   marco_zero_deslocamento: 0.033,

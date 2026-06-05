@@ -8,6 +8,7 @@ from typing import Any
 import structlog
 
 from motor.adapters.supabase import SupabaseClient, get_supabase
+from motor.domain.apocalyptic_signals import PROPHECY_SIGNAL_KEYWORDS
 from motor.pipeline.historical_baseline import (
     BASELINE_ID,
     HistoricalBaselineService,
@@ -19,18 +20,8 @@ logger = structlog.get_logger()
 MATCH_THRESHOLD = 0.45
 PARTIAL_THRESHOLD = 0.3
 
-# Palavras-chave por profecia pendente para cruzar com eventos/interpretação diária
-SIGNAL_KEYWORDS: dict[str, list[str]] = {
-    "pend_paz_falsa_oriente": ["paz", "tratado", "oriente", "israel", "jerusalém", "acordo"],
-    "pend_marca_compra_venda": ["cbdc", "marca", "biometria", "compra", "venda", "pagamento"],
-    "pend_besta_mar": ["anticristo", "besta", "mar", "lider", "global", "onu"],
-    "pend_besta_terra": ["falso", "profeta", "coerção", "imagem", "adorar"],
-    "pend_templo_restaurado": ["templo", "santuario", "sacrificio", "jerusalém"],
-    "pend_arrebatamento": ["arrebatamento", "trombeta", "encontro", "ar"],
-    "pend_dois_testemunhas": ["testemunhas", "profetizar", "jerusalém", "1260"],
-    "pend_sinais_cosmicos_finais": ["sol", "lua", "eclipse", "sismo", "terremoto"],
-    "pend_cbdc_piloto": ["cbdc", "moeda", "digital", "central", "piloto"],
-}
+# Re-export para testes e documentação
+SIGNAL_KEYWORDS = PROPHECY_SIGNAL_KEYWORDS
 
 
 def _tokenize(text: str) -> set[str]:
@@ -111,13 +102,13 @@ class FulfillmentTracker:
         stats = dict(rows[0].get("estatisticas") or {})
         if novo_status == "cumprida":
             stats["profecias_cumpridas"] = int(stats.get("profecias_cumpridas", 1797)) + 1
-            stats["profecias_pendentes"] = max(0, int(stats.get("profecias_pendentes", 20)) - 1)
+            stats["profecias_pendentes"] = max(0, int(stats.get("profecias_pendentes", 22)) - 1)
             stats["eventos_cumpridos"] = int(stats.get("eventos_cumpridos", 580)) + 1
             stats["eventos_pendentes"] = max(0, int(stats.get("eventos_pendentes", 20)) - 1)
         elif novo_status == "parcial":
             stats["eventos_cumpridos"] = int(stats.get("eventos_cumpridos", 580)) + 0
 
-        total = int(stats.get("total_profecias_biblicas", 1817))
+        total = int(stats.get("total_profecias_biblicas", 1819))
         cumpridas = int(stats.get("profecias_cumpridas", 1797))
         eventos_total = int(stats.get("eventos_principais_mapeados", 600))
         eventos_cumpridos = int(stats.get("eventos_cumpridos", 580))

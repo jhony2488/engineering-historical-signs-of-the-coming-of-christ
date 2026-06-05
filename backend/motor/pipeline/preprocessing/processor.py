@@ -50,6 +50,24 @@ class Preprocessor:
             "tecnologia": ["cbdc", "digital", "biometr", "surveillance", "ai"],
             "religiao": ["church", "igreja", "faith", "fe", "gospel", "apostasia"],
             "conflito": ["war", "guerra", "conflict", "military"],
+            "narrativa_extraterrestre": [
+                "ufo",
+                "uap",
+                "ovni",
+                "alien",
+                "extraterrestrial",
+                "extraterrestre",
+                "disclosure",
+            ],
+            "engano_apocaliptico": [
+                "false prophet",
+                "falso profeta",
+                "deception",
+                "engano",
+                "lying signs",
+                "prodigio",
+                "apocalyptic",
+            ],
         }
         for topic, keywords in mapping.items():
             if any(k in lower for k in keywords):

@@ -39,6 +39,20 @@ class SupabaseClient:
         result = self._client.table(table).upsert(data, on_conflict=on_conflict).execute()
         return result.data[0] if result.data else data
 
+    def update(
+        self,
+        table: str,
+        filters: dict[str, Any],
+        data: dict[str, Any],
+    ) -> list[dict[str, Any]]:
+        if not self._client:
+            return [{**filters, **data}]
+        query = self._client.table(table).update(data)
+        for key, value in filters.items():
+            query = query.eq(key, value)
+        result = query.execute()
+        return result.data or []
+
     def select(
         self,
         table: str,

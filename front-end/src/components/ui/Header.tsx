@@ -22,6 +22,7 @@ const ADMIN_LINKS = [
   { href: "/grafo", label: "Grafo" },
   { href: "/revisao", label: "Revisão" },
   { href: "/insights", label: "Insights" },
+  { href: "/newsletter", label: "Newsletter" },
 ] as const;
 
 export function Header({

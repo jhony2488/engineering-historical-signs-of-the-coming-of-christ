@@ -18,6 +18,10 @@ import {
   type Point,
 } from "@/lib/utils/geometry";
 
+import {
+  SPLINE_CELEBRATION_END,
+  SPLINE_CELEBRATION_START,
+} from "@/lib/spline-celebration";
 import { SceneSize } from "@/lib/utils/geometry";
 
 export function useSplineCompanionPosition(size: SceneSize = SCENE_SIZE) {
@@ -36,6 +40,7 @@ export function useSplineCompanionPosition(size: SceneSize = SCENE_SIZE) {
   const scrollStopTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const pinTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const lastScrollYRef = useRef(0);
+  const isCelebratingRef = useRef(false);
 
   const applyLateral = useCallback((side: LateralSide, animate: boolean) => {
     lateralSideRef.current = side;
@@ -46,7 +51,7 @@ export function useSplineCompanionPosition(size: SceneSize = SCENE_SIZE) {
   const isMobile = useCallback(() => window.innerWidth < 640, []);
 
   const syncInitialPosition = useCallback(() => {
-    if (isPinnedRef.current) return;
+    if (isPinnedRef.current || isCelebratingRef.current) return;
     setTransitionEnabled(false);
     if (isMobile()) {
       // Lateral X (esquerda ou direita), Y alinhada ao footer
@@ -70,7 +75,7 @@ export function useSplineCompanionPosition(size: SceneSize = SCENE_SIZE) {
     };
 
     const onScrollStop = () => {
-      if (isPinnedRef.current) return;
+      if (isPinnedRef.current || isCelebratingRef.current) return;
 
       isScrollingRef.current = false;
       setIsScrolling(false);
@@ -82,7 +87,7 @@ export function useSplineCompanionPosition(size: SceneSize = SCENE_SIZE) {
     };
 
     const onScroll = () => {
-      if (isPinnedRef.current) return;
+      if (isPinnedRef.current || isCelebratingRef.current) return;
       if (isMobile()) return;
 
       const currentY = window.scrollY;
@@ -111,6 +116,7 @@ export function useSplineCompanionPosition(size: SceneSize = SCENE_SIZE) {
     };
 
     const onDoubleClick = (event: MouseEvent) => {
+      if (isCelebratingRef.current) return;
       if (pinTimerRef.current) clearTimeout(pinTimerRef.current);
 
       isPinnedRef.current = true;
@@ -127,8 +133,22 @@ export function useSplineCompanionPosition(size: SceneSize = SCENE_SIZE) {
       }, PIN_DURATION_MS);
     };
 
+    const onCelebrationStart = () => {
+      isCelebratingRef.current = true;
+      if (scrollStopTimerRef.current) clearTimeout(scrollStopTimerRef.current);
+      if (pinTimerRef.current) clearTimeout(pinTimerRef.current);
+      isPinnedRef.current = false;
+      isScrollingRef.current = false;
+      setIsScrolling(false);
+    };
+
+    const onCelebrationEnd = () => {
+      isCelebratingRef.current = false;
+      syncInitialPosition();
+    };
+
     const onResize = () => {
-      if (isPinnedRef.current) return;
+      if (isPinnedRef.current || isCelebratingRef.current) return;
       if (isScrollingRef.current) {
         const progress = Math.min(1, scrollAccumulatorRef.current / SCROLL_DISTANCE_FOR_CENTER);
         const from = lateralPoint(scrollOriginSideRef.current, sizeRef.current);
@@ -142,11 +162,15 @@ export function useSplineCompanionPosition(size: SceneSize = SCENE_SIZE) {
     window.addEventListener("scroll", onScroll, { passive: true });
     window.addEventListener("dblclick", onDoubleClick);
     window.addEventListener("resize", onResize);
+    window.addEventListener(SPLINE_CELEBRATION_START, onCelebrationStart);
+    window.addEventListener(SPLINE_CELEBRATION_END, onCelebrationEnd);
 
     return () => {
       window.removeEventListener("scroll", onScroll);
       window.removeEventListener("dblclick", onDoubleClick);
       window.removeEventListener("resize", onResize);
+      window.removeEventListener(SPLINE_CELEBRATION_START, onCelebrationStart);
+      window.removeEventListener(SPLINE_CELEBRATION_END, onCelebrationEnd);
       clearScrollStopTimer();
       if (pinTimerRef.current) clearTimeout(pinTimerRef.current);
     };

@@ -129,3 +129,17 @@ model ArquivoProfetico {
   @@index([status])
   @@map("arquivo_profetico")
 }
+
+model NewsletterSubscriber {
+  id               String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  email            String    @unique
+  status           String    @default("active")
+  unsubscribeToken String    @unique @map("unsubscribe_token")
+  source           String?   @default("web")
+  subscribedAt     DateTime  @default(now()) @map("subscribed_at") @db.Timestamptz(6)
+  unsubscribedAt   DateTime? @map("unsubscribed_at") @db.Timestamptz(6)
+  createdAt        DateTime  @default(now()) @map("created_at") @db.Timestamptz(6)
+
+  @@index([status])
+  @@map("newsletter_subscribers")
+}

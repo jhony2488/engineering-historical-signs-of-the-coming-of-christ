@@ -15,6 +15,7 @@ async def test_daily_pipeline_dry_run(llm_dry_run):
     assert len(result.get("ranking_terra", [])) == 10
     assert "relatorio_html" in result
     assert "transicao_fase" in result
+    assert "newsletter_enviados" in result
 
 
 @pytest.mark.asyncio

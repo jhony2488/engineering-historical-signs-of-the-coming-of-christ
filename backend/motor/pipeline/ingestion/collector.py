@@ -66,7 +66,11 @@ class IngestionCollector:
 
     async def collect_gdelt(self) -> list[RawDocument]:
         docs: list[RawDocument] = []
-        query = "middle east conflict OR digital currency OR religious persecution"
+        query = (
+            "middle east conflict OR digital currency OR religious persecution "
+            "OR (UFO OR UAP OR extraterrestrial disclosure) "
+            "OR (false prophet OR apocalyptic deception OR lying signs)"
+        )
         url = (
             "https://api.gdeltproject.org/api/v2/doc/doc"
             f"?query={query}&mode=ArtList&maxrecords=15&format=json"

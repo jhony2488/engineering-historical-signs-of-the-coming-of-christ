@@ -63,7 +63,7 @@ async def health(request: Request) -> dict:
 @app.get("/api/v1/baseline/historico")
 @limiter.limit(settings.api_rate_limit)
 async def baseline_historico(request: Request) -> dict:
-    """Overview de profecias cumpridas (Camada 0) — 1.817 profecias / ~600 eventos."""
+    """Overview de profecias cumpridas (Camada 0) — ~1.819 profecias / ~600 eventos."""
     overview = HistoricalBaselineService().get_overview()
     if not overview:
         overview = HistoricalBaselineService().ensure_initialized()

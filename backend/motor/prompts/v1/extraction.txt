@@ -15,7 +15,13 @@ Você NÃO prevê datas, NÃO interpreta profecias e NÃO opina teologicamente.
 conflito_militar | tensao_diplomatica | sancoes_economicas | colapso_institucional |
 crise_humanitaria | avanco_tecnologico_controle | unificacao_politica | apostasia_religiosa |
 perseguidao_religiosa | desastre_natural | migracao_massa | narrativa_globo_midia |
+narrativa_extraterrestre | narrativa_engano_apocaliptico | prodigio_falso |
 sinal_geopolitico | outro
+
+### Eixos complementares (Apocalipse / enganos)
+- narrativa_extraterrestre: UFO/UAP, disclosure governamental, "não-humanos", OVNIs, civilizações alienígenas
+- narrativa_engano_apocaliptico: falsos profetas, grande engano, sinais enganosos, narrativas messiânicas falsas
+- prodigio_falso: maravilhas/prodígios mediáticos ou tecnológicos que seduzem multidões (eco de Ap 13 / 2Ts 2)
 
 ## regiao (slug)
 oriente_medio | europa | america_norte | america_sul | africa | asia_pacifico |

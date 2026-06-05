@@ -8,9 +8,17 @@ feeds:
   - name: aljazeera
     url: https://www.aljazeera.com/xml/rss/all.xml
     categoria: oriente_medio
+  - name: google_ufo_disclosure
+    url: https://news.google.com/rss/search?q=UFO+OR+UAP+OR+extraterrestrial+disclosure&hl=en-US&gl=US&ceid=US:en
+    categoria: narrativa_extraterrestre
+  - name: google_apocalyptic_deception
+    url: https://news.google.com/rss/search?q=apocalyptic+deception+OR+false+prophet+OR+lying+signs&hl=en-US&gl=US&ceid=US:en
+    categoria: engano_apocaliptico
 
 gdelt_themes:
   - MIDDLE_EAST
   - RELIGION
   - ECON_CURRENCY
   - CYBER_ATTACK
+  - UFO
+  - DISINFO

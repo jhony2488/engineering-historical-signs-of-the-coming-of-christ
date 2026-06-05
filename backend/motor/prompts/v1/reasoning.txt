@@ -23,6 +23,8 @@ A entrada contém tipicamente:
 3. SE eventos dispersos, tensão moderada, sem padrão → ENTÃO FASE_I ou FASE_II com pontuacao_logica baixa
 4. SE timeline indica aceleração vs. estabilidade → ENTÃO ajustar pontuacao_logica ±0.15
 5. SE tons mostram expansao discursiva sem contracao estrutural → ENTÃO cautela (possível falso líder)
+6. SE eventos incluem narrativa_extraterrestre ou narrativa_engano_apocaliptico com impacto_global ≥ 0.5
+   → ENTÃO ponderar FASE_II/III (padrão de sedução/prodígios — Mt 24:24, 2Ts 2, Ap 13)
 
 # pontuacao_logica (0.0–1.0)
 0.0–0.3: evidência fraca ou contraditória

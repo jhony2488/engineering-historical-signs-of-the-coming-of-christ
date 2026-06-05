@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { PropheticBaselinePanel } from "@/components/baseline/PropheticBaselinePanel";
+import { EmailSignupForm } from "@/components/newsletter/EmailSignupForm";
 import { ChipGroup } from "@/components/ui/ChipGroup";
 import { Header } from "@/components/ui/Header";
 import { LoadingDots } from "@/components/ui/LoadingDots";
@@ -78,6 +79,12 @@ export default function ProfeciasPage() {
               atualizacoes={atualizacoes}
               arquivo={arquivo}
               isMock={isMock}
+            />
+
+            <EmailSignupForm
+              source="profecias"
+              title="Avise-me sobre novas profecias cumpridas"
+              description="Receba um e-mail quando o motor detectar novas atualizações no arquivo profético após o run diário."
             />
 
             <ChipGroup

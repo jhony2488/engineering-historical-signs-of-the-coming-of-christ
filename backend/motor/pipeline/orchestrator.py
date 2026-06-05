@@ -17,6 +17,7 @@ from motor.pipeline.fulfillment_tracker import FulfillmentTracker
 from motor.pipeline.historical_baseline import HistoricalBaselineService
 from motor.pipeline.ingestion.collector import IngestionCollector
 from motor.pipeline.llm.layers import LLMPipeline
+from motor.pipeline.newsletter_service import NewsletterDigestService
 from motor.pipeline.preprocessing.processor import Preprocessor
 from motor.pipeline.reports.generator import ReportGenerator
 from motor.schemas.validator import get_validator
@@ -240,7 +241,7 @@ class DailyOrchestrator:
                 "overview_resumo": baseline.get("overview", {}).get("resumo"),
                 "marco_zero_deslocamento": baseline.get("marco_zero_deslocamento"),
                 "profecias_pendentes": baseline.get("estatisticas", {}).get(
-                    "profecias_pendentes", 20
+                    "profecias_pendentes", 22
                 ),
                 "novas_cumpridas_hoje": novas_cumpridas,
                 "atualizacoes_recentes": (baseline.get("atualizacoes") or [])[:5],
@@ -291,7 +292,13 @@ class DailyOrchestrator:
             },
         )
 
+        newsletter_result = NewsletterDigestService(self.db).send_daily_digest(ref_date, payload)
+        payload["newsletter_enviados"] = newsletter_result
+
         logger.info(
-            "daily_run_complete", fase=payload["fase_atual"], indice=payload["indice_global"]
+            "daily_run_complete",
+            fase=payload["fase_atual"],
+            indice=payload["indice_global"],
+            newsletter_sent=newsletter_result.get("sent", 0),
         )
         return payload
