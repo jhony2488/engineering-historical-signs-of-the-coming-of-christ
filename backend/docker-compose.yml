@@ -1,0 +1,76 @@
+services:
+  postgres:
+    image: pgvector/pgvector:pg16
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: sinais
+      POSTGRES_PASSWORD: sinais
+      POSTGRES_DB: sinais
+    ports:
+      - "5433:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./supabase/migrations/20260604000001_init_schema.sql:/docker-entrypoint-initdb.d/01-init.sql:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U sinais -d sinais"]
+      interval: 5s
+      timeout: 5s
+      retries: 12
+      start_period: 30s
+
+  redis:
+    image: redis:7-alpine
+    restart: unless-stopped
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+
+  api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: runtime
+    restart: unless-stopped
+    ports:
+      - "8000:8000"
+    environment:
+      LLM_DRY_RUN: "true"
+      ADMIN_API_KEY: change-me
+      API_RATE_LIMIT: 120/minute
+      REDIS_URL: redis://redis:6379/0
+      # Sem Supabase: motor opera em modo mock (inserts locais, reads vazios)
+      SUPABASE_URL: ""
+      SUPABASE_SERVICE_ROLE_KEY: ""
+      SUPABASE_ANON_KEY: ""
+    depends_on:
+      redis:
+        condition: service_healthy
+      postgres:
+        condition: service_healthy
+
+  # Batch diário em dry-run (sem chaves LLM/Supabase)
+  # Uso: docker compose --profile batch run --rm batch
+  batch:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: runtime
+    profiles: [batch]
+    environment:
+      LLM_DRY_RUN: "true"
+      REDIS_URL: redis://redis:6379/0
+      ADMIN_API_KEY: change-me
+    command: python -m motor.cli run-daily --dry-run --force
+    depends_on:
+      redis:
+        condition: service_healthy
+
+volumes:
+  postgres_data:
+  redis_data:
