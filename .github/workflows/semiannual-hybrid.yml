@@ -1,0 +1,36 @@
+name: Semiannual Hybrid — Motor Nível 3
+
+on:
+  schedule:
+    # 1º de julho, 11:00 UTC (~08:00 BRT)
+    - cron: "0 11 1 7 *"
+    # 1º de janeiro, 12:30 UTC — após annual-hybrid (11:00)
+    - cron: "30 12 1 1 *"
+  workflow_dispatch:
+
+defaults:
+  run:
+    working-directory: backend
+
+jobs:
+  hybrid:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: pip
+          cache-dependency-path: backend/pyproject.toml
+      - run: |
+          python -m pip install --upgrade pip
+          pip install -e .
+      - name: Run semiannual hybrid analysis (Nível 3)
+        env:
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+          GROQ_API_KEY: ${{ secrets.GROQ_API_KEY }}
+          OPENROUTER_API_KEY: ${{ secrets.OPENROUTER_API_KEY }}
+          LLM_DRY_RUN: ${{ vars.LLM_DRY_RUN || 'false' }}
+        run: python -m motor.cli run-hybrid-analysis --window semiannual
