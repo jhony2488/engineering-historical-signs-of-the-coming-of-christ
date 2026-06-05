@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="630" viewBox="0 0 1200 630">
+  <defs>
+    <linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#0a0c10"/>
+      <stop offset="100%" style="stop-color:#1a1f2e"/>
+    </linearGradient>
+  </defs>
+  <rect width="1200" height="630" fill="url(#bg)"/>
+  <text x="80" y="200" fill="#d4a853" font-family="Georgia, serif" font-size="28" letter-spacing="4">ENGENHARIA DE SINAIS</text>
+  <text x="80" y="280" fill="#ffffff" font-family="Georgia, serif" font-size="56" font-weight="bold">Monitor Escatológico</text>
+  <text x="80" y="340" fill="#94a3b8" font-family="system-ui, sans-serif" font-size="24">Análise interpretativa · Transição entre eras · Rankings PAP</text>
+  <circle cx="1000" cy="315" r="120" stroke="#60a5fa" stroke-width="2" fill="none" opacity="0.6"/>
+  <circle cx="1000" cy="315" r="80" stroke="#d4a853" stroke-width="1.5" fill="none" opacity="0.8"/>
+</svg>

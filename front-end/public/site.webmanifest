@@ -1,0 +1,18 @@
+{
+  "name": "Engenharia de Sinais Históricos",
+  "short_name": "Sinais Históricos",
+  "description": "Monitor escatológico analítico — fases, transições e rankings probabilísticos",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#0a0c10",
+  "theme_color": "#11141c",
+  "lang": "pt-BR",
+  "icons": [
+    {
+      "src": "/favicon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}

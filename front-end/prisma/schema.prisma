@@ -1,0 +1,96 @@
+// Prisma schema — leitura do Supabase PostgreSQL (mesmo banco do backend)
+// DDL principal: backend/supabase/migrations/
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
+}
+
+model ResultadoEscatologico {
+  id                 String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  dataReferencia     DateTime @map("data_referencia") @db.Date
+  faseAtual          String   @map("fase_atual")
+  probabilidadeFase  Float    @map("probabilidade_fase")
+  indiceGlobal       Float    @map("indice_global")
+  confianca          Float
+  jsonAnaliseIa      Json     @map("json_analise_ia")
+  createdAt          DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
+
+  @@index([dataReferencia])
+  @@map("resultados_escatologicos")
+}
+
+model RankingProbabilistico {
+  id                 String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  dataReferencia     DateTime @map("data_referencia") @db.Date
+  posicao            Int
+  candidatoId        String   @map("candidato_id")
+  nome               String
+  personagem         String
+  probabilidadeAtual Float    @map("probabilidade_atual")
+  tendencia24h       Float    @default(0) @map("tendencia_24h")
+  fatorPrincipal     String?  @map("fator_principal")
+  scoresCriterio     Json?    @default("{}") @map("scores_criterio")
+  createdAt          DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
+
+  @@index([dataReferencia, personagem])
+  @@map("ranking_probabilistico")
+}
+
+model CandidatoPerfil {
+  id             String   @id
+  nome           String
+  personagem     String
+  scoresCriterio Json     @default("{}") @map("scores_criterio")
+  ativo          Boolean  @default(true)
+  createdAt      DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
+
+  @@map("candidatos_perfil")
+}
+
+model SnapshotPeriodo {
+  id             String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  janela         String
+  dataReferencia DateTime @map("data_referencia") @db.Date
+  dados          Json
+  createdAt      DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
+
+  @@index([janela, dataReferencia])
+  @@map("snapshots_periodo")
+}
+
+model ParametroFase {
+  id         String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  versao     Int
+  ativo      Boolean  @default(false)
+  emissoes   Json
+  transicoes Json
+  aprovado   Boolean  @default(false)
+  createdAt  DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
+
+  @@map("parametros_fase")
+}
+
+model GrafoNo {
+  nodeId    String   @id @map("node_id")
+  tipo      String
+  attrs     Json     @default("{}")
+  createdAt DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
+
+  @@map("grafo_nos")
+}
+
+model GrafoAresta {
+  id        String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  sourceId  String   @map("source_id")
+  targetId  String   @map("target_id")
+  relacao   String
+  createdAt DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
+
+  @@map("grafo_arestas")
+}
