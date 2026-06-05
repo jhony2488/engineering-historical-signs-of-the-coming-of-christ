@@ -1,4 +1,4 @@
-"""Testes do HMM de fases e discretização de observações."""
+"""Phase HMM and observation discretization tests."""
 
 from motor.domain.phases import FaseEscatologica
 from motor.math.hmm import PhaseHMM, discretize_observation

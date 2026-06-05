@@ -15,14 +15,14 @@ describe("useSplineSceneAvailability", () => {
     fetchMock.mockReset();
   });
 
-  it("permanece em checking quando URL está vazia", () => {
+  it("stays in checking when URL is empty", () => {
     const { result } = renderHook(() => useSplineSceneAvailability("   "));
 
     expect(result.current).toBe("checking");
     expect(fetchMock).not.toHaveBeenCalled();
   });
 
-  it("marca unavailable para arquivo .spline do editor", async () => {
+  it("marks unavailable for editor .spline file", async () => {
     const { result } = renderHook(() =>
       useSplineSceneAvailability("/biblically_accurate_angel.spline"),
     );
@@ -33,7 +33,7 @@ describe("useSplineSceneAvailability", () => {
     expect(fetchMock).not.toHaveBeenCalled();
   });
 
-  it("marca ready quando probe HEAD retorna ok", async () => {
+  it("marks ready when HEAD probe succeeds", async () => {
     fetchMock.mockResolvedValueOnce({ ok: true, status: 200 });
 
     const { result } = renderHook(() =>
@@ -49,7 +49,7 @@ describe("useSplineSceneAvailability", () => {
     });
   });
 
-  it("tenta GET quando HEAD retorna 405", async () => {
+  it("falls back to GET when HEAD returns 405", async () => {
     fetchMock
       .mockResolvedValueOnce({ ok: false, status: 405 })
       .mockResolvedValueOnce({ ok: true, status: 200 });
@@ -64,7 +64,7 @@ describe("useSplineSceneAvailability", () => {
     expect(fetchMock).toHaveBeenCalledTimes(2);
   });
 
-  it("marca unavailable quando probe falha", async () => {
+  it("marks unavailable when probe fails", async () => {
     fetchMock.mockRejectedValueOnce(new Error("network"));
 
     const { result } = renderHook(() =>
@@ -76,7 +76,7 @@ describe("useSplineSceneAvailability", () => {
     });
   });
 
-  it("revalida quando sceneUrl muda", async () => {
+  it("revalidates when sceneUrl changes", async () => {
     fetchMock.mockResolvedValue({ ok: true, status: 200 });
 
     const { result, rerender } = renderHook(

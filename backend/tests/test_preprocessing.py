@@ -1,4 +1,4 @@
-"""Testes do pré-processador (Camada 2)."""
+"""Preprocessor tests (Layer 2)."""
 
 from motor.pipeline.preprocessing.processor import Preprocessor
 

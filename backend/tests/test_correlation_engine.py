@@ -1,4 +1,4 @@
-"""Testes do motor de correlação (Camada 8)."""
+"""Correlation engine tests (Layer 8)."""
 
 from motor.pipeline.correlation.engine import CorrelationEngine
 from tests.conftest import SAMPLE_EVENTS, SAMPLE_REASONING

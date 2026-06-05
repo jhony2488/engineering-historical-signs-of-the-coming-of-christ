@@ -25,7 +25,7 @@ describe("useGrafoData", () => {
     vi.clearAllMocks();
   });
 
-  it("inicia em loading com dados mock como fallback", () => {
+  it("starts loading with mock data as fallback", () => {
     fetchGrafo.mockReturnValue(new Promise(() => undefined));
     fetchCenarios.mockReturnValue(new Promise(() => undefined));
 
@@ -37,7 +37,7 @@ describe("useGrafoData", () => {
     expect(result.current.fromDb).toBe(false);
   });
 
-  it("carrega grafo e cenários do banco com sucesso", async () => {
+  it("loads graph and scenarios from database successfully", async () => {
     fetchGrafo.mockResolvedValue(GRAFO_DB);
     fetchCenarios.mockResolvedValue(CENARIOS_DB);
 
@@ -54,7 +54,7 @@ describe("useGrafoData", () => {
     expect(result.current.gnnConvergence).toBe(0.77);
   });
 
-  it("usa fallback mock quando API falha", async () => {
+  it("uses mock fallback when API fails", async () => {
     fetchGrafo.mockRejectedValue(new Error("grafo 500"));
     fetchCenarios.mockRejectedValue(new Error("cenarios 500"));
 

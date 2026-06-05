@@ -1,4 +1,4 @@
-"""Fixtures compartilhadas para testes do motor escatológico."""
+"""Shared fixtures for eschatological engine tests."""
 
 from __future__ import annotations
 
@@ -44,7 +44,7 @@ def candidatos_seed() -> list[dict]:
 
 @pytest.fixture
 def llm_dry_run(monkeypatch: pytest.MonkeyPatch):
-    """Ativa LLM_DRY_RUN e limpa cache de settings."""
+    """Enables LLM_DRY_RUN and clears settings cache."""
     monkeypatch.setenv("LLM_DRY_RUN", "true")
     from motor.config import get_settings
 
@@ -76,7 +76,7 @@ def historico_mock_rows(ref_date: date) -> list[dict]:
 
 
 class FakeSupabase:
-    """Stub mínimo de SupabaseClient para testes unitários."""
+    """Minimal SupabaseClient stub for unit tests."""
 
     def __init__(
         self,

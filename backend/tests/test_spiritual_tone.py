@@ -1,4 +1,4 @@
-"""Testes do analisador de tom espiritual (heurística v1)."""
+"""Spiritual tone analyzer tests (heuristic v1)."""
 
 from motor.ml.spiritual_tone import SpiritualToneAnalyzer
 

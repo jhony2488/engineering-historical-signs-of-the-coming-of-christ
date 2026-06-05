@@ -1,4 +1,4 @@
-"""Testes unitários de rankings e tendencia_24h no orchestrator."""
+"""Unit tests for rankings and tendencia_24h in the orchestrator."""
 
 from datetime import date
 

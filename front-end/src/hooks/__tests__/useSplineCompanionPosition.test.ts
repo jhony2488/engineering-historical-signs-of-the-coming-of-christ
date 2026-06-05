@@ -41,7 +41,7 @@ describe("useSplineCompanionPosition", () => {
     setScrollY(0);
   });
 
-  it("inicializa na posição lateral esquerda no desktop", () => {
+  it("initializes at left lateral position on desktop", () => {
     const expected = lateralPoint("left", SIZE);
     const { result } = renderHook(() => useSplineCompanionPosition(SIZE));
 
@@ -50,7 +50,7 @@ describe("useSplineCompanionPosition", () => {
     expect(result.current.isScrolling).toBe(false);
   });
 
-  it("move para posição do mouse no duplo clique", () => {
+  it("moves to mouse position on double click", () => {
     const { result } = renderHook(() => useSplineCompanionPosition(SIZE));
 
     act(() => {
@@ -64,7 +64,7 @@ describe("useSplineCompanionPosition", () => {
     expect(result.current.position.y).toBe(310 - SIZE.height / 2);
   });
 
-  it("marca isScrolling durante scroll no desktop", () => {
+  it("sets isScrolling during scroll on desktop", () => {
     const { result } = renderHook(() => useSplineCompanionPosition(SIZE));
 
     act(() => {
@@ -76,7 +76,7 @@ describe("useSplineCompanionPosition", () => {
     expect(result.current.transitionEnabled).toBe(false);
   });
 
-  it("alterna lateral após parar de scroll", () => {
+  it("switches lateral side after scroll stops", () => {
     const { result } = renderHook(() => useSplineCompanionPosition(SIZE));
     const initial = lateralPoint("left", SIZE);
 
@@ -97,7 +97,7 @@ describe("useSplineCompanionPosition", () => {
     expect(initial).toEqual(lateralPoint("left", SIZE));
   });
 
-  it("ignora scroll em viewport mobile", () => {
+  it("ignores scroll on mobile viewport", () => {
     setViewport(390, 800);
     const { result } = renderHook(() => useSplineCompanionPosition(SIZE));
     const before = result.current.position;
@@ -111,7 +111,7 @@ describe("useSplineCompanionPosition", () => {
     expect(result.current.position).toEqual(before);
   });
 
-  it("desfixa posição após PIN_DURATION_MS no duplo clique", () => {
+  it("unpins position after PIN_DURATION_MS on double click", () => {
     const { result } = renderHook(() => useSplineCompanionPosition(SIZE));
 
     act(() => {
@@ -131,7 +131,7 @@ describe("useSplineCompanionPosition", () => {
     expect(result.current.position).toEqual(lateralPoint("left", SIZE));
   });
 
-  it("atualiza posição quando size muda após resize", () => {
+  it("updates position when size changes after resize", () => {
     const { result, rerender } = renderHook(
       ({ size }) => useSplineCompanionPosition(size),
       { initialProps: { size: SIZE } },

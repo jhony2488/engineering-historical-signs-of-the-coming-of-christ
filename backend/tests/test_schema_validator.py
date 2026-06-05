@@ -1,4 +1,4 @@
-"""Testes de validação JSON Schema."""
+"""JSON Schema validation tests."""
 
 import jsonschema
 import pytest

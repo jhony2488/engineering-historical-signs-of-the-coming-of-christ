@@ -18,28 +18,28 @@ describe("useResponsiveSceneSize", () => {
     setViewport(1280);
   });
 
-  it("retorna tamanho desktop (SCENE_SIZE) em viewport larga", () => {
+  it("returns desktop size (SCENE_SIZE) on wide viewport", () => {
     setViewport(1280);
     const { result } = renderHook(() => useResponsiveSceneSize({ SCENE_SIZE }));
 
     expect(result.current).toEqual(SCENE_SIZE);
   });
 
-  it("retorna tamanho tablet entre 640px e 1023px", () => {
+  it("returns tablet size between 640px and 1023px", () => {
     setViewport(800);
     const { result } = renderHook(() => useResponsiveSceneSize({ SCENE_SIZE }));
 
     expect(result.current).toEqual({ width: 130, height: 170 });
   });
 
-  it("retorna tamanho mobile abaixo de 640px", () => {
+  it("returns mobile size below 640px", () => {
     setViewport(390);
     const { result } = renderHook(() => useResponsiveSceneSize({ SCENE_SIZE }));
 
     expect(result.current).toEqual({ width: 100, height: 130 });
   });
 
-  it("atualiza tamanho ao redimensionar a janela", () => {
+  it("updates size when window is resized", () => {
     setViewport(1280);
     const { result } = renderHook(() => useResponsiveSceneSize({ SCENE_SIZE }));
 
@@ -53,7 +53,7 @@ describe("useResponsiveSceneSize", () => {
     expect(result.current).toEqual({ width: 100, height: 130 });
   });
 
-  it("reage quando SCENE_SIZE muda", () => {
+  it("reacts when SCENE_SIZE changes", () => {
     setViewport(1280);
     const custom = { width: 180, height: 220 };
     const { result, rerender } = renderHook(

@@ -1,4 +1,4 @@
-"""Testes de classificadores de domínio: energias, macro/micro e bestas."""
+"""Domain classifier tests: energies, macro/micro and beasts."""
 
 from motor.domain.beasts import compute_beast_scores
 from motor.domain.energies import Energia, classify_energy_heuristic

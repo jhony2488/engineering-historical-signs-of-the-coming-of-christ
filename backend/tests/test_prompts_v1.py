@@ -1,4 +1,4 @@
-"""Contratos dos prompts v1 — placeholders e campos obrigatórios."""
+"""v1 prompt contracts — placeholders and required output fields."""
 
 from pathlib import Path
 
@@ -32,11 +32,11 @@ def test_prompt_file_exists(filename: str) -> None:
 def test_prompt_placeholders(filename: str, placeholders: list[str]) -> None:
     content = (PROMPTS_DIR / filename).read_text(encoding="utf-8")
     for ph in placeholders:
-        assert ph in content, f"{filename} deve conter {ph}"
+        assert ph in content, f"{filename} must contain {ph}"
 
 
 @pytest.mark.parametrize("filename,keys", REQUIRED_OUTPUT_KEYS.items())
 def test_prompt_declares_output_keys(filename: str, keys: list[str]) -> None:
     content = (PROMPTS_DIR / filename).read_text(encoding="utf-8")
     for key in keys:
-        assert key in content, f"{filename} deve documentar campo de saída '{key}'"
+        assert key in content, f"{filename} must document output field '{key}'"

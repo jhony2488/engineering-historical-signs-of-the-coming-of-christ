@@ -1,4 +1,4 @@
-"""Testes do gerador de relatório HTML (Camada 9)."""
+"""HTML report generator tests (Layer 9)."""
 
 from motor.pipeline.reports.generator import ReportGenerator
 

@@ -1,4 +1,4 @@
-"""Testes do Motor Nível 2 — síntese periódica."""
+"""Level 2 engine tests — periodic synthesis."""
 
 import pytest
 
