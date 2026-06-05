@@ -1,0 +1,16 @@
+feeds:
+  - name: reuters_world
+    url: https://feeds.reuters.com/reuters/worldNews
+    categoria: geopolitica
+  - name: bbc_world
+    url: http://feeds.bbci.co.uk/news/world/rss.xml
+    categoria: geopolitica
+  - name: aljazeera
+    url: https://www.aljazeera.com/xml/rss/all.xml
+    categoria: oriente_medio
+
+gdelt_themes:
+  - MIDDLE_EAST
+  - RELIGION
+  - ECON_CURRENCY
+  - CYBER_ATTACK

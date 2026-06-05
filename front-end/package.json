@@ -6,7 +6,10 @@
     "dev": "next dev",
     "build": "prisma generate && next build",
     "start": "next start",
-    "lint": "next lint",
+    "lint": "eslint .",
+    "lint:fix": "eslint . --fix",
+    "format": "prettier --write .",
+    "format:check": "prettier --check .",
     "test": "vitest run",
     "test:watch": "vitest",
     "postinstall": "prisma generate",
@@ -16,13 +19,17 @@
     "db:studio": "prisma studio",
     "auth:hash-password": "tsx scripts/hash-password.ts",
     "indexnow:all": "dotenv -e .env.local -- tsx scripts/indexnow-all.ts",
-    "google-indexing": "dotenv -e .env.local -- tsx scripts/google-indexing.ts"
+    "google-indexing": "dotenv -e .env.local -- tsx scripts/google-indexing.ts",
+    "storybook": "storybook dev -p 6006",
+    "build-storybook": "storybook build"
   },
   "prisma": {
     "seed": "tsx prisma/seed.ts"
   },
   "dependencies": {
     "@prisma/client": "^6.1.0",
+    "@splinetool/react-spline": "^4.1.0",
+    "@splinetool/runtime": "^1.12.96",
     "clsx": "^2.1.1",
     "cytoscape": "^3.30.4",
     "isomorphic-dompurify": "^2.30.0",
@@ -32,7 +39,17 @@
     "recharts": "^2.15.0",
     "zod": "^3.25.76"
   },
+  "overrides": {
+    "webpack": "5.101.2"
+  },
   "devDependencies": {
+    "@eslint/eslintrc": "^3.3.1",
+    "@storybook/addon-essentials": "^8.6.14",
+    "@storybook/addon-links": "^8.6.14",
+    "@storybook/blocks": "^8.6.14",
+    "@storybook/nextjs": "^8.6.14",
+    "@storybook/react": "^8.6.14",
+    "@storybook/test": "^8.6.14",
     "@testing-library/jest-dom": "^6.6.3",
     "@testing-library/react": "^16.1.0",
     "@types/node": "^22.10.0",
@@ -42,12 +59,16 @@
     "autoprefixer": "^10.4.20",
     "eslint": "^9.16.0",
     "eslint-config-next": "^15.1.0",
+    "eslint-config-prettier": "^10.1.5",
     "jsdom": "^26.0.0",
     "postcss": "^8.4.49",
+    "prettier": "^3.5.3",
     "prisma": "^6.1.0",
+    "storybook": "^8.6.14",
     "tailwindcss": "^3.4.16",
     "tsx": "^4.19.0",
     "typescript": "^5.7.2",
-    "vitest": "^3.0.5"
+    "vitest": "^3.0.5",
+    "webpack": "5.101.2"
   }
 }
