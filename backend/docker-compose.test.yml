@@ -1,0 +1,68 @@
+# Stack de testes — não sobe API nem Postgres por padrão
+#
+# Rodar todos os testes:
+#   docker compose -f docker-compose.test.yml run --rm test
+#
+# Rodar com relatório verboso:
+#   docker compose -f docker-compose.test.yml run --rm test pytest tests/ -v
+#
+# Subir API + rodar testes de integração HTTP (health):
+#   docker compose -f docker-compose.test.yml --profile integration up -d api
+#   docker compose -f docker-compose.test.yml --profile integration run --rm test-integration
+
+services:
+  test:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: test
+    environment:
+      LLM_DRY_RUN: "true"
+      ADMIN_API_KEY: change-me
+      PYTHONPATH: /app
+    command: pytest tests/ -q --tb=short
+
+  # Testes com código montado (útil durante desenvolvimento)
+  test-dev:
+    profiles: [dev]
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: test
+    volumes:
+      - ./motor:/app/motor
+      - ./api:/app/api
+      - ./tests:/app/tests
+      - ./config:/app/config
+    environment:
+      LLM_DRY_RUN: "true"
+      ADMIN_API_KEY: change-me
+    command: pytest tests/ -q --tb=short
+
+  # API mínima para smoke test HTTP
+  api:
+    profiles: [integration]
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: runtime
+    ports:
+      - "8000:8000"
+    environment:
+      LLM_DRY_RUN: "true"
+      ADMIN_API_KEY: change-me
+      API_RATE_LIMIT: 120/minute
+
+  test-integration:
+    profiles: [integration]
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: test
+    environment:
+      LLM_DRY_RUN: "true"
+      API_BASE_URL: http://api:8000
+    command: pytest tests/test_api.py -q --tb=short
+    depends_on:
+      api:
+        condition: service_healthy
