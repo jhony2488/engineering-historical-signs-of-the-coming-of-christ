@@ -4,7 +4,7 @@ import { PhaseTimeline } from "@/components/dashboard/PhaseTimeline";
 import { TRANSICAO_ATIVA } from "./fixtures";
 
 describe("PhaseTimeline", () => {
-  it("destaca fase ativa em modo estável", () => {
+  it("highlights active phase in stable mode", () => {
     render(
       <PhaseTimeline
         faseAtual="FASE_II"
@@ -19,7 +19,7 @@ describe("PhaseTimeline", () => {
     expect(screen.getByText(/HMM:/)).toHaveTextContent("41%");
   });
 
-  it("exibe modo transição com fases dominante e secundária", () => {
+  it("shows transition mode with dominant and secondary phases", () => {
     render(
       <PhaseTimeline
         faseAtual="FASE_II"
@@ -34,7 +34,7 @@ describe("PhaseTimeline", () => {
     expect(screen.getByText(/próxima/)).toBeInTheDocument();
   });
 
-  it("renderiza as quatro fases da linha do tempo", () => {
+  it("renders all four timeline phases", () => {
     render(<PhaseTimeline faseAtual="FASE_I" probabilidade={0.4} />);
     expect(screen.getByRole("heading", { name: "O Início das Dores" })).toBeInTheDocument();
     expect(screen.getByRole("heading", { name: "A Grande Apostasia" })).toBeInTheDocument();

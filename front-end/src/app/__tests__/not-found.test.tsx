@@ -3,7 +3,7 @@ import { describe, expect, it } from "vitest";
 import NotFound from "@/app/not-found";
 
 describe("NotFound", () => {
-  it("renderiza código 404 e links de navegação", () => {
+  it("renders 404 code and navigation links", () => {
     render(<NotFound />);
     expect(screen.getByText("404")).toBeInTheDocument();
     expect(screen.getByText("Sinal não mapeado")).toBeInTheDocument();

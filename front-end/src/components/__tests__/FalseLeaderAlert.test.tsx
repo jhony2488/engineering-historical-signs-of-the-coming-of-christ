@@ -3,7 +3,7 @@ import { describe, expect, it } from "vitest";
 import { FalseLeaderAlert } from "@/components/dashboard/FalseLeaderAlert";
 
 describe("FalseLeaderAlert", () => {
-  it("renderiza alerta ativo com scores opcionais", () => {
+  it("renders active alert with optional scores", () => {
     render(
       <FalseLeaderAlert
         alerta
@@ -19,13 +19,13 @@ describe("FalseLeaderAlert", () => {
     expect(screen.getByText("Divergência discurso vs estrutura.")).toBeInTheDocument();
   });
 
-  it("renderiza estado sem alerta", () => {
+  it("renders no-alert state", () => {
     render(<FalseLeaderAlert alerta={false} scoreIncongruencia={0.2} />);
     expect(screen.getByText(/Sem alerta de falso líder/)).toBeInTheDocument();
     expect(screen.queryByText(/Alerta de engano sistêmico/)).not.toBeInTheDocument();
   });
 
-  it("omite colunas de discurso e estrutura quando undefined", () => {
+  it("omits discourse and structure columns when undefined", () => {
     render(<FalseLeaderAlert alerta scoreIncongruencia={0.5} />);
     expect(screen.queryByText("Discurso")).not.toBeInTheDocument();
     expect(screen.queryByText("Estrutura")).not.toBeInTheDocument();

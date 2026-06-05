@@ -13,12 +13,12 @@ describe("cache", () => {
     localStorage.clear();
   });
 
-  it("retorna null quando cache está vazio", () => {
+  it("returns null when cache is empty", () => {
     expect(getCached(cacheKeys.resultado.data, cacheKeys.resultado.ts)).toBeNull();
     expect(isCacheExpired(cacheKeys.resultado.ts)).toBe(true);
   });
 
-  it("armazena e recupera dados no mesmo dia", () => {
+  it("stores and retrieves data on the same day", () => {
     const payload = { indice_global: 0.58 };
     setCache(cacheKeys.resultado.data, payload, cacheKeys.resultado.ts);
 
@@ -26,7 +26,7 @@ describe("cache", () => {
     expect(getCached(cacheKeys.resultado.data, cacheKeys.resultado.ts)).toEqual(payload);
   });
 
-  it("expira cache de dia anterior", () => {
+  it("expires cache from previous day", () => {
     const yesterday = new Date();
     yesterday.setDate(yesterday.getDate() - 1);
 
@@ -37,7 +37,7 @@ describe("cache", () => {
     expect(getCached(cacheKeys.resultado.data, cacheKeys.resultado.ts)).toBeNull();
   });
 
-  it("limpa cache corretamente", () => {
+  it("clears cache correctly", () => {
     setCache(cacheKeys.resultado.data, { x: 1 }, cacheKeys.resultado.ts);
     clearCache(cacheKeys.resultado.data, cacheKeys.resultado.ts);
 
@@ -45,7 +45,7 @@ describe("cache", () => {
     expect(isCacheExpired(cacheKeys.resultado.ts)).toBe(true);
   });
 
-  it("getStaleCached ignora expiração", () => {
+  it("getStaleCached ignores expiration", () => {
     const yesterday = new Date();
     yesterday.setDate(yesterday.getDate() - 1);
     localStorage.setItem(cacheKeys.resultado.data, JSON.stringify({ stale: true }));
@@ -55,7 +55,7 @@ describe("cache", () => {
     expect(getStaleCached(cacheKeys.resultado.data)).toEqual({ stale: true });
   });
 
-  it("retorna null para JSON inválido", () => {
+  it("returns null for invalid JSON", () => {
     localStorage.setItem(cacheKeys.resultado.data, "not-json");
     localStorage.setItem(cacheKeys.resultado.ts, Date.now().toString());
 

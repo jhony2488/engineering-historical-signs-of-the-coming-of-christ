@@ -4,12 +4,12 @@ import { InterpretationPanel } from "@/components/dashboard/InterpretationPanel"
 import { INTERPRETACAO_COMPLETA } from "./fixtures";
 
 describe("InterpretationPanel", () => {
-  it("não renderiza quando interpretacao é undefined", () => {
+  it("does not render when interpretacao is undefined", () => {
     const { container } = render(<InterpretationPanel />);
     expect(container).toBeEmptyDOMElement();
   });
 
-  it("renderiza aderência, listas e citações", () => {
+  it("renders adherence, lists and citations", () => {
     render(<InterpretationPanel interpretacao={INTERPRETACAO_COMPLETA} />);
     expect(screen.getByText("Interpretação Hermenêutica")).toBeInTheDocument();
     expect(screen.getByText(/Aderência profética:/)).toHaveTextContent("55%");
@@ -19,7 +19,7 @@ describe("InterpretationPanel", () => {
     expect(screen.getByText("Ap 13:16-17")).toBeInTheDocument();
   });
 
-  it("omite seções vazias", () => {
+  it("omits empty sections", () => {
     render(
       <InterpretationPanel
         interpretacao={{ aderencia_profetica: 0.4, similaridades: [], divergencias: [], citacoes: [] }}

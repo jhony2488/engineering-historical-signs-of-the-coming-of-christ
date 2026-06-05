@@ -4,17 +4,17 @@ import { SynthesisPanel } from "@/components/historico/SynthesisPanel";
 import { SNAPSHOT_NIVEL2, SNAPSHOT_NIVEL3 } from "./fixtures";
 
 describe("SynthesisPanel", () => {
-  it("exibe estado de carregamento", () => {
+  it("shows loading state", () => {
     render(<SynthesisPanel snapshot={null} hybrid={null} loading />);
     expect(screen.getByText(/Carregando síntese do período/)).toBeInTheDocument();
   });
 
-  it("exibe fallback quando não há snapshots", () => {
+  it("shows fallback when there are no snapshots", () => {
     render(<SynthesisPanel snapshot={null} hybrid={null} />);
     expect(screen.getByText(/Nenhum snapshot de síntese/)).toBeInTheDocument();
   });
 
-  it("renderiza painel Nível 2 com delta e padrões", () => {
+  it("renders Level 2 panel with delta and patterns", () => {
     render(
       <SynthesisPanel
         snapshot={SNAPSHOT_NIVEL2}
@@ -31,7 +31,7 @@ describe("SynthesisPanel", () => {
     expect(screen.getByText(/\+17\.0 pp/)).toBeInTheDocument();
   });
 
-  it("renderiza painel Nível 3 híbrido", () => {
+  it("renders Level 3 hybrid panel", () => {
     render(<SynthesisPanel snapshot={null} hybrid={SNAPSHOT_NIVEL3} />);
     expect(screen.getByText("Motor Nível 3")).toBeInTheDocument();
     expect(screen.getByText(/Panorama anual/)).toBeInTheDocument();
@@ -39,7 +39,7 @@ describe("SynthesisPanel", () => {
     expect(screen.getByText(/Mt 24:6-7/)).toBeInTheDocument();
   });
 
-  it("renderiza ambos os painéis lado a lado", () => {
+  it("renders both panels side by side", () => {
     render(<SynthesisPanel snapshot={SNAPSHOT_NIVEL2} hybrid={SNAPSHOT_NIVEL3} />);
     expect(screen.getByText("Motor Nível 2")).toBeInTheDocument();
     expect(screen.getByText("Motor Nível 3")).toBeInTheDocument();

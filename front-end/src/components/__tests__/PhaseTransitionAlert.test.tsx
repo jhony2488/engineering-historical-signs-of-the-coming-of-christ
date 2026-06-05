@@ -4,7 +4,7 @@ import { PhaseTransitionAlert } from "@/components/dashboard/PhaseTransitionAler
 import { TRANSICAO_ATIVA } from "./fixtures";
 
 describe("PhaseTransitionAlert", () => {
-  it("não renderiza quando transicao_entre_fases é false", () => {
+  it("does not render when transicao_entre_fases is false", () => {
     const { container } = render(
       <PhaseTransitionAlert
         transicao={{ ...TRANSICAO_ATIVA, transicao_entre_fases: false }}
@@ -13,7 +13,7 @@ describe("PhaseTransitionAlert", () => {
     expect(container).toBeEmptyDOMElement();
   });
 
-  it("renderiza títulos das fases adjacentes e pontuações", () => {
+  it("renders adjacent phase titles and scores", () => {
     render(<PhaseTransitionAlert transicao={TRANSICAO_ATIVA} />);
     expect(screen.getByText("Zona de Transição entre Fases")).toBeInTheDocument();
     expect(screen.getByText("A Grande Apostasia")).toBeInTheDocument();
@@ -22,14 +22,14 @@ describe("PhaseTransitionAlert", () => {
     expect(screen.getByText(/38\.0%/)).toBeInTheDocument();
   });
 
-  it("exibe margem entre fases e descrição", () => {
+  it("shows margin between phases and description", () => {
     render(<PhaseTransitionAlert transicao={TRANSICAO_ATIVA} />);
     expect(screen.getByText(/Δ 2\.0%/)).toBeInTheDocument();
     expect(screen.getByText(TRANSICAO_ATIVA.descricao)).toBeInTheDocument();
     expect(screen.getByText(/Proximidade relativa: 95%/)).toBeInTheDocument();
   });
 
-  it("identifica fase dominante e secundária nos rótulos", () => {
+  it("labels dominant and secondary phases", () => {
     render(<PhaseTransitionAlert transicao={TRANSICAO_ATIVA} />);
     expect(screen.getByText("Mais próxima")).toBeInTheDocument();
     expect(screen.getByText("Segunda mais próxima")).toBeInTheDocument();

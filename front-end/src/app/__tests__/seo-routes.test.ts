@@ -8,7 +8,7 @@ import robots from "@/app/robots";
 
 describe("seo routes", () => {
 
-  it("sitemap inclui apenas rotas públicas", () => {
+  it("sitemap includes only public routes", () => {
 
     const entries = sitemap();
 
@@ -26,7 +26,7 @@ describe("seo routes", () => {
 
 
 
-  it("robots bloqueia api e área admin", () => {
+  it("robots blocks api and admin area", () => {
 
     const r = robots();
 

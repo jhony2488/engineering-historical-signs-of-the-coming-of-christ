@@ -5,7 +5,7 @@ import { MOCK_RESULTADO } from "@/lib/mock";
 import { RANKING_TENDENCIAS } from "./fixtures";
 
 describe("RankingTable", () => {
-  it("renderiza candidatos do ranking Top-10", () => {
+  it("renders Top-10 ranking candidates", () => {
     render(
       <RankingTable
         title="Besta do Mar"
@@ -19,14 +19,16 @@ describe("RankingTable", () => {
     expect(screen.getAllByRole("row")).toHaveLength(11);
   });
 
-  it("mostra ícones de tendência 24h (alta, baixa, estável)", () => {
+  it("shows 24h trend icons (up, down, stable)", () => {
     render(<RankingTable title="Tendências" subtitle="PAP" items={RANKING_TENDENCIAS} />);
-    expect(screen.getByText(/▲ \+2\.5%/)).toBeInTheDocument();
-    expect(screen.getByText(/▼ -1\.2%/)).toBeInTheDocument();
-    expect(screen.getByText("▬ Estável")).toBeInTheDocument();
+    expect(screen.getByText(/\+2\.5%/)).toBeInTheDocument();
+    expect(screen.getByText(/-1\.2%/)).toBeInTheDocument();
+    expect(screen.getByText("Estável")).toBeInTheDocument();
+    expect(screen.getByText("Tendência de alta")).toBeInTheDocument();
+    expect(screen.getByText("Tendência de queda")).toBeInTheDocument();
   });
 
-  it("exibe posição, PAP e fator principal", () => {
+  it("shows position, PAP and main factor", () => {
     render(<RankingTable title="Detalhes" subtitle="-" items={RANKING_TENDENCIAS.slice(0, 1)} />);
     expect(screen.getByText("1º")).toBeInTheDocument();
     expect(screen.getByText("Candidato Alta")).toBeInTheDocument();
@@ -34,7 +36,7 @@ describe("RankingTable", () => {
     expect(screen.getByText("Destaque em carisma_global")).toBeInTheDocument();
   });
 
-  it("mostra mensagem quando lista vazia", () => {
+  it("shows message when list is empty", () => {
     render(<RankingTable title="Vazio" subtitle="-" items={[]} />);
     expect(screen.getByText("Nenhum candidato ranqueado")).toBeInTheDocument();
   });

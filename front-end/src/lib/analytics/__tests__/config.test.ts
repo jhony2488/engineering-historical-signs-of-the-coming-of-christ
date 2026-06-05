@@ -10,17 +10,17 @@ describe("analytics config", () => {
     vi.unstubAllEnvs();
   });
 
-  it("aceita measurement id válido", () => {
+  it("accepts valid measurement id", () => {
     vi.stubEnv("NEXT_PUBLIC_GA_MEASUREMENT_ID", "G-ABC123");
     expect(getGaMeasurementId()).toBe("G-ABC123");
   });
 
-  it("rejeita measurement id inválido", () => {
+  it("rejects invalid measurement id", () => {
     vi.stubEnv("NEXT_PUBLIC_GA_MEASUREMENT_ID", "UA-OLD");
     expect(getGaMeasurementId()).toBeUndefined();
   });
 
-  it("rastreia apenas rotas públicas", () => {
+  it("tracks only public routes", () => {
     expect(isPublicAnalyticsPath("/")).toBe(true);
     expect(isPublicAnalyticsPath("/rankings")).toBe(true);
     expect(isPublicAnalyticsPath("/historico")).toBe(false);

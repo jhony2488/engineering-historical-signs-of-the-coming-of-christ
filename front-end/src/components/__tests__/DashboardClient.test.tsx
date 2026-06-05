@@ -10,6 +10,8 @@ const fetchResultadoAtual = vi.fn();
 const fetchHistorico = vi.fn();
 const fetchRankingSWR = vi.fn();
 const fetchRanking = vi.fn();
+const fetchBaselineHistoricoSWR = vi.fn();
+const fetchBaselineAtualizacoesSWR = vi.fn();
 const getDataSource = vi.fn(() => "db" as const);
 
 vi.mock("@/components/charts/ConvictionChart", () => ({
@@ -22,6 +24,8 @@ vi.mock("@/lib/api", () => ({
   fetchHistorico: (...args: unknown[]) => fetchHistorico(...args),
   fetchRankingSWR: (...args: unknown[]) => fetchRankingSWR(...args),
   fetchRanking: (...args: unknown[]) => fetchRanking(...args),
+  fetchBaselineHistoricoSWR: (...args: unknown[]) => fetchBaselineHistoricoSWR(...args),
+  fetchBaselineAtualizacoesSWR: (...args: unknown[]) => fetchBaselineAtualizacoesSWR(...args),
   getDataSource: () => getDataSource(),
 }));
 
@@ -68,9 +72,21 @@ describe("DashboardClient", () => {
         source: "db",
       }),
     );
+    fetchBaselineHistoricoSWR.mockResolvedValue({
+      data: null,
+      fromCache: false,
+      isMock: false,
+      source: "db",
+    });
+    fetchBaselineAtualizacoesSWR.mockResolvedValue({
+      data: [],
+      fromCache: false,
+      isMock: false,
+      source: "db",
+    });
   });
 
-  it("exibe loading e depois painel com dados mock", async () => {
+  it("shows loading then panel with mock data", async () => {
     render(<DashboardClient />);
     await waitFor(() => {
       expect(screen.getByText("Monitor Escatológico")).toBeInTheDocument();
@@ -79,14 +95,14 @@ describe("DashboardClient", () => {
     expect(screen.getByText("Coalizão de Mediação Global")).toBeInTheDocument();
   });
 
-  it("mostra alerta de transição quando resultado tem transicao_fase", async () => {
+  it("shows transition alert when result has transicao_fase", async () => {
     render(<DashboardClient />);
     await waitFor(() => {
       expect(screen.getByText("Zona de Transição entre Fases")).toBeInTheDocument();
     });
   });
 
-  it("revalida dados ao clicar em Atualizar", async () => {
+  it("revalidates data when clicking Refresh", async () => {
     render(<DashboardClient />);
     await waitFor(() => screen.getByText("Atualizar dados"));
 
@@ -98,7 +114,7 @@ describe("DashboardClient", () => {
     });
   });
 
-  it("exibe estado vazio quando não há resultado", async () => {
+  it("shows empty state when there is no result", async () => {
     fetchResultadoAtualSWR.mockResolvedValueOnce({
       data: null as unknown as typeof MOCK_RESULTADO,
       fromCache: false,
@@ -113,7 +129,7 @@ describe("DashboardClient", () => {
     });
   });
 
-  it("revalida em background quando SWR retorna cache stale", async () => {
+  it("revalidates in background when SWR returns stale cache", async () => {
     fetchResultadoAtualSWR.mockResolvedValueOnce({
       data: MOCK_RESULTADO,
       fromCache: true,

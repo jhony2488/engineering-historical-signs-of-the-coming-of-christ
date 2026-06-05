@@ -20,6 +20,8 @@ export function applySecurityHeaders(response: NextResponse): NextResponse {
   const apiOrigin = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
   const gaConnect =
     "https://www.google-analytics.com https://analytics.google.com https://region1.google-analytics.com https://www.googletagmanager.com";
+  const splineConnect =
+    "https://unpkg.com https://prod.spline.design https://*.spline.design";
 
   response.headers.set(
     "Content-Security-Policy",
@@ -29,7 +31,8 @@ export function applySecurityHeaders(response: NextResponse): NextResponse {
       "style-src 'self' 'unsafe-inline'",
       "img-src 'self' data: blob: https://www.google-analytics.com",
       "font-src 'self'",
-      `connect-src 'self' ${apiOrigin} ${gaConnect}`,
+      `connect-src 'self' ${apiOrigin} ${gaConnect} ${splineConnect}`,
+      "worker-src 'self' blob:",
       "frame-ancestors 'none'",
       "base-uri 'self'",
       "form-action 'self'",

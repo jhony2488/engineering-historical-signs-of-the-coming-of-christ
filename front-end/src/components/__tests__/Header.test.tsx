@@ -11,13 +11,15 @@ vi.mock("next/navigation", () => ({
 
 describe("Header", () => {
 
-  it("renderiza navegação pública (somente leitura)", () => {
+  it("renders public read-only navigation", () => {
 
     render(<Header />);
 
     expect(screen.getByText("Monitor Escatológico")).toBeInTheDocument();
 
     expect(screen.getByRole("link", { name: "Painel" })).toHaveAttribute("href", "/");
+
+    expect(screen.getByRole("link", { name: "Profecias" })).toHaveAttribute("href", "/profecias");
 
     expect(screen.getByRole("link", { name: "Rankings" })).toHaveAttribute("href", "/rankings");
 
@@ -31,7 +33,7 @@ describe("Header", () => {
 
 
 
-  it("variante admin exibe rotas restritas e sair", () => {
+  it("admin variant shows restricted routes and logout", () => {
 
     render(<Header variant="admin" />);
 
@@ -45,13 +47,13 @@ describe("Header", () => {
 
     expect(screen.getByRole("link", { name: "Insights" })).toHaveAttribute("href", "/insights");
 
-    expect(screen.getByRole("button", { name: "Sair" })).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "Sair da área administrativa" })).toBeInTheDocument();
 
   });
 
 
 
-  it("não exibe metadados sem dataReferencia", () => {
+  it("does not show metadata without dataReferencia", () => {
 
     render(<Header />);
 
@@ -61,7 +63,7 @@ describe("Header", () => {
 
 
 
-  it("exibe metadados de referência e fonte", () => {
+  it("shows reference date and source metadata", () => {
 
     render(<Header dataReferencia="2026-06-04" fromCache isMock dataSource="db" />);
 

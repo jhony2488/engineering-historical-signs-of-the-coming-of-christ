@@ -6,25 +6,25 @@ import { NextRequest } from "next/server";
 import { middleware } from "@/middleware";
 
 describe("middleware", () => {
-  it("ignora rotas /api públicas sem headers extras", async () => {
+  it("bypasses public /api routes without extra headers", async () => {
     const req = new NextRequest(new URL("http://localhost:3000/api/db/resultado/atual"));
     const res = await middleware(req);
     expect(res.headers.get("X-Frame-Options")).toBeNull();
   });
 
-  it("bloqueia API de snapshot sem sessão", async () => {
+  it("blocks snapshot API without session", async () => {
     const req = new NextRequest(new URL("http://localhost:3000/api/db/snapshot/weekly"));
     const res = await middleware(req);
     expect(res.status).toBe(401);
   });
 
-  it("bloqueia API de analytics admin sem sessão", async () => {
+  it("blocks admin analytics API without session", async () => {
     const req = new NextRequest(new URL("http://localhost:3000/api/admin/analytics"));
     const res = await middleware(req);
     expect(res.status).toBe(401);
   });
 
-  it("redireciona páginas privadas para login", async () => {
+  it("redirects private pages to login", async () => {
     const req = new NextRequest(new URL("http://localhost:3000/historico"));
     const res = await middleware(req);
     expect(res.status).toBeGreaterThanOrEqual(300);
@@ -32,7 +32,7 @@ describe("middleware", () => {
     expect(res.headers.get("location")).toContain("from=%2Fhistorico");
   });
 
-  it("aplica headers de segurança em páginas públicas", async () => {
+  it("applies security headers on public pages", async () => {
     const req = new NextRequest(new URL("http://localhost:3000/rankings"));
     const res = await middleware(req);
     expect(res.headers.get("X-Frame-Options")).toBe("DENY");
@@ -40,7 +40,7 @@ describe("middleware", () => {
     expect(res.headers.get("Content-Security-Policy")).toContain("default-src 'self'");
   });
 
-  it("ignora arquivos estáticos", async () => {
+  it("bypasses static files", async () => {
     const req = new NextRequest(new URL("http://localhost:3000/favicon.ico"));
     const res = await middleware(req);
     expect(res.headers.get("X-Frame-Options")).toBeNull();

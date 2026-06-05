@@ -1,4 +1,4 @@
-﻿import { beforeEach, describe, expect, it, vi } from "vitest";
+import { beforeEach, describe, expect, it, vi } from "vitest";
 
 const { findFirst, findMany } = vi.hoisted(() => ({
   findFirst: vi.fn(),
@@ -27,17 +27,17 @@ const baseJson = {
   ranking_terra: [],
 };
 
-describe("db/resultados", () => {
+describe("db/results", () => {
   beforeEach(() => {
     vi.clearAllMocks();
   });
 
-  it("getUltimoResultado retorna null sem dados", async () => {
+  it("getUltimoResultado returns null when no data", async () => {
     findFirst.mockResolvedValue(null);
     expect(await getUltimoResultado()).toBeNull();
   });
 
-  it("getUltimoResultado mapeia campos do prisma", async () => {
+  it("getUltimoResultado maps prisma fields", async () => {
     findFirst.mockResolvedValue({
       dataReferencia: new Date("2026-06-04"),
       faseAtual: "FASE_II",
@@ -53,12 +53,12 @@ describe("db/resultados", () => {
     expect(result?.indice_global).toBe(0.58);
   });
 
-  it("getRankingDb retorna vazio sem data", async () => {
+  it("getRankingDb returns empty when no date", async () => {
     findFirst.mockResolvedValue(null);
     expect(await getRankingDb("besta_mar")).toEqual([]);
   });
 
-  it("getHistoricoResultados mapeia lista", async () => {
+  it("getHistoricoResultados maps list", async () => {
     findMany.mockResolvedValue([
       {
         dataReferencia: new Date("2026-06-01"),

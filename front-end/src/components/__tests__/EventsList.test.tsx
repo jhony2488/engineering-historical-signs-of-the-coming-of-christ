@@ -4,7 +4,7 @@ import { EventsList } from "@/components/dashboard/EventsList";
 import { EVENTO_CONTRACAO, EVENTO_EXPANSAO } from "./fixtures";
 
 describe("EventsList", () => {
-  it("renderiza eventos com métricas e badges", () => {
+  it("renders events with metrics and badges", () => {
     render(<EventsList eventos={[EVENTO_CONTRACAO, EVENTO_EXPANSAO]} />);
     expect(screen.getByText("conflito militar")).toBeInTheDocument();
     expect(screen.getByText("despertamento local")).toBeInTheDocument();
@@ -15,12 +15,12 @@ describe("EventsList", () => {
     expect(screen.getByText(EVENTO_CONTRACAO.descricao!)).toBeInTheDocument();
   });
 
-  it("mostra mensagem quando lista vazia", () => {
+  it("shows message when list is empty", () => {
     render(<EventsList eventos={[]} />);
     expect(screen.getByText("Nenhum evento processado")).toBeInTheDocument();
   });
 
-  it("renderiza evento sem descrição", () => {
+  it("renders event without description", () => {
     const semDesc = { ...EVENTO_EXPANSAO, descricao: undefined };
     render(<EventsList eventos={[semDesc]} />);
     expect(screen.getByText("despertamento local")).toBeInTheDocument();
