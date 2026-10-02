@@ -84,7 +84,8 @@ No-op intencional — a política atual é retenção somente no Postgres
 ## Classificadores locais (destilação)
 
 Contexto completo sobre quais modelos treinam e quais são pré-treinados:
-[modelos-locais.md](modelos-locais.md).
+[modelos-locais.md](modelos-locais.md). Runbook operacional do ciclo de
+treino/revisão/ativação: [treino-modelos.md](treino-modelos.md).
 
 ### `export-extraction-dataset`
 

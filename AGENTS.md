@@ -62,6 +62,7 @@ com profecias e publicação de rankings/fases em um dashboard.
 | [backend/docs/setup-supabase.md](backend/docs/setup-supabase.md) | Setup do Supabase e migrations |
 | [backend/docs/model-providers.md](backend/docs/model-providers.md) | Provedores LLM (Groq, OpenRouter, Ollama) |
 | [backend/docs/modelos-locais.md](backend/docs/modelos-locais.md) | Modelos locais: pré-treinados × paramétricos × treinados |
+| [backend/docs/treino-modelos.md](backend/docs/treino-modelos.md) | Runbook de treino/recalibração (EM, destilação, GNN) |
 | [backend/docs/github-actions.md](backend/docs/github-actions.md) | Workflows, crons e secrets |
 | [backend/README.md](backend/README.md) | Visão geral e CLI do motor |
 | [front-end/README.md](front-end/README.md) | Visão geral do dashboard |

@@ -62,6 +62,9 @@ embeddings, degradam para heurística lexical de keywords
 
 ## Treinados de verdade
 
+> Ciclo operacional completo (quando treinar, revisar, ativar e reverter):
+> [treino-modelos.md](treino-modelos.md).
+
 ### Destilação sklearn (camada 4)
 
 `export-extraction-dataset` exporta pares trecho↔extração validada do LLM
