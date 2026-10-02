@@ -2,12 +2,14 @@
 
 import { useEffect, useRef, useState } from "react";
 
+import { useCachedSplineScene } from "@/hooks/useCachedSplineScene";
 import { useResponsiveSceneSize } from "@/hooks/useResponsiveSceneSize";
 import { useSplineCelebration } from "@/hooks/useSplineCelebration";
 import { useSplineCompanionPosition } from "@/hooks/useSplineCompanionPosition";
 
 import { SCENE_SIZE } from "../../lib/utils/constants";
 import { LazySplineScene } from "./LazySplineScene";
+import { SplineSceneFallback } from "./SplineSceneFallback";
 
 export function FloatingSplineCompanion() {
   const responsiveSize = useResponsiveSceneSize({ SCENE_SIZE });
@@ -20,6 +22,7 @@ export function FloatingSplineCompanion() {
   const sceneUrl = isMobile
     ? "/biblically_accurate_angel_eyes_and_rings-2.spline"
     : "/biblically_accurate_angel_eyes_and_rings.spline";
+  const { url: cachedSceneUrl } = useCachedSplineScene(sceneUrl);
   const innerRef = useRef<HTMLDivElement>(null);
   const [isPlaying, setIsPlaying] = useState(false);
 
@@ -84,7 +87,11 @@ export function FloatingSplineCompanion() {
         </>
       )}
       <div ref={innerRef} className="pointer-events-auto h-full w-full">
-        <LazySplineScene scene={sceneUrl} />
+        {cachedSceneUrl ? (
+          <LazySplineScene scene={cachedSceneUrl} />
+        ) : (
+          <SplineSceneFallback />
+        )}
       </div>
     </div>
   );

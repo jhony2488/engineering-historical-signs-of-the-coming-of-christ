@@ -2,6 +2,10 @@
 export const SPLINE_SCENE_PATH =
   "/biblically_accurate_angel_eyes_and_rings.spline";
 
+/** Bump manual se a cena mudar sem alterar ETag/Last-Modified (ver .env.example). */
+export const SPLINE_CACHE_VERSION =
+  process.env.NEXT_PUBLIC_SPLINE_CACHE_VERSION?.trim() || "1";
+
 export const SCENE_SIZE = { width: 200, height: 260 } as const;
 
 export const MARGIN_X = 1;
