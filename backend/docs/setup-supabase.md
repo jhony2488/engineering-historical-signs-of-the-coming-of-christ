@@ -23,6 +23,9 @@ Isso cria:
 - Seeds de candidatos e `parametros_fase` — calibração versionada do HMM
   (`ativo=true` = versão em uso; novas versões do `train-phase-hmm` entram
   inativas até aprovação)
+- `20261002000001_propostas_ajuste.sql` — propostas de ajuste geradas por
+  LLM para revisão humana (`pendente` → `aprovada`/`rejeitada`/`aplicada`),
+  acessadas pelos endpoints `/api/v1/admin/propostas-ajuste*`
 
 ## 3. Variáveis de ambiente
 

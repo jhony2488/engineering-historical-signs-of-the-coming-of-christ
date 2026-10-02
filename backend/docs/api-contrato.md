@@ -125,6 +125,9 @@ Header obrigatório: `X-Admin-Key: <ADMIN_API_KEY>` (401 se inválido).
 | `GET /api/v1/admin/jobs/{job_id}` | padrão | Status do job na fila Redis |
 | `POST /api/v1/admin/approve-review?data_referencia=` | `10/minute` | Aprova transição `pending_review` → `complete` |
 | `POST /api/v1/admin/reject-review?data_referencia=` | `10/minute` | Rejeita transição → `status: rejected` (append-only) |
+| `GET /api/v1/admin/propostas-ajuste?status=&limit=` | `30/minute` | Lista propostas de ajuste geradas por LLM (`{propostas, count}`) |
+| `POST /api/v1/admin/propostas-ajuste/{id}/aprovar?marcar_aplicada=` | `10/minute` | Aprova proposta (`aprovada`; `marcar_aplicada=true` → `aplicada` + `aplicado_em`) |
+| `POST /api/v1/admin/propostas-ajuste/{id}/rejeitar?motivo=` | `10/minute` | Rejeita proposta → `status: rejeitada` (append-only) |
 
 ## Integração Next.js
 

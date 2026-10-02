@@ -108,6 +108,27 @@ Não treinam — "calibrar" é editar descrições e pesos:
 
 Versionamento = git. Efeito é imediato (arquivos lidos a cada chamada).
 
+## Propostas de ajuste via LLM (`propostas_ajuste`)
+
+Além do treino, a LLM pode **sugerir** ajustes — a revisão é via API, não
+edição direta. O drift mensal (`run-data-drift`) gera registros `pendente`
+em `propostas_ajuste` a partir das `recomendacoes` da análise.
+
+```bash
+# revisar pendentes (header X-Admin-Key)
+GET  /api/v1/admin/propostas-ajuste?status=pendente
+POST /api/v1/admin/propostas-ajuste/{id}/aprovar                 # status=aprovada
+POST /api/v1/admin/propostas-ajuste/{id}/aprovar?marcar_aplicada=true  # já aplicou no alvo
+POST /api/v1/admin/propostas-ajuste/{id}/rejeitar?motivo=...
+```
+
+Tipos de alvo cobertos: `prototipo`, `lexico` (tom espiritual + glossário
+i18n), `threshold`, `flag` (ex.: `translate_narratives`,
+`classifier_hints_enabled`, `prompts_lang`), `parametro_hmm`,
+`peso_mcda`, `criterio_fase`, `prompt_template`, `local_model_map`
+(cascata SLM), `field_spec`. A tabela é a trilha de auditoria — a aplicação
+do valor no alvo segue manual e documentada.
+
 ## Cadência sugerida
 
 | Frequência | Ação |

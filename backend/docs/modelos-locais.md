@@ -137,6 +137,25 @@ contexto do modelo e evita respostas malformadas de modelos menores.
 Camadas 5–7 seguem em `json_object` até terem schemas próprios (contrato —
 exige issue prévia).
 
+## Propostas de ajuste via LLM (`propostas_ajuste`)
+
+A LLM pode **sugerir** ajustes nos modelos/config locais — nunca aplicá-los.
+O fluxo mensal de data drift (`run-data-drift`) converte as
+`recomendacoes` da análise em registros `pendente` na tabela
+`propostas_ajuste` (tipo, alvo, valor atual × proposto, justificativa,
+modelo de origem). O admin revisa via
+`GET/POST /api/v1/admin/propostas-ajuste*` (`aprovada`/`rejeitada`/
+`aplicada`) — aplicação do valor no alvo é manual e fica registrada em
+`aplicado_em`. Mesmo padrão de governança do `parametros_fase` inativo.
+
+Alvos cobertos pelo vocabulário de `tipo`: `classifier_prototypes.json`
+(`prototipo`), léxico de tom + glossário/mapa bíblico do i18n (`lexico`),
+thresholds e flags de `motor/config.py` (`threshold`, `flag`),
+`parametros_fase` (`parametro_hmm`), pesos MCDA (`peso_mcda`), critérios de
+fase (`criterio_fase`), templates de prompt v1/v2_en (`prompt_template`),
+cascata/perfis do tier SLM (`local_model_map`) e specs de tradução
+(`field_spec`).
+
 ## Limites conhecidos
 
 - O GNN treinado opera sobre grafos pequenos (~500 nós); features de texto
