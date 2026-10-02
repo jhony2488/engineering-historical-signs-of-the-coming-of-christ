@@ -20,8 +20,9 @@ export function applySecurityHeaders(response: NextResponse): NextResponse {
   const apiOrigin = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
   const gaConnect =
     "https://www.google-analytics.com https://analytics.google.com https://region1.google-analytics.com https://www.googletagmanager.com";
+  // blob: — runtime do Spline faz fetch da cena servida via IndexedDB (createObjectURL)
   const splineConnect =
-    "https://unpkg.com https://prod.spline.design https://*.spline.design";
+    "blob: https://unpkg.com https://prod.spline.design https://*.spline.design";
 
   response.headers.set(
     "Content-Security-Policy",
