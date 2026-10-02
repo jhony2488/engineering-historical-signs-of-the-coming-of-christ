@@ -1,8 +1,9 @@
 # Arquitetura do Front-end
 
 Next.js 15 (App Router) + React 19 + TypeScript + Tailwind. O dashboard é
-**somente leitura**: nunca executa pipeline de IA, nunca chama LLM e nunca
-grava em `resultados_escatologicos`.
+**somente leitura**: nunca executa pipeline de IA, nunca chama LLM de API e
+nunca grava em `resultados_escatologicos`. (Exceção: inferência on-device —
+ver [IA on-device](#ia-on-device-pwa).)
 
 ## Fluxo de dados
 
@@ -115,6 +116,46 @@ Queries ficam em `src/lib/db/` (`resultados.ts`, `snapshots.ts`,
 
 Stories (`.stories.tsx`) alimentam o Storybook (`npm run storybook`,
 :6006). Testes em `__tests__/` (Vitest + Testing Library).
+
+## IA on-device + PWA
+
+O dashboard pode gerar resumos/explicações **no navegador do usuário**, sem
+rede e sem custo — exceção documentada à regra "nunca chama LLMs" (não há
+chamada de API: o modelo roda localmente no cliente).
+
+```text
+layout.tsx → components/local-ai/LocalAIHost
+  └─ lib/local-ai/engine.ts        probe → tier → download → ready
+        ├─ capabilities.ts         navigator.gpu/ml, deviceMemory, cores,
+        │                          connection.saveData/effectiveType, storage.estimate
+        ├─ models.ts               tiers a|b|c com cascata de candidatos
+        ├─ local-ai.worker.ts      Web Worker: WebLLM (WebGPU) | Transformers.js (WebNN/WASM)
+        └─ model-store.ts          IndexedDB esh-local-ai (manifest + outputs por hash)
+```
+
+- **Tiers** (`lib/local-ai/models.ts`): `a`/`b` usam `@mlc-ai/web-llm`
+  (WebGPU, modelos MLC q4f16: Qwen2.5-3B → Llama-3.2-1B → Qwen2.5-0.5B);
+  `c` usa `@huggingface/transformers` (WebNN→WASM, SmolLM2 q8).
+- **Resolução de pesos**: cache do engine (IDB/Cache) → `public/models/`
+  self-host → CDN Hugging Face. Falha total ou dispositivo sem suporte →
+  nada é baixado e **nenhum componente de IA renderiza**.
+- **Download**: automático em background; em `saveData`/rede ≤3g exige
+  opt-in (`DownloadStatusChip`).
+- **Persistência**: `navigator.storage.persist()` no init; outputs gerados
+  cacheados no IDB por `sha256(input + versão de prompt)`.
+- **Self-host**: `npm run ai:download-models` espelha os modelos em
+  `public/models/` (gitignored; dev/Docker — em deploy CI a pasta não vai e
+  o runtime cai no CDN).
+- **PWA**: `public/sw.js` (shell offline + runtime cache; bypass para CDNs
+  de modelos), `site.webmanifest` com ícones PNG (`scripts/gen-pwa-icons.mjs`),
+  `ServiceWorkerRegister` (só produção) e `InstallPwaButton` no footer.
+- **Copy**: a UI nunca diz que a IA é local/roda no navegador — textos
+  neutros ("Resumo do dia", "Explicar") + disclaimer "não é a saída oficial
+  do motor".
+
+Flags: `NEXT_PUBLIC_LOCAL_AI=auto|off`, `NEXT_PUBLIC_LOCAL_AI_MODEL_BASE`,
+`NEXT_PUBLIC_LOCAL_AI_FORCE_TIER`, `NEXT_PUBLIC_LOCAL_AI_CACHE_VERSION`,
+`NEXT_PUBLIC_SW_DISABLED`.
 
 ## Segurança
 

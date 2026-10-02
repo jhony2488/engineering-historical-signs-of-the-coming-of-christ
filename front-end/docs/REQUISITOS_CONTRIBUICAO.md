@@ -82,12 +82,15 @@ Todos devem passar sem erros.
 - Novas tabelas ou colunas no `prisma/schema.prisma`
 - Alteração de `NEXT_PUBLIC_*` que exija novas variáveis em produção
 - Remoção de fallback mock ou mudança de comportamento do cache
-- Novas dependências pesadas (D3, Cytoscape, mapas, etc.)
+- Novas dependências pesadas (D3, Cytoscape, mapas, etc.) — `@mlc-ai/web-llm`
+  e `@huggingface/transformers` já foram aprovadas p/ IA on-device
 - Autenticação, sessão ou armazenamento de tokens no cliente
 
 ### O que o front-end **não** deve fazer
 
-- Executar pipeline de IA ou chamar Groq/OpenRouter diretamente
+- Executar pipeline de IA ou chamar Groq/OpenRouter diretamente — a única
+  inferência permitida é **on-device** (`src/lib/local-ai/`), sem rede nem
+  credenciais, nunca identificada na UI como "local"
 - Gravar em `resultados_escatologicos` (append-only é responsabilidade do motor)
 - Expor `SUPABASE_SERVICE_ROLE_KEY` ou credenciais de escrita no cliente
 - Armazenar tokens de autenticação em `localStorage`

@@ -15,6 +15,10 @@ Next.js 15 + TypeScript + Tailwind CSS + Recharts.
 - **Histórico** — gráfico e tabela com janelas semanal/mensal/trimestral/anual
 - **Cache localStorage** — expiração diária (cache-first)
 - **Fallback demo** — dados mock quando API indisponível
+- **IA on-device** — resumos/explicações gerados no navegador (WebLLM +
+  Transformers.js, tiers por capacidade; invisível sem suporte) — ver
+  [docs/arquitetura.md](docs/arquitetura.md#ia-on-device-pwa)
+- **PWA** — instalável, shell offline e persistência dos modelos baixados
 
 ## Setup
 
@@ -48,6 +52,7 @@ Cobertura: `lib/` (cache, api, phases, mock, seo, db), `middleware`, componentes
 | `DIRECT_URL` | Conexão direta Supabase (migrations) |
 | `NEXT_PUBLIC_API_URL` | FastAPI quando `DATA_SOURCE=fastapi` |
 | `NEXT_PUBLIC_USE_MOCK` | `true` força dados de demonstração |
+| `NEXT_PUBLIC_LOCAL_AI` | `auto` (default) ou `off` — IA on-device |
 
 O `next.config.ts` faz rewrite de `/api/backend/*` → FastAPI.
 
@@ -77,11 +82,13 @@ O `next.config.ts` faz rewrite de `/api/backend/*` → FastAPI.
 ## Estrutura
 
 ```
-public/            # favicon, og-image, robots, manifest
+public/            # favicon, og-image, robots, manifest, sw.js, offline.html,
+                   # icons/ (PWA), models/ (gitignored — `npm run ai:download-models`)
 prisma/            # schema, migrations, seed
+scripts/           # download-local-models.ts, gen-pwa-icons.mjs
 src/
 ├── app/           # páginas, layouts SEO, api/db
 ├── middleware.ts
-├── components/
-└── lib/           # api, prisma, db, seo, cache
+├── components/    # inclui local-ai/ e pwa/
+└── lib/           # api, prisma, db, seo, cache, local-ai/
 ```

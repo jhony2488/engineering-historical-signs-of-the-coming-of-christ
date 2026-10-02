@@ -24,7 +24,11 @@ com profecias e publicação de rankings/fases em um dashboard.
 - **Custo zero no início** — priorize Groq free tier, GitHub Actions e
   Supabase free; evite infra 24/7.
 - **Front-end só lê** — o dashboard nunca executa pipeline de IA, nunca chama
-  LLMs e nunca grava em `resultados_escatologicos`.
+  LLMs **de API** e nunca grava em `resultados_escatologicos`.
+  Exceção: inferência **on-device** (`front-end/src/lib/local-ai/` —
+  WebLLM/Transformers.js no navegador do usuário) é permitida porque não usa
+  rede, custo ou credenciais; ela só lê dados já exibidos e nunca é
+  identificada na UI como "local".
 - **Cadeia de fallback LLM** — `Local GGUF (se LOCAL_LLM_ENABLED) → Ollama →
   Groq → OpenRouter → dry-run`; dentro do tier local, cascata por alias
   7B→3B→1.5B com perfis de parâmetros por modelo (`LOCAL_MODEL_MAP` em
