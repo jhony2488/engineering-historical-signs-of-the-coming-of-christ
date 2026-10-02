@@ -25,6 +25,7 @@ export async function POST(request: Request) {
     const payload = row.jsonAnaliseIa as Record<string, unknown>;
     payload.revisao_humana = true;
     payload.status = "complete";
+    payload.revisao_aprovada_em = new Date().toISOString();
 
     await prisma.resultadoEscatologico.update({
       where: { id: row.id },

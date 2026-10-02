@@ -12,7 +12,9 @@ interface HeaderProps {
 
 const PUBLIC_LINKS = [
   { href: "/", label: "Painel" },
+  { href: "/globo", label: "Globo" },
   { href: "/profecias", label: "Profecias" },
+  { href: "/joshua", label: "Joshua" },
   { href: "/rankings", label: "Rankings" },
 ] as const;
 

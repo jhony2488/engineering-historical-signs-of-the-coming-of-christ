@@ -93,4 +93,5 @@ export const cacheKeys = {
   baseline: { data: BASELINE_KEY, ts: BASELINE_TS_KEY },
   baselineArquivo: { data: BASELINE_ARQ_KEY, ts: BASELINE_ARQ_TS_KEY },
   baselineAtualizacoes: { data: BASELINE_UPD_KEY, ts: BASELINE_UPD_TS_KEY },
+  ameacas: { data: "sinais_ameacas_cache", ts: "sinais_ameacas_timestamp" },
 };

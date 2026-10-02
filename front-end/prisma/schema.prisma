@@ -143,3 +143,128 @@ model NewsletterSubscriber {
   @@index([status])
   @@map("newsletter_subscribers")
 }
+
+model AmeacaPais {
+  id              String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  dataReferencia  DateTime @map("data_referencia") @db.Date
+  countryCode     String   @map("country_code")
+  countryName     String   @map("country_name")
+  riskScore       Float    @map("risk_score")
+  metrics         Json     @default("{}")
+  prescriptions   Json     @default("{}")
+  historicalEcho  Json     @default("{}") @map("historical_echo")
+  createdAt       DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
+
+  @@unique([dataReferencia, countryCode])
+  @@index([dataReferencia])
+  @@map("ameacas_pais")
+}
+
+model SimulacaoAbm {
+  id             String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  dataReferencia DateTime @map("data_referencia") @db.Date
+  countryCode    String   @map("country_code")
+  resultado      Json     @default("{}")
+  createdAt      DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
+
+  @@unique([dataReferencia, countryCode])
+  @@index([dataReferencia])
+  @@map("simulacoes_abm")
+}
+
+model AdversarialReview {
+  id               String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  dataReferencia   DateTime @map("data_referencia") @db.Date
+  countryCode      String?  @map("country_code")
+  resilienceScore  Float    @map("resilience_score")
+  payload          Json     @default("{}")
+  createdAt        DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
+
+  @@index([dataReferencia])
+  @@map("adversarial_reviews")
+}
+
+model ProvenanceLog {
+  id             String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  dataReferencia DateTime @map("data_referencia") @db.Date
+  stage          String
+  sourceHash     String   @map("source_hash")
+  parentHash     String?  @map("parent_hash")
+  resultHash     String?  @map("result_hash")
+  merkleRoot     String?  @map("merkle_root")
+  metadata       Json     @default("{}")
+  createdAt      DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
+
+  @@index([dataReferencia])
+  @@index([parentHash])
+  @@map("provenance_log")
+}
+
+model RecomendacaoAdaptativa {
+  id             String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  dataReferencia DateTime @map("data_referencia") @db.Date
+  countryCode    String?  @map("country_code")
+  urgency        String
+  triggers       Json     @default("[]")
+  actions        Json     @default("[]")
+  payload        Json     @default("{}")
+  createdAt      DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
+
+  @@index([dataReferencia])
+  @@map("recomendacoes_adaptativas")
+}
+
+model JoshuaProjectData {
+  id                       String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  peopleId                 String    @unique @map("people_id")
+  peopleName               String    @map("people_name")
+  countryCode              String    @map("country_code")
+  countryName              String?   @map("country_name")
+  population               Int       @default(0)
+  joshuaScale              Int?      @map("joshua_scale")
+  primaryLanguage          String?   @map("primary_language")
+  bibleTranslationStatus   String?   @map("bible_translation_status")
+  jesusFilmAvailable       Boolean   @default(false) @map("jesus_film_available")
+  audioRecordingsAvailable Boolean   @default(false) @map("audio_recordings_available")
+  percentChristian         Float?    @map("percent_christian")
+  percentEvangelical       Float?    @map("percent_evangelical")
+  percentAdherent          Float?    @map("percent_adherent")
+  sourceUrl                String?   @map("source_url")
+  collectedAt              DateTime  @default(now()) @map("collected_at") @db.Timestamptz(6)
+  updatedAt                DateTime  @default(now()) @map("updated_at") @db.Timestamptz(6)
+  dataHash                 String    @map("data_hash")
+
+  analyses MissiologicalAnalysis[]
+
+  @@index([countryCode])
+  @@index([joshuaScale])
+  @@index([updatedAt])
+  @@map("joshua_project_data")
+}
+
+model MissiologicalAnalysis {
+  id                        String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  joshuaDataId              String?  @map("joshua_data_id") @db.Uuid
+  peopleId                  String   @map("people_id")
+  countryCode               String   @map("country_code")
+  energyClassification      Json     @default("{}") @map("energy_classification")
+  expansionScore            Float    @default(0) @map("expansion_score")
+  contractionScore          Float    @default(0) @map("contraction_score")
+  missiologicalRisk         Float    @default(0) @map("missiological_risk")
+  progressTrend             String?  @map("progress_trend")
+  phaseCorrelation          Json     @default("{}") @map("phase_correlation")
+  inferredPhase             String?  @map("inferred_phase")
+  llmAnalysis               Json     @default("{}") @map("llm_analysis")
+  hermeneuticInterpretation String?  @map("hermeneutic_interpretation")
+  alerts                    Json     @default("[]")
+  analyzedAt                DateTime @default(now()) @map("analyzed_at") @db.Timestamptz(6)
+  modelVersion              String?  @default("heuristic-v1") @map("model_version")
+
+  joshuaData JoshuaProjectData? @relation(fields: [joshuaDataId], references: [id], onDelete: SetNull)
+
+  @@index([countryCode])
+  @@index([inferredPhase])
+  @@index([analyzedAt])
+  @@index([peopleId])
+  @@map("missiological_analysis")
+}

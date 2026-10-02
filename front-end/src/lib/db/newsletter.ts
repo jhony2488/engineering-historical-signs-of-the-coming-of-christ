@@ -130,7 +130,10 @@ export async function sendMassNewsletter(
   for (const sub of subscribers) {
     const footer = buildEmailUnsubscribeFooter(sub.unsubscribeToken, siteUrl);
     const text = `${body.trim()}\n\n—\n${footer}`;
-    const html = `${plainTextToHtml(body.trim())}<hr><p style="font-size:12px;color:#666">${footer}</p>`;
+    const { sanitizeHtml } = await import("@/lib/sanitize");
+    const html = sanitizeHtml(
+      `${plainTextToHtml(body.trim())}<hr><p style="font-size:12px;color:#666">${footer}</p>`,
+    );
 
     const ok = await sendEmail({
       to: sub.email,

@@ -1,3 +1,4 @@
+import { MOCK_AMEACAS } from "./mock-ameacas";
 import { MOCK_RANKING_MAR, MOCK_RANKING_TERRA } from "./mock-rankings";
 import type { ResultadoEscatologico } from "./types";
 
@@ -91,6 +92,16 @@ export const MOCK_RESULTADO: ResultadoEscatologico = {
   },
   ranking_mar: MOCK_RANKING_MAR,
   ranking_terra: MOCK_RANKING_TERRA,
+  ameacas_paises: MOCK_AMEACAS,
+  ecos_historicos: MOCK_AMEACAS.map((a) => a.historical_echo).filter(
+    Boolean,
+  ) as ResultadoEscatologico["ecos_historicos"],
+  provenance: {
+    merkle_root: "demo_merkle_root_abc123",
+    integrity_ok: true,
+    chain_length: 6,
+    stages: ["ingestion", "extraction", "correlation", "threats", "final_report"],
+  },
   transicao_fase: {
     transicao_entre_fases: true,
     fase_dominante: "FASE_II",

@@ -21,6 +21,8 @@ describe("Header", () => {
 
     expect(screen.getByRole("link", { name: "Profecias" })).toHaveAttribute("href", "/profecias");
 
+    expect(screen.getByRole("link", { name: "Joshua" })).toHaveAttribute("href", "/joshua");
+
     expect(screen.getByRole("link", { name: "Rankings" })).toHaveAttribute("href", "/rankings");
 
     expect(screen.queryByRole("link", { name: "Histórico" })).not.toBeInTheDocument();

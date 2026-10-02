@@ -5,6 +5,7 @@ import { useCallback, useEffect, useState } from "react";
 import { Header } from "@/components/ui/Header";
 import { LoadingDots } from "@/components/ui/LoadingDots";
 import { PageShell } from "@/components/ui/PageShell";
+import { sanitizeHtml } from "@/lib/sanitize";
 
 type Subscriber = {
   email: string;
@@ -166,6 +167,23 @@ export default function NewsletterPage() {
                   Cada e-mail inclui link de descadastro automaticamente. Sem RESEND_API_KEY, o envio
                   roda em modo simulado (dry-run).
                 </p>
+                {body.trim().length >= 10 && (
+                  <div className="rounded-lg border border-ink-700 bg-ink-950/80 p-3 text-sm text-slate-300">
+                    <p className="text-xs text-slate-500 mb-2">Pré-visualização (sanitizada)</p>
+                    <div
+                      dangerouslySetInnerHTML={{
+                        __html: sanitizeHtml(
+                          body
+                            .trim()
+                            .replace(/&/g, "&amp;")
+                            .replace(/</g, "&lt;")
+                            .replace(/>/g, "&gt;")
+                            .replace(/\n/g, "<br>"),
+                        ),
+                      }}
+                    />
+                  </div>
+                )}
                 <button
                   type="submit"
                   disabled={sending || data.stats.active === 0}

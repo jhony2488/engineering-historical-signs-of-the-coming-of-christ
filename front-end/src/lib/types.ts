@@ -34,6 +34,7 @@ export interface TransicaoFase {
 
 export interface Correlacao {
   indice_global?: number;
+  proximidade_espiritual?: number;
   fase?: FaseId;
   confianca?: number;
   posterior_bayes?: number;
@@ -44,16 +45,28 @@ export interface Correlacao {
   score_besta_mar?: number;
   score_besta_terra?: number;
   justificativa?: string;
+  proximidade?: {
+    proximidade_espiritual?: number;
+    convergencia_dimensao?: number;
+    convergencia_energia?: number;
+    saturacao_sinais?: number;
+    descricao?: string;
+  };
   transicao_fase?: TransicaoFase;
   fase_scores_consolidados?: Record<FaseId, number>;
   metricas?: {
     avg_tension?: number;
     avg_impact?: number;
     expansao_ratio?: number;
+    contracao_ratio?: number;
     macro_ratio?: number;
+    micro_ratio?: number;
     score_expansao_discurso?: number;
     score_contracao_estrutura?: number;
     graph_convergence?: number;
+    convergencia_dimensao?: number;
+    convergencia_energia?: number;
+    saturacao_sinais?: number;
   };
 }
 
@@ -63,6 +76,7 @@ export interface ResultadoEscatologico {
   fase_atual: FaseId;
   probabilidade_fase: number;
   indice_global: number;
+  proximidade_espiritual?: number;
   confianca: number;
   correlacao: Correlacao;
   transicao_fase?: TransicaoFase;
@@ -78,9 +92,121 @@ export interface ResultadoEscatologico {
   ranking_mar: RankingCandidato[];
   ranking_terra: RankingCandidato[];
   ranking_falso_lider?: RankingCandidato[];
+  ameacas_paises?: AmeacaPais[];
+  ecos_historicos?: HistoricalEchoMatch[];
+  simulacoes_abm?: AbmResultado[];
+  adversarial?: AdversarialReviewPayload[];
+  recomendacoes_adaptativas?: RecomendacaoAdaptativa[];
+  provenance?: ProvenanceSummary;
   revisao_humana?: boolean;
-  status?: "complete" | "partial" | "reverted";
+  status?: "complete" | "partial" | "reverted" | "pending_review" | "rejected";
   baseline_historico?: BaselineHistoricoResumo;
+  relatorio_html?: string;
+  relatorio_pdf_b64?: string;
+}
+
+export interface HistoricalEchoMatch {
+  historical_echo_match?: string;
+  titulo?: string;
+  similarity_percentage?: number;
+  pattern_phase?: string;
+  projected_cycle_duration?: { min_months?: number; max_months?: number };
+  prescription_bias?: Record<string, string>;
+  scores?: Record<string, number>;
+}
+
+export interface AmeacaPais {
+  country_code: string;
+  country_name: string;
+  risk_score: number;
+  lat?: number;
+  lng?: number;
+  metrics: {
+    juridical_instability?: number;
+    financial_control_level?: number;
+    religious_freedom_threat?: number;
+    conflict_intensity?: number;
+    [key: string]: number | undefined;
+  };
+  prescriptions: {
+    physical?: string[];
+    financial?: string[];
+    spiritual?: string[];
+  };
+  historical_echo?: HistoricalEchoMatch | Record<string, unknown>;
+  data_referencia?: string;
+  event_count?: number;
+  joshua?: {
+    expansion_score?: number;
+    contraction_score?: number;
+    missiological_risk?: number;
+    avg_joshua_scale?: number;
+    peoples_count?: number;
+  };
+}
+
+export interface AdversarialReviewPayload {
+  country_code?: string;
+  resilience_score?: number;
+  fragile_premises?: string[];
+  counter_thesis?: string;
+  counter_hypothesis?: string;
+  interpretation?: string;
+  recommendation?: string;
+}
+
+export interface AbmResultado {
+  country_code?: string;
+  runs?: number;
+  horizon_months?: number;
+  fragility_index?: number;
+  probabilistic_outcomes?: Record<string, number>;
+  critical_trigger_points?: number[];
+  monte_carlo?: Record<string, number>;
+  synthesis?: { synthesis?: string; disclaimer?: string } | string;
+}
+
+export interface RecomendacaoAdaptativa {
+  country_code?: string;
+  urgency: "agora" | "semana" | "mes" | "condicional";
+  triggers?: unknown[];
+  actions?: string[];
+  payload?: Record<string, unknown>;
+}
+
+export interface ProvenanceSummary {
+  merkle_root?: string;
+  chain_length?: number;
+  last_hash?: string;
+  stages?: string[];
+  integrity_ok?: boolean;
+}
+
+export interface AmeacaPaisDetail {
+  ameaca: AmeacaPais;
+  abm?: AbmResultado | null;
+  adversarial?: AdversarialReviewPayload | null;
+  recomendacoes?: RecomendacaoAdaptativa[];
+  provenance?: ProvenanceSummary | null;
+}
+
+export interface ProvenanceDayResponse {
+  data_referencia: string;
+  entries: Array<{
+    stage: string;
+    source_hash: string;
+    parent_hash?: string | null;
+    result_hash?: string | null;
+    merkle_root?: string | null;
+    metadata?: Record<string, unknown>;
+  }>;
+  verification: {
+    ok: boolean;
+    stages?: number;
+    merkle_root?: string | null;
+    reason?: string;
+  };
+  payload_provenance?: ProvenanceSummary | null;
 }
 
 export type JanelaTemporal = "weekly" | "monthly" | "quarterly" | "semiannual" | "annual";

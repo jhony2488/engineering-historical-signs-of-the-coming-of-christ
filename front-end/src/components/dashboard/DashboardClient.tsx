@@ -238,9 +238,19 @@ export function DashboardClient() {
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 stagger-grid">
           <ProximityMeter
+            proximidade={
+              resultado.proximidade_espiritual ?? corr.proximidade_espiritual ?? corr.proximidade?.proximidade_espiritual
+            }
             indice={resultado.indice_global}
             confianca={resultado.confianca}
             posteriorBayes={corr.posterior_bayes}
+            convergenciaDimensao={
+              corr.proximidade?.convergencia_dimensao ?? metricas.convergencia_dimensao
+            }
+            convergenciaEnergia={
+              corr.proximidade?.convergencia_energia ?? metricas.convergencia_energia
+            }
+            descricao={corr.proximidade?.descricao}
           />
           <EnergyPanel
             eventos={resultado.eventos_analisados}
@@ -252,6 +262,25 @@ export function DashboardClient() {
             avgImpact={metricas.avg_impact}
           />
         </div>
+
+        <a
+          href="/globo"
+          className="group relative block overflow-hidden rounded-lg border border-ink-700/60 bg-gradient-to-br from-ink-900/80 via-[#0c1a2e] to-ink-950 px-5 py-6 transition hover:border-gold-500/40"
+        >
+          <p className="text-xs uppercase tracking-[0.18em] text-gold-400/80">Camadas 10–15</p>
+          <h3 className="mt-1 font-display text-xl text-white group-hover:text-gold-100">
+            Mapa de Ameaças
+          </h3>
+          <p className="mt-2 max-w-xl text-sm text-slate-400">
+            Globo 3D com risco por país, ecos históricos e recomendações adaptativas.
+            {(resultado.ameacas_paises?.length ?? 0) > 0 &&
+              ` · ${resultado.ameacas_paises!.length} países monitorados`}
+            {resultado.provenance?.integrity_ok && " · L14 íntegro"}
+          </p>
+          <span className="mt-3 inline-block text-xs text-cyan-400/90 group-hover:text-cyan-300">
+            Abrir globo / verificar integridade →
+          </span>
+        </a>
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 stagger-grid">
           <FalseLeaderAlert

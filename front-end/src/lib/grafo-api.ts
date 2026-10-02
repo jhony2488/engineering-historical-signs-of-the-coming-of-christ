@@ -17,3 +17,14 @@ export async function fetchCenarios(): Promise<CenarioSimulacao[]> {
   if (!res.ok) throw new Error(`cenarios ${res.status}`);
   return res.json() as Promise<CenarioSimulacao[]>;
 }
+
+export async function fetchWhatIf(ativos: string[]) {
+  const res = await fetch("/api/db/cenarios/what-if", {
+    method: "POST",
+    credentials: "include",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ ativos, trials: 200 }),
+  });
+  if (!res.ok) throw new Error(`what-if ${res.status}`);
+  return res.json() as Promise<import("./scenario-whatif").WhatIfResult>;
+}

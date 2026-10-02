@@ -8,6 +8,7 @@ import { ExportPdfButton } from "@/components/ui/ExportPdfButton";
 import { Header } from "@/components/ui/Header";
 import { LoadingDots } from "@/components/ui/LoadingDots";
 import { PageShell } from "@/components/ui/PageShell";
+import { ReportHtmlButton } from "@/components/ui/ReportHtmlButton";
 import {
   fetchHistorico,
   fetchHistoricoSWR,
@@ -79,6 +80,7 @@ export default function HistoricoPage() {
 
   const filtered = sliceByWindow(historico, janela);
   const motorMeta = JANELAS_UI.find((j) => j.id === janela);
+  const latestHtml = [...filtered].reverse().find((h) => h.relatorio_html)?.relatorio_html;
 
   return (
     <>
@@ -87,7 +89,12 @@ export default function HistoricoPage() {
         badge="Motor Nível 1–3"
         title="Arquivo Cronológico"
         subtitle="Síntese diária, painéis Nível 2 e panorama híbrido Nível 3 — via API Next.js/Prisma."
-        actions={<ExportPdfButton />}
+        actions={
+          <div className="flex flex-wrap items-center gap-2">
+            <ReportHtmlButton html={latestHtml} />
+            <ExportPdfButton />
+          </div>
+        }
       >
         <ChipGroup
           options={JANELAS_UI.map((j) => ({ id: j.id, label: j.label }))}

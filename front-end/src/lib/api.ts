@@ -13,13 +13,17 @@ import {
   MOCK_BASELINE_ATUALIZACOES,
   MOCK_BASELINE_HISTORICO,
 } from "./mock-baseline";
+import { MOCK_AMEACAS, getMockAmeacaDetail } from "./mock-ameacas";
 import { MOCK_RANKING_MAR, MOCK_RANKING_TERRA, MOCK_RANKING_FALSO_LIDER } from "./mock-rankings";
 import { getMockSnapshot } from "./mock-snapshots";
 import { MOCK_RESULTADO, generateMockHistorico } from "./mock";
 import type {
+  AmeacaPais,
+  AmeacaPaisDetail,
   ArquivoProfeticoItem,
   BaselineAtualizacao,
   BaselineHistorico,
+  ProvenanceDayResponse,
   RankingCandidato,
   ResultadoEscatologico,
   SnapshotPeriodo,
@@ -80,6 +84,13 @@ const PATHS = {
     const q = `?limit=${limit}`;
     return DATA_SOURCE === "db" ? `/baseline/atualizacoes${q}` : `/api/v1/baseline/atualizacoes${q}`;
   },
+  ameacas: DATA_SOURCE === "db" ? "/ameacas" : "/api/v1/ameacas/paises",
+  ameacaDetail: (code: string) =>
+    DATA_SOURCE === "db" ? `/ameacas/${code}` : `/api/v1/ameacas/paises/${code}`,
+  provenance: (day: string) =>
+    DATA_SOURCE === "db"
+      ? `/provenance/verify/${day}`
+      : `/api/v1/provenance/day/${day}`,
 };
 
 export async function fetchResultadoAtual(
@@ -484,4 +495,76 @@ export async function fetchBaselineAtualizacoesSWR(
     return { data: stale, fromCache: true, isMock: false, source: DATA_SOURCE, revalidating: true };
   }
   return fetchBaselineAtualizacoes(limit);
+}
+
+export async function fetchAmeacasPaises(
+  options: { skipCache?: boolean } = {},
+): Promise<FetchMeta & { data: AmeacaPais[] }> {
+  const keys = cacheKeys.ameacas;
+  if (!options.skipCache && typeof window !== "undefined") {
+    const cached = getCached<AmeacaPais[]>(keys.data, keys.ts);
+    if (cached) return { data: cached, fromCache: true, isMock: false, source: DATA_SOURCE };
+  }
+
+  if (USE_MOCK) {
+    if (typeof window !== "undefined") setCache(keys.data, MOCK_AMEACAS, keys.ts);
+    return { data: MOCK_AMEACAS, fromCache: false, isMock: true, source: DATA_SOURCE };
+  }
+
+  try {
+    const data = await fetchJson<AmeacaPais[]>(PATHS.ameacas);
+    if (typeof window !== "undefined") setCache(keys.data, data, keys.ts);
+    return { data, fromCache: false, isMock: false, source: DATA_SOURCE };
+  } catch {
+    if (typeof window !== "undefined") setCache(keys.data, MOCK_AMEACAS, keys.ts);
+    return { data: MOCK_AMEACAS, fromCache: false, isMock: true, source: DATA_SOURCE };
+  }
+}
+
+export async function fetchAmeacaDetail(
+  code: string,
+): Promise<FetchMeta & { data: AmeacaPaisDetail | null }> {
+  if (USE_MOCK) {
+    return {
+      data: getMockAmeacaDetail(code),
+      fromCache: false,
+      isMock: true,
+      source: DATA_SOURCE,
+    };
+  }
+  try {
+    const data = await fetchJson<AmeacaPaisDetail>(PATHS.ameacaDetail(code));
+    return { data, fromCache: false, isMock: false, source: DATA_SOURCE };
+  } catch {
+    return {
+      data: getMockAmeacaDetail(code),
+      fromCache: false,
+      isMock: true,
+      source: DATA_SOURCE,
+    };
+  }
+}
+
+export async function fetchProvenanceDay(
+  day: string,
+): Promise<FetchMeta & { data: ProvenanceDayResponse | null }> {
+  if (USE_MOCK) {
+    return {
+      data: {
+        data_referencia: day,
+        entries: [],
+        verification: { ok: true, stages: 0, merkle_root: "demo_merkle_root_abc123" },
+        payload_provenance: MOCK_RESULTADO.provenance ?? null,
+      },
+      fromCache: false,
+      isMock: true,
+      source: DATA_SOURCE,
+    };
+  }
+  try {
+    const data = await fetchJson<ProvenanceDayResponse>(PATHS.provenance(day));
+    return { data, fromCache: false, isMock: false, source: DATA_SOURCE };
+  } catch {
+    return { data: null, fromCache: false, isMock: true, source: DATA_SOURCE };
+  }
 }
