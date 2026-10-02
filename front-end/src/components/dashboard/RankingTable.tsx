@@ -1,3 +1,4 @@
+import { CandidateExplainButton } from "@/components/local-ai/CandidateExplainButton";
 import type { RankingCandidato } from "@/lib/types";
 
 interface RankingTableProps {
@@ -55,6 +56,7 @@ export function RankingTable({ title, subtitle, items }: RankingTableProps) {
                 <td className="py-3 pr-3 text-slate-500 tabular-nums">{item.posicao}º</td>
                 <td className="py-3 pr-3 text-white font-medium transition-colors duration-200 group-hover:text-gold-100">
                   {item.nome}
+                  <CandidateExplainButton candidato={item} />
                 </td>
                 <td className="py-3 pr-3 text-right tabular-nums text-gold-400 transition-all duration-200 group-hover:scale-[1.02]">
                   {item.probabilidade_atual.toFixed(1)}%

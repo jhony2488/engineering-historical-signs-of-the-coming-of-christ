@@ -1,4 +1,5 @@
 import { EmailSignupForm } from "@/components/newsletter/EmailSignupForm";
+import { InstallPwaButton } from "@/components/pwa/InstallPwaButton";
 
 export function SiteFooter() {
   return (
@@ -9,6 +10,8 @@ export function SiteFooter() {
       aria-label="Rodapé do site"
     >
       <EmailSignupForm source="footer" compact />
+
+      <InstallPwaButton />
 
       <p className="site-footer-attribution">
         Engenharia de Sinais Históricos — análise interpretativa, não predição de datas. Feito por{" "}

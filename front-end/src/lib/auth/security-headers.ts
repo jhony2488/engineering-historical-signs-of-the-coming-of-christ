@@ -23,16 +23,19 @@ export function applySecurityHeaders(response: NextResponse): NextResponse {
   // blob: — runtime do Spline faz fetch da cena servida via IndexedDB (createObjectURL)
   const splineConnect =
     "blob: https://unpkg.com https://prod.spline.design https://*.spline.design";
+  // IA on-device: pesos ONNX/MLC do Hugging Face + runtime WASM do ORT (jsdelivr)
+  const localAiConnect =
+    "https://huggingface.co https://*.hf.co https://cdn.jsdelivr.net";
 
   response.headers.set(
     "Content-Security-Policy",
     [
       "default-src 'self'",
-      "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://www.googletagmanager.com",
+      "script-src 'self' 'unsafe-inline' 'unsafe-eval' 'wasm-unsafe-eval' https://www.googletagmanager.com",
       "style-src 'self' 'unsafe-inline'",
       "img-src 'self' data: blob: https://www.google-analytics.com",
       "font-src 'self'",
-      `connect-src 'self' ${apiOrigin} ${gaConnect} ${splineConnect}`,
+      `connect-src 'self' ${apiOrigin} ${gaConnect} ${splineConnect} ${localAiConnect}`,
       "worker-src 'self' blob:",
       "frame-ancestors 'none'",
       "base-uri 'self'",

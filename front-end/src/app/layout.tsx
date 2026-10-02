@@ -2,6 +2,8 @@ import type { Metadata, Viewport } from "next";
 
 import { GoogleAnalytics } from "@/components/analytics/GoogleAnalytics";
 import { BackgroundAudio } from "@/components/audio/BackgroundAudio";
+import { LocalAIHost } from "@/components/local-ai/LocalAIHost";
+import { ServiceWorkerRegister } from "@/components/pwa/ServiceWorkerRegister";
 import { SplineCompanionLoader } from "@/components/spline/SplineCompanionLoader";
 import { SiteFooter } from "@/components/ui/SiteFooter";
 import { rootMetadata, siteConfig } from "@/lib/seo/metadata";
@@ -54,6 +56,8 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           <SplineCompanionLoader />
           {children}
           <SiteFooter />
+          <LocalAIHost />
+          <ServiceWorkerRegister />
         </div>
       </body>
     </html>

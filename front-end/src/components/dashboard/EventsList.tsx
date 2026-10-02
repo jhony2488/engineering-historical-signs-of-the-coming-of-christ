@@ -1,3 +1,4 @@
+import { EventsLocalSummary } from "@/components/local-ai/EventsLocalSummary";
 import { VirtualList } from "@/components/ui/VirtualList";
 import type { EventoEstruturado } from "@/lib/types";
 
@@ -50,6 +51,7 @@ export function EventsList({ eventos }: EventsListProps) {
           ))}
         </ul>
       )}
+      <EventsLocalSummary eventos={eventos} />
     </section>
   );
 }

@@ -2,6 +2,8 @@
 
 import { useCallback, useEffect, useState } from "react";
 import { PropheticBaselinePanel } from "@/components/baseline/PropheticBaselinePanel";
+import { LocalAssistantPanel } from "@/components/local-ai/LocalAssistantPanel";
+import { LocalSummaryCard } from "@/components/local-ai/LocalSummaryCard";
 import { BeastScores } from "./BeastScores";
 import { EnergyPanel } from "./EnergyPanel";
 import { EventsList } from "./EventsList";
@@ -319,7 +321,10 @@ export function DashboardClient() {
           <EventsList eventos={resultado.eventos_analisados} />
           <InterpretationPanel interpretacao={resultado.interpretacao} />
         </div>
+
+        <LocalSummaryCard resultado={resultado} />
       </main>
+      <LocalAssistantPanel contexto={resultado} />
     </>
   );
 }

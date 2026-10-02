@@ -22,6 +22,9 @@ export const PIN_DURATION_MS = 10_000;
 /** Curvatura do movimento circular (bezier) entre lateral e footer. */
 export const ARC_BULGE_PX = 130;
 
+/** IA on-device (WebLLM/Transformers.js) — "off" desliga sem UI residual. */
+export const LOCAL_AI_ENABLED = process.env.NEXT_PUBLIC_LOCAL_AI !== "off";
+
 export const HIDDEN_ROUTE_PREFIXES = [
   "/login",
   "/historico",
