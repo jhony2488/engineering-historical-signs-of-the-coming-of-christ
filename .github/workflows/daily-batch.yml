@@ -27,13 +27,22 @@ jobs:
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
-          pip install -e ".[ml]"
+          pip install -e ".[ml,local]" --extra-index-url https://abetlen.github.io/llama-cpp-python/whl/cpu
 
       - name: Cache embedding model
         uses: actions/cache@v4
         with:
           path: ~/.cache/huggingface
           key: bge-m3-${{ runner.os }}
+
+      - name: Cache local SLM weights
+        uses: actions/cache@v4
+        with:
+          path: backend/models_cache
+          key: slm-gguf-${{ runner.os }}-${{ hashFiles('backend/motor/adapters/local_llm.py') }}
+
+      - name: Download local SLM (cascade 7B→3B→1.5B)
+        run: python scripts/download_models.py --all
 
       - name: Validate schemas
         run: python -m motor.cli validate-schemas
@@ -45,4 +54,8 @@ jobs:
           GROQ_API_KEY: ${{ secrets.GROQ_API_KEY }}
           OPENROUTER_API_KEY: ${{ secrets.OPENROUTER_API_KEY }}
           LLM_DRY_RUN: ${{ vars.LLM_DRY_RUN || 'false' }}
+          LOCAL_LLM_ENABLED: ${{ vars.LOCAL_LLM_ENABLED || 'true' }}
+          PROMPTS_LANG: ${{ vars.PROMPTS_LANG || 'en' }}
+          TRANSLATE_NARRATIVES: ${{ vars.TRANSLATE_NARRATIVES || 'true' }}
+          CLASSIFIER_HINTS_ENABLED: ${{ vars.CLASSIFIER_HINTS_ENABLED || 'true' }}
         run: python -m motor.cli run-daily
