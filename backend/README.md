@@ -8,10 +8,11 @@ Motor Python de processamento batch para **Engenharia de Sinais Históricos da v
 
 | Camada | Responsabilidade | Tecnologia |
 |--------|------------------|------------|
-| 1 | Ingestão RSS/GDELT/ACLED | `feedparser`, `httpx` |
+| 1 | Ingestão RSS/GDELT/ACLED | `feedparser`, `httpx` + dedup semântico BGE |
 | 2 | Pré-processamento e chunking | `BeautifulSoup`, heurísticas |
-| 3 | Embeddings + RAG teológico | BGE-M3, pgvector |
-| 4 | Extração estruturada JSON | Groq Llama |
+| 3 | Embeddings + RAG teológico | BGE-M3, pgvector, BGE reranker (opcional) |
+| 3.5 | Gate de relevância de chunks | Zero-shot BGE-M3 / lexical (`motor/ml/relevance.py`) |
+| 4 | Extração estruturada JSON | Groq Llama + shadow classifier (`motor/ml/event_classifier.py`) |
 | 5 | Linha temporal | Groq Mistral/Llama |
 | 6 | Raciocínio SE/ENTÃO | Groq DeepSeek/Llama |
 | 7 | Hermenêutica bíblica | Groq Gemma/Llama + RAG |
@@ -19,6 +20,11 @@ Motor Python de processamento batch para **Engenharia de Sinais Históricos da v
 | 9 | Relatórios HTML/JSON | Jinja2 |
 
 **GNN v1:** centralidade via NetworkX (substituível por PyG/DGL no RunPod).
+
+**Classificadores locais (`motor/ml/`):** relevância zero-shot, shadow classifier da
+camada 4, cross-encoder (RAG rerank + match profecia↔evento), dedup semântico e
+destilação sklearn sobre embeddings BGE (`EXTRACTION_MODE=classifier_first` após
+`export-extraction-dataset` + `train-event-classifier`).
 
 ## Setup local
 

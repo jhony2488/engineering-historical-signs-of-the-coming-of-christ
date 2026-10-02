@@ -1,0 +1,58 @@
+{
+  "version": "1.0.0",
+  "description": "Protótipos textuais pt-BR para classificação zero-shot via embeddings (BGE-M3). Usados por RelevanceGate (camada 3) e EventShadowClassifier (camada 4). Cada rótulo tem descrições; score = melhor cosseno texto↔descrição.",
+  "relevance_positive": [
+    "Evento geopolítico, religioso ou tecnológico com alcance sistêmico: conflitos, tratados, perseguição religiosa, vigilância, moedas digitais, governança global, sinais enganosos",
+    "Mudança institucional ou estrutural relevante para monitoramento histórico: novas leis, coalizões internacionais, infraestrutura de controle, desastres de grande escala",
+    "Notícia factual sobre tensão internacional, crise humanitária, avanço de tecnologias de identificação ou movimentos religiosos de impacto global",
+    "Declaração ou ação de organizações internacionais, governos centrais ou blocos políticos com repercussão além de um país"
+  ],
+  "relevance_negative": [
+    "Conteúdo de entretenimento, esporte, celebridades, fofoca ou cultura pop sem consequência institucional",
+    "Notícia local de cotidiano: trânsito, clima comum, crimes pontuais, vagas de emprego, receitas e estilo de vida",
+    "Publicidade, promoção, anúncio comercial ou conteúdo patrocinado",
+    "Opinião editorial, horóscopo, humor ou conteúdo viral sem fato observável relevante"
+  ],
+  "evento": {
+    "conflito_militar": "combate armado, ataque militar, bombardeio, mobilização de tropas entre forças organizadas",
+    "tensao_diplomatica": "ruptura ou escalada diplomática entre estados: expulsão de embaixadores, ultimatos, retirada de tratados",
+    "sancoes_economicas": "sanções econômicas, embargos, bloqueios financeiros impostos por estados ou blocos",
+    "colapso_institucional": "colapso ou falência de instituições estatais: governo dissolvido, estado falido, quebra de ordem pública",
+    "crise_humanitaria": "crise humanitária: fome, deslocamento forçado, epidemia, colapso de serviços essenciais",
+    "avanco_tecnologico_controle": "avanço de tecnologia de controle: CBDC, identidade digital, biometria, vigilância em massa",
+    "unificacao_politica": "unificação ou integração política: novos blocos, tratados de governança supranacional, autoridade central compartilhada",
+    "apostasia_religiosa": "apostasia ou erosão religiosa: abandono institucional da fé, secularização forçada, mudança doutrinária central",
+    "perseguidao_religiosa": "perseguição religiosa: prisões, restrições ou violência contra grupos por motivo de fé",
+    "desastre_natural": "desastre natural de grande escala: terremoto, tsunami, erupção, seca ou evento climático extremo",
+    "migracao_massa": "migração em massa: fluxos de refugiados ou deslocamento populacional de grande magnitude",
+    "narrativa_globo_midia": "narrativa midiática global coordenada: campanhas de informação, censura ou consenso forjado em larga escala",
+    "narrativa_extraterrestre": "narrativa extraterrestre institucional: UFO/UAP, disclosure oficial, relatos de não-humanos",
+    "narrativa_engano_apocaliptico": "engano apocalíptico: falsos mestres, falsos messias, sinais enganosos, narrativas messiânicas seculares",
+    "prodigio_falso": "prodígio ou maravilha mediática/tecnológica de amplo alcance usada para validar autoridade",
+    "sinal_geopolitico": "sinal geopolítico genérico sem evento concreto único: tendência de fundo, movimento estrutural difuso",
+    "outro": "evento que não se encaixa nas demais categorias"
+  },
+  "regiao": {
+    "oriente_medio": "Oriente Médio: Israel, Gaza, Irã, Síria, Jerusalém, países árabes",
+    "europa": "Europa: União Europeia, Reino Unido, países europeus",
+    "america_norte": "América do Norte: Estados Unidos, Canadá, México",
+    "america_sul": "América do Sul e Central: Brasil, Argentina, países latinos",
+    "africa": "África: países africanos e organizações regionais africanas",
+    "asia_pacifico": "Ásia e Pacífico: China, Índia, Japão, Coreia, sudeste asiático, Oceania",
+    "russia_eurasia": "Rússia e Eurásia: Rússia, Ucrânia, Ásia Central, Cáucaso",
+    "global": "alcance global ou multilateral: ONU, organismos internacionais, múltiplas regiões",
+    "outro": "região não identificada ou outra"
+  },
+  "dimensao": {
+    "macro": "escala macro: instituições, estados, blocos, economia global, tratados, conflitos interestatais",
+    "micro": "escala micro: indivíduos, comunidades locais, discurso viral, eventos pontuais"
+  },
+  "topico": {
+    "oriente_medio": "assuntos do Oriente Médio: Israel, Gaza, Irã, conflitos regionais",
+    "tecnologia": "tecnologia de controle: CBDC, identidade digital, biometria, vigilância, inteligência artificial",
+    "religiao": "religião: igreja, fé, movimentos religiosos, apostasia, despertamento",
+    "conflito": "conflito e guerra: operações militares, disputas armadas, escalada bélica",
+    "narrativa_extraterrestre": "narrativa extraterrestre: UFO, UAP, OVNI, disclosure, não-humanos",
+    "engano_apocaliptico": "engano apocalíptico: falso profeta, sinais enganosos, prodígios, grande engano"
+  }
+}
