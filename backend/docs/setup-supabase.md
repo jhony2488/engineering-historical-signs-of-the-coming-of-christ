@@ -20,7 +20,9 @@ Isso cria:
 - Tabelas das 9 camadas
 - Índices BRIN, GIN e HNSW
 - RLS read-only para `anon`
-- Seeds de candidatos e parâmetros HMM
+- Seeds de candidatos e `parametros_fase` — calibração versionada do HMM
+  (`ativo=true` = versão em uso; novas versões do `train-phase-hmm` entram
+  inativas até aprovação)
 
 ## 3. Variáveis de ambiente
 

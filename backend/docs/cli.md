@@ -83,6 +83,9 @@ No-op intencional — a política atual é retenção somente no Postgres
 
 ## Classificadores locais (destilação)
 
+Contexto completo sobre quais modelos treinam e quais são pré-treinados:
+[modelos-locais.md](modelos-locais.md).
+
 ### `export-extraction-dataset`
 
 Exporta pares trecho↔extração LLM para destilação do classificador local.
@@ -100,6 +103,39 @@ do LLM (`CLASSIFIER_CONFIDENCE_MIN`).
 ```bash
 python -m motor.cli train-event-classifier --dataset config/extraction_dataset.jsonl --out-dir config/event_classifier
 ```
+
+### `train-phase-hmm`
+
+Recalibra o HMM de fases via EM (Baum-Welch) sobre a série diária de
+observações reconstruída de `resultados_escatologicos` (mínimo
+`HMM_EM_MIN_DAYS` dias). Com `--persist`, grava nova versão em
+`parametros_fase` **inativa e não aprovada** — ativação manual
+(`ativo=true`) após revisão.
+
+```bash
+python -m motor.cli train-phase-hmm --limit 365 --persist
+```
+
+| Opção | Descrição |
+|-------|-----------|
+| `--persist` | Grava versão inativa em `parametros_fase` |
+| `--limit N` | Dias de histórico considerados (default: 365) |
+
+### `train-gnn`
+
+Treina o `PropheticGNN` por link prediction auto-supervisionada sobre o
+grafo persistido (`grafo_nos`/`grafo_arestas`) e salva os pesos em
+`GNN_WEIGHTS_PATH` (default `config/gnn_weights.pt`). Requer
+`pip install -e ".[gnn]"`.
+
+```bash
+python -m motor.cli train-gnn --epochs 200 --out config/gnn_weights.pt
+```
+
+| Opção | Descrição |
+|-------|-----------|
+| `--epochs N` | Épocas de treino (default: `GNN_TRAIN_EPOCHS`) |
+| `--out PATH` | Destino dos pesos (default: `GNN_WEIGHTS_PATH`) |
 
 ## Jobs
 

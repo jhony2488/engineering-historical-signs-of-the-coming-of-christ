@@ -95,10 +95,15 @@ extra `pip install -e ".[ml]"`. Protótipos zero-shot em
 
 ### 4–7 — LLM (Groq + fallback OpenRouter)
 - **4:** extração JSON estruturada (assistida pelo gate 3.5 e pelo shadow
-  classifier acima)
+  classifier acima) — formato enforced por `json_schema`
+  (`evento_estruturado.schema.json`) na chamada da API
 - **5:** linha temporal
 - **6:** raciocínio SE/ENTÃO
 - **7:** hermenêutica com RAG bíblico
+
+Saída estruturada via configuração da chamada (`json_schema` ou
+`json_object`/`format`), não apenas via instrução no prompt — ver
+[modelos-locais.md](modelos-locais.md).
 
 ### 8 — Correlação
 - Bayes (convicção sequencial)
@@ -156,7 +161,12 @@ Camadas **16–22** (rede de nós, consenso, tokenomia, DAO, Nostr, mesh Atos), 
 
 ## GNN v1
 
-Centralidade via **NetworkX** como proxy de message-passing. Tabelas `grafo_nos` e `grafo_arestas` prontas para migração futura para PyG/DGL.
+`PropheticGNN` (`motor/ml/gnn.py`): encoder SAGEConv de 2 camadas via
+**PyTorch Geometric** quando o extra `[gnn]` está instalado; fallback
+NumPy/NetworkX como proxy de message-passing. Pesos treináveis offline por
+link prediction auto-supervisionada (arestas de `grafo_arestas` = positivos)
+via `python -m motor.cli train-gnn` → `config/gnn_weights.pt`. Tabelas
+`grafo_nos`/`grafo_arestas` persistem a topologia.
 
 ## Persistência
 

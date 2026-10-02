@@ -19,12 +19,15 @@ Motor Python de processamento batch para **Engenharia de Sinais Históricos da v
 | 8 | Correlação Bayes + HMM + MCDA | `numpy` (Viterbi puro) |
 | 9 | Relatórios HTML/JSON | Jinja2 |
 
-**GNN v1:** centralidade via NetworkX (substituível por PyG/DGL no RunPod).
+**GNN v1:** SAGEConv via PyTorch Geometric (extra `[gnn]`, pesos treináveis por
+link prediction via `train-gnn`) ou proxy NetworkX — ver
+[`docs/modelos-locais.md`](docs/modelos-locais.md).
 
 **Classificadores locais (`motor/ml/`):** relevância zero-shot, shadow classifier da
 camada 4, cross-encoder (RAG rerank + match profecia↔evento), dedup semântico e
 destilação sklearn sobre embeddings BGE (`EXTRACTION_MODE=classifier_first` após
-`export-extraction-dataset` + `train-event-classifier`).
+`export-extraction-dataset` + `train-event-classifier`). Taxonomia
+pré-treinado × paramétrico × treinado: [`docs/modelos-locais.md`](docs/modelos-locais.md).
 
 ## Setup local
 

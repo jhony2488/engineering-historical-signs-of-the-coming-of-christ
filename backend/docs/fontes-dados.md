@@ -87,4 +87,4 @@ Camada 10 por país.
 | `countries_focus.json` | Países da Camada 10/ABM |
 | `historical_echoes_seed.json` | Ecos históricos (Camada 11) |
 | `profecias_baseline_seed.json` | Baseline de profecias (Camada 0) |
-| `classifier_prototypes.json` | Protótipos dos classificadores locais |
+| `classifier_prototypes.json` | Protótipos zero-shot dos classificadores locais — editar descrições recalibra sem treino |

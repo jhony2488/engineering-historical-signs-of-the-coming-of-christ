@@ -39,3 +39,31 @@ GROQ_MODEL_HERMENEUTICS=gemma2-9b-it
 OLLAMA_ENABLED=false
 OLLAMA_BASE_URL=http://localhost:11434
 ```
+
+## Saída estruturada por provedor
+
+O formato JSON das respostas é enforced na **configuração da chamada**, não
+só no prompt — `LLMRouter.complete(json_mode=..., json_schema=...)`:
+
+| Provedor | `json_mode=True` | `json_schema` informado |
+|----------|------------------|-------------------------|
+| Groq | `response_format=json_object` | `response_format=json_schema` (strict) |
+| OpenRouter | `response_format=json_object` | `response_format=json_schema` (strict) |
+| Ollama | `format="json"` | `format=<schema dict>` |
+
+A camada 4 passa `evento_estruturado.schema.json` como `json_schema`;
+demais camadas usam `json_object` (schemas próprios = follow-up, exige
+issue prévia). `SchemaValidator` continua validando pós-parse.
+
+## Modelos locais (HuggingFace, sem chave de API)
+
+Além dos LLMs, o motor usa modelos HF pré-treinados locais em CPU:
+
+| Papel | Modelo | Env |
+|-------|--------|-----|
+| Embeddings | `BAAI/bge-m3` | `BGE_MODEL_NAME` |
+| Reranker | `BAAI/bge-reranker-v2-m3` | `RERANKER_MODEL_NAME` |
+| Sentimento (tom espiritual) | `cardiffnlp/twitter-xlm-roberta-base-sentiment` | `SENTIMENT_MODEL_NAME` |
+
+Detalhes (o que treina e o que só recebe parâmetros):
+[modelos-locais.md](modelos-locais.md).

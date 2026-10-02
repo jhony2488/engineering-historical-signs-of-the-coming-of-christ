@@ -82,7 +82,8 @@ dry-run**. Detalhes: [model-providers.md](model-providers.md).
 
 ## Classificadores locais (`motor/ml/`)
 
-Sem chave de API — rodam em CPU.
+Sem chave de API — rodam em CPU. Taxonomia completa (pré-treinados ×
+paramétricos × treinados): [modelos-locais.md](modelos-locais.md).
 
 | Variável | Default | Descrição |
 |----------|---------|-----------|
@@ -99,6 +100,25 @@ Sem chave de API — rodam em CPU.
 | `EXTRACTION_MODE` | `llm` | `llm` ou `classifier_first` (destilação) |
 | `CLASSIFIER_CONFIDENCE_MIN` | `0.6` | Confiança mínima do classificador local |
 | `DISTILL_MIN_ROWS` | `300` | Linhas mínimas para destilação |
+| `SENTIMENT_MODEL_NAME` | `cardiffnlp/twitter-xlm-roberta-base-sentiment` | Modelo HF de sentimento do tom espiritual (manter labels positive/negative/neutral) |
+
+### HMM — EM offline (`train-phase-hmm`)
+
+| Variável | Default | Descrição |
+|----------|---------|-----------|
+| `HMM_EM_MIN_DAYS` | `30` | Dias mínimos de histórico para treinar |
+| `HMM_EM_MAX_ITER` | `100` | Iterações máximas do Baum-Welch |
+| `HMM_EM_TOL` | `1e-4` | Tolerância de convergência (Δ log-likelihood) |
+
+### GNN — link prediction (`train-gnn`, extra `[gnn]`)
+
+| Variável | Default | Descrição |
+|----------|---------|-----------|
+| `GNN_WEIGHTS_PATH` | `config/gnn_weights.pt` | Artefato dos pesos treinados |
+| `GNN_TRAIN_EPOCHS` | `200` | Épocas de treino |
+| `GNN_TRAIN_LR` | `0.01` | Learning rate (Adam) |
+| `GNN_NEG_RATIO` | `1` | Negativos por aresta positiva |
+| `GNN_TEXT_FEATURES_ENABLED` | `false` | Mistura projeção do embedding BGE do texto do nó nas features |
 
 ## Site e e-mail (digest diário)
 

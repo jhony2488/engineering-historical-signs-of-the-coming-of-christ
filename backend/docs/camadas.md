@@ -63,8 +63,9 @@ camadas hermenêuticas na Escritura.
 | Módulo | `motor/ml/relevance.py` (`RelevanceGate`) |
 | Env | `RELEVANCE_GATE_ENABLED`, `EXTRACTION_TOP_K`, `RELEVANCE_MIN_SCORE` |
 
-Ordena os chunks por relevância escatológica (zero-shot BGE / lexical) antes
-de gastar chamadas de LLM — auditoria em `audit_log` como `camada_3_gate`.
+Ordena os chunks por relevância escatológica (zero-shot BGE sobre
+`config/classifier_prototypes.json` / fallback lexical) antes de gastar
+chamadas de LLM — auditoria em `audit_log` como `camada_3_gate`.
 
 ## Camadas 4–7 — LLMs (Groq → OpenRouter → Ollama)
 
@@ -85,6 +86,12 @@ Classificadores locais auxiliares (`motor/ml/`): `event_classifier.py`
 (cross-encoder BGE para rerank do RAG e match profecia↔evento),
 `spiritual_tone.py`/`spiritual_tone_classifier.py` (tom expansão/contração),
 `distill.py` (destilação sklearn — ver `EXTRACTION_MODE=classifier_first`).
+O que é pré-treinado, paramétrico ou treinado: ver
+[modelos-locais.md](modelos-locais.md).
+
+A camada 4 passa `evento_estruturado.schema.json` como `json_schema` na
+chamada LLM — enforcement de formato na API (Groq/OpenRouter strict,
+Ollama `format`); as demais camadas seguem em `json_object`.
 
 ## Camada 8 — Correlação matemática
 
@@ -98,8 +105,12 @@ Classificadores locais auxiliares (`motor/ml/`): `event_classifier.py`
 | Saída | `resultado_correlacao.schema.json` → `resultados_escatologicos` |
 
 Consolida extração, timeline, raciocínio e hermenêutica em: fase estimada
-(HMM/Viterbi), convicção Bayesiana, índice global, alerta de falso líder,
-scores Besta do Mar/Terra, proximidade espiritual e transição de fase.
+(HMM/Viterbi sobre a série diária de observações — histórico de
+`resultados_escatologicos` + eventos do dia), convicção Bayesiana, índice
+global, alerta de falso líder, scores Besta do Mar/Terra, proximidade
+espiritual e transição de fase. Matrizes do HMM vêm de `parametros_fase`
+(versão ativa) e podem ser recalibradas via EM offline
+(`train-phase-hmm`).
 
 ## Rankings Top-10 (MCDA)
 
@@ -111,9 +122,12 @@ Cada item valida `ranking_candidato.schema.json`. Campos: `posicao`,
 
 ## Grafo (GNN v1)
 
-`motor/ml/graph.py` (`PropheticGraph`) + `motor/ml/gnn.py` — centralidade via
-NetworkX como proxy de message-passing. Persiste `grafo_nos`/`grafo_arestas`
-e expõe `graph_convergence` nas métricas. Preparado para migração a PyG/DGL.
+`motor/ml/graph.py` (`PropheticGraph`) + `motor/ml/gnn.py` — SAGEConv 2
+camadas via PyTorch Geometric quando o extra `[gnn]` está instalado;
+caso contrário, proxy NumPy. Os pesos são treináveis offline por link
+prediction auto-supervisionada (`train-gnn` → `config/gnn_weights.pt`,
+carregado lazy como `pyg_trained`). Persiste `grafo_nos`/`grafo_arestas`
+e expõe `graph_convergence` nas métricas.
 
 ## Camada 10 — Ameaças por país
 
