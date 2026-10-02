@@ -1,5 +1,3 @@
-import sys
-
 from motor.prompts import loader
 
 PT_FILES = [p.name for p in (loader.PROMPTS_DIR).iterdir() if p.suffix == ".txt"]
@@ -15,8 +13,16 @@ def test_v2_en_keeps_markers_and_enums():
     for name in PT_FILES:
         pt = (loader.PROMPTS_DIR / name).read_text(encoding="utf-8")
         en = (EN_DIR / name).read_text(encoding="utf-8")
-        for marker in ("{{texto}}", "{{rag}}", "{{eventos}}", "{{dados}}", "{{abm}}",
-                       "{{threat}}", "{{resilience}}", "{{debiasing}}"):
+        for marker in (
+            "{{texto}}",
+            "{{rag}}",
+            "{{eventos}}",
+            "{{dados}}",
+            "{{abm}}",
+            "{{threat}}",
+            "{{resilience}}",
+            "{{debiasing}}",
+        ):
             if marker in pt:
                 assert marker in en, f"{name}: marker {marker} ausente no EN"
         for token in ("expansao", "contracao", "FASE_I", "json"):

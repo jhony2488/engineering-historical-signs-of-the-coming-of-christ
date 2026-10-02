@@ -70,7 +70,7 @@ class Settings(BaseSettings):
     # adapters/local_llm.py (LOCAL_MODEL_MAP). Extra: pip install -e ".[local]"
     local_llm_enabled: bool = False
     local_models_dir: Path = Field(default=BACKEND_ROOT / "models_cache")
-    local_llm_ctx: int = 0      # 0 = usa o perfil do candidato
+    local_llm_ctx: int = 0  # 0 = usa o perfil do candidato
     local_llm_threads: int = 0  # 0 = usa o perfil do candidato
 
     # Classificadores locais (motor/ml/)

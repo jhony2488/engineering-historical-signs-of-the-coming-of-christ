@@ -74,9 +74,7 @@ async def test_cascade_falls_to_smaller_model(tmp_path, monkeypatch):
     p7, p3 = tmp_path / CANDS[0]["file"], tmp_path / CANDS[1]["file"]
     p7.write_bytes(b"gguf")
     p3.write_bytes(b"gguf")
-    mod, calls = _fake_llama_module(
-        {str(p7): RuntimeError("boom"), str(p3): '{"ok":true}'}
-    )
+    mod, calls = _fake_llama_module({str(p7): RuntimeError("boom"), str(p3): '{"ok":true}'})
     monkeypatch.setitem(sys.modules, "llama_cpp", mod)
 
     client = _client(tmp_path)
@@ -103,9 +101,7 @@ async def test_cascade_skips_missing_file(tmp_path, monkeypatch):
 async def test_all_candidates_fail_raises(tmp_path, monkeypatch):
     for c in CANDS:
         (tmp_path / c["file"]).write_bytes(b"gguf")
-    mod, _ = _fake_llama_module(
-        {str(tmp_path / c["file"]): RuntimeError("x") for c in CANDS}
-    )
+    mod, _ = _fake_llama_module({str(tmp_path / c["file"]): RuntimeError("x") for c in CANDS})
     monkeypatch.setitem(sys.modules, "llama_cpp", mod)
 
     client = _client(tmp_path)
@@ -129,9 +125,7 @@ async def test_json_schema_builds_response_format(tmp_path, monkeypatch):
 
     client = _client(tmp_path)
     schema = {"type": "object"}
-    await client.complete(
-        ALIAS, [{"role": "user", "content": "x"}], json_schema=schema
-    )
+    await client.complete(ALIAS, [{"role": "user", "content": "x"}], json_schema=schema)
     rf = calls[str(path)]["kwargs"]["response_format"]
     assert rf["type"] == "json_object"
     assert rf["schema"] == schema
@@ -178,9 +172,7 @@ async def test_router_falls_to_groq_when_local_exhausted(tmp_path, monkeypatch):
     router = LLMRouter()
     router._local = _client(tmp_path)
 
-    mod, _ = _fake_llama_module(
-        {str(tmp_path / c["file"]): RuntimeError("x") for c in CANDS}
-    )
+    mod, _ = _fake_llama_module({str(tmp_path / c["file"]): RuntimeError("x") for c in CANDS})
     monkeypatch.setitem(sys.modules, "llama_cpp", mod)
 
     class _GroqProbe:
@@ -191,7 +183,5 @@ async def test_router_falls_to_groq_when_local_exhausted(tmp_path, monkeypatch):
 
     router._groq = _GroqProbe()
 
-    _, provider = await router.complete(
-        ALIAS, [{"role": "user", "content": "x"}], json_mode=True
-    )
+    _, provider = await router.complete(ALIAS, [{"role": "user", "content": "x"}], json_mode=True)
     assert provider == "groq"

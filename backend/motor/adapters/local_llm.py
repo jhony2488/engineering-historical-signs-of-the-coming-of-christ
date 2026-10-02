@@ -80,9 +80,7 @@ class LocalLlamaClient:
     def is_configured(self) -> bool:
         if not self._enabled:
             return False
-        return any(
-            (self._models_dir / c["file"]).exists() for c in iter_candidates()
-        )
+        return any((self._models_dir / c["file"]).exists() for c in iter_candidates())
 
     def _get_instance(self, candidate: dict[str, Any]) -> Any:
         file = candidate["file"]
@@ -153,13 +151,10 @@ class LocalLlamaClient:
                     self._generate, candidate, messages, json_schema, json_mode
                 )
             except Exception as exc:
-                logger.warning(
-                    "local_llm_candidate_failed", file=file, error=str(exc)
-                )
+                logger.warning("local_llm_candidate_failed", file=file, error=str(exc))
                 errors.append(f"{file}: {exc}")
                 self._instances.pop(file, None)
 
         raise RuntimeError(
-            "cascata local esgotada para "
-            f"'{model}': {'; '.join(errors) or 'sem candidatos'}"
+            f"cascata local esgotada para '{model}': {'; '.join(errors) or 'sem candidatos'}"
         )

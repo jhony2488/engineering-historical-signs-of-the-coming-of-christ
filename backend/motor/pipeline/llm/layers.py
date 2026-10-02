@@ -44,9 +44,7 @@ _SYSTEM_EN = {
 class LLMPipeline:
     PROMPT_VERSION = PROMPT_VERSION
 
-    def __init__(
-        self, router: LLMRouter | None = None, embeddings: Any | None = None
-    ) -> None:
+    def __init__(self, router: LLMRouter | None = None, embeddings: Any | None = None) -> None:
         self.router = router or LLMRouter()
         self.settings = get_settings()
         self.validator = get_validator()
@@ -83,9 +81,7 @@ class LLMPipeline:
             logger.warning("rag_per_chunk_failed", error=str(exc))
             return fallback
 
-    def _fill_from_classifier(
-        self, parsed: dict[str, Any], shadow: dict[str, Any]
-    ) -> list[str]:
+    def _fill_from_classifier(self, parsed: dict[str, Any], shadow: dict[str, Any]) -> list[str]:
         """classifier_hints_enabled: preenche/corrige categóricos inválidos
         (evento/energia/dimensao) com o classificador local, antes do validate."""
         if not self.settings.classifier_hints_enabled or not shadow:
@@ -185,11 +181,11 @@ class LLMPipeline:
             model_name = "local_event_extractor_v1"
             shadow: dict[str, Any] | None = None
 
-            def get_shadow() -> dict[str, Any]:
+            def get_shadow(text: str = chunk.get("texto", "")) -> dict[str, Any]:
                 nonlocal shadow
                 if shadow is None:
                     try:
-                        shadow = self.shadow.classify(chunk.get("texto", ""))
+                        shadow = self.shadow.classify(text)
                     except Exception as exc:
                         logger.warning("classifier_hints_failed", error=str(exc))
                         shadow = {}

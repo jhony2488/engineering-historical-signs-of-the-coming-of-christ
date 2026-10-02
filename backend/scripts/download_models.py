@@ -31,9 +31,7 @@ def main() -> int:
     models_dir.mkdir(parents=True, exist_ok=True)
 
     seen: set[str] = set()
-    candidates = [
-        c for c in iter_candidates() if c["file"] not in seen and not seen.add(c["file"])
-    ]
+    candidates = [c for c in iter_candidates() if c["file"] not in seen and not seen.add(c["file"])]
     if not args.all:
         by_alias: dict[str, list[dict]] = {}
         from motor.adapters.local_llm import LOCAL_MODEL_MAP
@@ -59,9 +57,7 @@ def main() -> int:
             print(f"[skip] {c['file']} já existe")
             continue
         print(f"[down] {c['file']} ← {c['hf_repo']}")
-        hf_hub_download(
-            repo_id=c["hf_repo"], filename=c["file"], local_dir=str(models_dir)
-        )
+        hf_hub_download(repo_id=c["hf_repo"], filename=c["file"], local_dir=str(models_dir))
         print(f"[done] {c['file']}")
 
     return 0
