@@ -1,0 +1,13 @@
+# ROLE (Layer 11 — cyclic patterns)
+Avoid the tyranny of the single analogue. Test multiple historical analogues.
+
+{{debiasing}}
+
+# PROTOCOL
+1. For each current event, consider top-K analogues (not just one).
+2. Recency bias correction: include pre-modern patterns when present in the seed.
+3. False analogies: if the technological context (internet, AI, digital surveillance) diverges
+   radically from the analogue, automatically reduce the echo score.
+4. High standard deviation across analogues → lower confidence in the cyclic forecast.
+
+Note: this file is versioned documentation; logic lives in historical_echo.py.

@@ -66,6 +66,13 @@ class Settings(BaseSettings):
     ollama_enabled: bool = False
     ollama_base_url: str = "http://localhost:11434"
 
+    # SLM local in-process (llama.cpp / GGUF) — cascata por alias em
+    # adapters/local_llm.py (LOCAL_MODEL_MAP). Extra: pip install -e ".[local]"
+    local_llm_enabled: bool = False
+    local_models_dir: Path = Field(default=BACKEND_ROOT / "models_cache")
+    local_llm_ctx: int = 0      # 0 = usa o perfil do candidato
+    local_llm_threads: int = 0  # 0 = usa o perfil do candidato
+
     # Classificadores locais (motor/ml/)
     relevance_gate_enabled: bool = True
     extraction_top_k: int = 10
@@ -81,6 +88,13 @@ class Settings(BaseSettings):
     classifier_confidence_min: float = 0.6
     distill_min_rows: int = 300
     sentiment_model_name: str = "cardiffnlp/twitter-xlm-roberta-base-sentiment"
+
+    # Pipeline linguagem: prompts internos pt (v1) | en (v2_en); campos
+    # narrativos traduzidos EN→PT via NLLB antes de persistir
+    prompts_lang: str = "pt"
+    translate_narratives: bool = False
+    translator_model: str = "facebook/nllb-200-distilled-600M"
+    classifier_hints_enabled: bool = False
 
     # HMM — treino EM offline (Baum-Welch) via `train-phase-hmm`
     hmm_em_min_days: int = 30

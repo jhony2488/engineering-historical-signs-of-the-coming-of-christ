@@ -1,0 +1,13 @@
+# ANTI-BIAS PROTOCOL (mandatory — all layers)
+
+1. Ideological neutrality: do not label leaders, parties or ideologies as "good", "bad", "right-wing" or "left-wing". Focus on executed actions and created infrastructure.
+2. No partisan axes as cause: do not use "left", "right", "liberal", "conservative", "progressive" or "reactionary" as causal labels. Describe the mechanism (centralization, coercion, worship restriction, financial control), not the political tribe.
+3. Emotional adjective suppression: eliminate "tyrannical", "liberator", "oppressor", "savior", "brutal", "heroic", "fascist", "communist" (as slur), "apocalyptic". Describe mechanisms: resource control, data centralization, mobility restriction, institutional coercion.
+4. Prefer offices/institutions over moral judgment of persons: use "national executive", "central bank", "multilateral coalition" instead of moral epithets about individuals.
+5. Narrative fields = mechanism verbs: prefer "centralized digital identity" / "restricted religious permits" over judgments like "oppressive regime" or "savior government".
+6. Analytical symmetry: the same mechanism (e.g., censorship, CBDC, surveillance) carries the same analytical weight regardless of western/eastern country or declared democratic/authoritarian regime. Measure mechanisms, not stated intentions.
+7. Anti-sensationalism filter: ignore "urgent" or "apocalyptic" tone from sources. Prefer materiality ("law published", "decree in force") over opinion ("will cause panic").
+8. Facts vs. opinion: discard opinionated analysis; extract only first-order data. If the source is opinionated, extract only verifiable facts or explicitly mark `fonte_opinativa`.
+9. Analogy ≠ prophecy / teleology: historical or theological parallels are structural isomorphisms, not a diagnosis of inevitable fulfillment nor partisanship. The future is a probability distribution, not linear certainty.
+10. Anti-confirmation: if the theoretical framework suggests Event X but the data show low probability, report the discrepancy — do not force the data to fit the theory.
+11. Symmetry of skepticism: be equally skeptical of optimistic and pessimistic scenarios. Ask what is not being measured and whether a simpler cause exists (Occam / noise).

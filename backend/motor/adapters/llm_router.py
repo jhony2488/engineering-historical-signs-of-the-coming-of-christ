@@ -4,6 +4,7 @@ import structlog
 from tenacity import retry, stop_after_attempt, wait_exponential
 
 from motor.adapters.groq import GroqClient
+from motor.adapters.local_llm import LocalLlamaClient
 from motor.adapters.ollama import OllamaClient
 from motor.adapters.openrouter import OpenRouterClient
 from motor.config import get_settings
@@ -12,9 +13,10 @@ logger = structlog.get_logger()
 
 
 class LLMRouter:
-    """Ordem: Ollama (se habilitado) → Groq → OpenRouter → dry-run via GroqClient."""
+    """Ordem: Local GGUF (se habilitado) → Ollama → Groq → OpenRouter → dry-run via GroqClient."""
 
     def __init__(self) -> None:
+        self._local = LocalLlamaClient()
         self._ollama = OllamaClient()
         self._groq = GroqClient()
         self._openrouter = OpenRouterClient()
@@ -40,8 +42,16 @@ class LLMRouter:
         `json_mode` garante apenas JSON válido.
         """
         settings = get_settings()
+        prefer_local = settings.local_llm_enabled and not self._force_fallback
         prefer_ollama = settings.ollama_enabled and not self._force_fallback
         kw = {"json_schema": json_schema, "schema_name": schema_name}
+
+        if prefer_local and self._local.is_configured:
+            try:
+                content = await self._local.complete(model, messages, json_mode, temperature, **kw)
+                return content, "local_gguf"
+            except Exception as exc:
+                logger.warning("local_llm_failed_fallback", error=str(exc), model=model)
 
         if prefer_ollama and self._ollama.is_configured:
             try:
