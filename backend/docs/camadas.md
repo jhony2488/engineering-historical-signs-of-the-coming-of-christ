@@ -26,7 +26,7 @@ arquivo cronológico.
 |------|-------|
 | Módulo | `motor/pipeline/ingestion/collector.py`, `extended_sources.py` |
 | Config | `config/feeds.yaml`, `config/acled_seed.json` |
-| Saída | `RawDocument` → tabela `documentos` (dedup por `content_hash`) |
+| Saída | `RawDocument` → tabela `documentos` (dedup por `content_hash` + semântico por embedding — `SEMANTIC_DEDUP_*`) |
 
 Fontes: RSS (`feeds.yaml`), GDELT (`gdelt_themes`), ACLED (API ou seed),
 PDFs/OCR (`OCR_IMAGES_DIR`), API.Bible, Reddit, Google Trends, feeds
@@ -50,6 +50,7 @@ heurísticas.
 | Modelo | `BAAI/bge-m3` (`BGE_MODEL_NAME`); fallback hash loga `embedding_hash_fallback_active` |
 | Corpus | `config/corpus_teologico_seed.json` → `corpus_teologico` (pgvector) |
 | Env | `EMBED_CHUNK_LIMIT` (cap de chunks embutidos por run) |
+| Rerank | `RERANKER_*` — cross-encoder BGE opcional rerankeia candidatos do RAG; `FULFILLMENT_CE_WEIGHT` pondera o match profecia↔evento do `FulfillmentTracker` |
 | Drift | CLI `run-data-drift` + prompt `embeddings_curation.txt` (mensal) |
 
 Cria memória pesquisável dos chunks e do corpus teológico; o RAG ancora as

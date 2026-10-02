@@ -97,7 +97,7 @@ Detalhes em [backend/docs/arquitetura.md](backend/docs/arquitetura.md) e
 |------------|------------|
 | Motor | Python 3.11+, FastAPI, `structlog`, `typer` |
 | LLMs | Groq Cloud (free tier) → OpenRouter (fallback) → Ollama (opcional) |
-| Embeddings/RAG | BGE-M3, pgvector, reranker BGE |
+| Embeddings/RAG | BGE-M3, pgvector, reranker BGE, classificadores locais (gate zero-shot, shadow mode, dedup semântico, destilação sklearn) |
 | Matemática | Bayes, HMM/Viterbi, MCDA, GNN v1 (NetworkX) |
 | Banco | PostgreSQL via Supabase (única persistência) |
 | Dashboard | Next.js 15, React 19, TypeScript, Tailwind, Recharts, Cytoscape, Three.js |

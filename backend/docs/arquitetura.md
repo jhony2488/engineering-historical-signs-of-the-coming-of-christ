@@ -8,7 +8,8 @@ O motor executa um pipeline batch diário que transforma documentos brutos em um
 flowchart LR
   ingest[Camada1_Ingestao] --> prep[Camada2_Preprocessamento]
   prep --> embed[Camada3_Embeddings]
-  embed --> llm[Camadas4_a_7_LLM]
+  embed --> ml[ML_Classificadores_locais]
+  ml --> llm[Camadas4_a_7_LLM]
   llm --> corr[Camada8_Correlacao]
   corr --> L11[Camada11_Ecos]
   corr --> L10[Camada10_Ameacas]
@@ -56,7 +57,9 @@ python -m motor.cli run-hybrid-analysis --window annual
 - GDELT: themes de `feeds.yaml`, corpo/snippet quando URL disponível; fallback sintético só se `ALLOW_GDELT_SYNTHETIC_FALLBACK`
 - ACLED: API key opcional; sem credenciais usa seed `config/acled_seed.json`
 - OCR de imagens em `OCR_IMAGES_DIR` (opcional)
-- Dedup por `content_hash`
+- Dedup por `content_hash` + dedup semântico por embedding
+  (`SEMANTIC_DEDUP_ENABLED`, `SEMANTIC_DEDUP_THRESHOLD=0.92`; sem modelo de
+  embedding, cai no hash)
 
 ### 2 — Pré-processamento
 - Limpeza HTML, normalização
@@ -67,11 +70,32 @@ python -m motor.cli run-hybrid-analysis --window annual
 - BGE-M3 (`sentence-transformers`) ou fallback hash (log `embedding_hash_fallback_active`)
 - Cap configurável `EMBED_CHUNK_LIMIT`
 - pgvector para busca semântica
-- RAG teológico (`corpus_teologico`)
+- RAG teológico (`corpus_teologico`) com rerank cross-encoder opcional
+  (`RERANKER_*`, `BAAI/bge-reranker-v2-m3`); mesmo reranker alimenta o blend
+  profecia↔evento do `FulfillmentTracker` (`FULFILLMENT_CE_WEIGHT`)
 - Drift mensal: CLI `run-data-drift` + prompt `embeddings_curation.txt`
 
+### Classificadores locais (`motor/ml/`)
+
+Modelos pequenos que rodam em CPU junto ao motor — sem chave de API,
+extra `pip install -e ".[ml]"`. Protótipos zero-shot em
+`config/classifier_prototypes.json`.
+
+- **Camada 3.5 — Gate de relevância** (`relevance.py`): ordena chunks por
+  relevância escatológica (BGE-M3 zero-shot / fallback lexical) antes da
+  extração — substitui o `chunks[:10]` cego; audit `camada_3_gate`
+- **Shadow classifier** (`event_classifier.py`): prediz evento/região/
+  energia/dimensão e compara com a saída do LLM sem sobrescrevê-la —
+  divergências logadas em `camada_4_shadow` (`EVENT_SHADOW_ENABLED`)
+- **Destilação** (`distill.py`): exporta dataset de extrações
+  (`export-extraction-dataset`) e treina bundle sklearn sobre embeddings BGE
+  (`train-event-classifier`). Com `EXTRACTION_MODE=classifier_first`, o modelo
+  local responde primeiro e o LLM só entra em baixa confiança
+  (`CLASSIFIER_CONFIDENCE_MIN`) ou falha de schema
+
 ### 4–7 — LLM (Groq + fallback OpenRouter)
-- **4:** extração JSON estruturada
+- **4:** extração JSON estruturada (assistida pelo gate 3.5 e pelo shadow
+  classifier acima)
 - **5:** linha temporal
 - **6:** raciocínio SE/ENTÃO
 - **7:** hermenêutica com RAG bíblico

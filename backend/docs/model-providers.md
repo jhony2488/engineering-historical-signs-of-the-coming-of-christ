@@ -15,6 +15,21 @@ Na fase zero-custo, o motor usa **Groq Cloud** (tier gratuito) com **fallback Op
 
 Ordem do `LLMRouter`: **Ollama (se habilitado) → Groq → OpenRouter → dry-run**.
 
+## Modelos locais (não-LLM)
+
+Paralelos ao router acima, `motor/ml/` roda classificadores pequenos em CPU —
+sem chave de API, instalados via `pip install -e ".[ml]"`:
+
+| Modelo | Uso |
+|--------|-----|
+| `BAAI/bge-m3` (`BGE_MODEL_NAME`) | Embeddings + classificação zero-shot por protótipos (`config/classifier_prototypes.json`) — gate de relevância e shadow classifier |
+| `BAAI/bge-reranker-v2-m3` (`RERANKER_MODEL_NAME`) | Cross-encoder: rerank do RAG teológico e match profecia↔evento |
+| Bundle sklearn (`config/event_classifier/`) | Extração local destilada da Camada 4 — ativo com `EXTRACTION_MODE=classifier_first` |
+
+Sem `sentence-transformers`/`scikit-learn` instalados, o pipeline cai nos
+fallbacks léxicos/hash e segue normalmente — os classificadores nunca são
+obrigatórios.
+
 ```bash
 # .env
 GROQ_MODEL_EXTRACTION=llama-3.1-8b-instant
