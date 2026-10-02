@@ -13,3 +13,8 @@ build/
 htmlcov/
 *.log
 models_cache/
+
+# Artefatos de treino (gerados por train-*/scripts — nunca commitar)
+config/gnn_weights.pt
+config/event_classifier/
+config/extraction_dataset.jsonl
