@@ -119,9 +119,7 @@ class FakeSupabase:
 
     def update(self, table: str, filters: dict, data: dict) -> list[dict]:
         rows = self.tables.get(table, [])
-        matched = [
-            row for row in rows if all(row.get(k) == v for k, v in filters.items())
-        ]
+        matched = [row for row in rows if all(row.get(k) == v for k, v in filters.items())]
         for row in matched:
             row.update(data)
         return matched
@@ -152,9 +150,7 @@ class FakeSupabase:
 
     def list_propostas_ajuste(self, status=None, limit: int = 50) -> list[dict]:
         filters = {"status": status} if status else None
-        return self.select(
-            "propostas_ajuste", filters=filters, order="-created_at", limit=limit
-        )
+        return self.select("propostas_ajuste", filters=filters, order="-created_at", limit=limit)
 
     def set_proposta_status(self, proposta_id, status, revisado_por=None, motivo=None):
         data = {"status": status, "revisado_em": "now"}

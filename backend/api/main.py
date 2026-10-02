@@ -350,9 +350,7 @@ async def ameacas_pais_detail(
         adv_filters["data_referencia"] = ref
         rec_filters["data_referencia"] = ref
     abm_rows = db.select("simulacoes_abm", filters=abm_filters, limit=1)
-    adv_rows = db.select(
-        "adversarial_reviews", filters=adv_filters, order="-created_at", limit=1
-    )
+    adv_rows = db.select("adversarial_reviews", filters=adv_filters, order="-created_at", limit=1)
     rec_rows = db.select("recomendacoes_adaptativas", filters=rec_filters, limit=5)
     latest = db.get_latest_resultado()
     payload = (latest or {}).get("json_analise_ia") or {}
@@ -534,9 +532,7 @@ async def rejeitar_proposta(
 ) -> dict:
     """Rejeita proposta — o registro permanece append-only com motivo."""
     db = get_supabase()
-    updated = db.set_proposta_status(
-        proposta_id, "rejeitada", motivo=motivo or None
-    )
+    updated = db.set_proposta_status(proposta_id, "rejeitada", motivo=motivo or None)
     if not updated:
         raise HTTPException(status_code=404, detail="Proposta não encontrada")
     return {"status": "rejeitada", "id": proposta_id}

@@ -189,9 +189,7 @@ class SupabaseClient:
         self, status: str | None = None, limit: int = 50
     ) -> list[dict[str, Any]]:
         filters = {"status": status} if status else None
-        return self.select(
-            "propostas_ajuste", filters=filters, order="-created_at", limit=limit
-        )
+        return self.select("propostas_ajuste", filters=filters, order="-created_at", limit=limit)
 
     def set_proposta_status(
         self,
