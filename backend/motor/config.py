@@ -66,6 +66,21 @@ class Settings(BaseSettings):
     ollama_enabled: bool = False
     ollama_base_url: str = "http://localhost:11434"
 
+    # Classificadores locais (motor/ml/)
+    relevance_gate_enabled: bool = True
+    extraction_top_k: int = 10
+    relevance_min_score: float = 0.0
+    event_shadow_enabled: bool = True
+    reranker_enabled: bool = True
+    reranker_model_name: str = "BAAI/bge-reranker-v2-m3"
+    reranker_candidate_multiplier: int = 4
+    fulfillment_ce_weight: float = 0.5
+    semantic_dedup_enabled: bool = True
+    semantic_dedup_threshold: float = 0.92
+    extraction_mode: str = "llm"  # llm | classifier_first
+    classifier_confidence_min: float = 0.6
+    distill_min_rows: int = 300
+
     feeds_config_path: Path = Field(default=CONFIG_DIR / "feeds.yaml")
 
     site_url: str = "http://localhost:3000"

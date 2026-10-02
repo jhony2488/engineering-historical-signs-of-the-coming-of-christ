@@ -39,6 +39,7 @@ ml = [
     "transformers>=4.46.0",
     "torch>=2.5.0",
     "spacy>=3.7.0",
+    "scikit-learn>=1.5.0",
 ]
 pdf = ["pymupdf>=1.24.0"]
 ingest = ["pytrends>=4.9.0", "pytesseract>=0.3.10", "Pillow>=10.0.0"]

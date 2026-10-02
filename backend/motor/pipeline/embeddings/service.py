@@ -33,6 +33,12 @@ class EmbeddingService:
                 self._model = False
         return self._model if self._model is not False else None
 
+    @property
+    def is_available(self) -> bool:
+        """True se o modelo de embedding real carregou (sem ele, embed_texts usa
+        fallback de hash determinístico — inválido para similaridade semântica)."""
+        return self._get_model() is not None
+
     def embed_texts(self, texts: list[str]) -> list[list[float]]:
         model = self._get_model()
         if model is None:
@@ -57,15 +63,19 @@ class EmbeddingService:
 
             db = get_supabase()
 
+        candidates: list[dict[str, str]] = []
         if db.is_configured:
             try:
                 vec = self.embed_texts([query])[0]
                 rows = db.rpc(
                     "match_documents",
-                    {"query_embedding": vec, "match_count": top_k},
+                    {
+                        "query_embedding": vec,
+                        "match_count": top_k * self.settings.reranker_candidate_multiplier,
+                    },
                 )
                 if rows:
-                    return [
+                    candidates = [
                         {
                             "referencia": r["referencia"],
                             "texto": r["texto"],
@@ -76,16 +86,37 @@ class EmbeddingService:
             except Exception as exc:
                 logger.warning("rag_pgvector_fallback", error=str(exc))
 
-        if not self._corpus:
+        if not candidates and self._corpus:
+            query_vec = np.array(self.embed_texts([query])[0])
+            scored = []
+            for item in self._corpus:
+                item_vec = np.array(self.embed_texts([item["texto"]])[0])
+                score = float(np.dot(query_vec, item_vec))
+                scored.append((score, item))
+            scored.sort(key=lambda x: x[0], reverse=True)
+            candidates = [
+                item for _, item in scored[: top_k * self.settings.reranker_candidate_multiplier]
+            ]
+
+        if not candidates:
             return []
-        query_vec = np.array(self.embed_texts([query])[0])
-        scored = []
-        for item in self._corpus:
-            item_vec = np.array(self.embed_texts([item["texto"]])[0])
-            score = float(np.dot(query_vec, item_vec))
-            scored.append((score, item))
-        scored.sort(key=lambda x: x[0], reverse=True)
-        return [item for _, item in scored[:top_k]]
+        if len(candidates) > top_k:
+            reranked = self._rerank(query, candidates)
+            if reranked is not None:
+                candidates = reranked
+        return candidates[:top_k]
+
+    def _rerank(self, query: str, candidates: list[dict[str, str]]) -> list[dict[str, str]] | None:
+        """Cross-encoder rerank (camada 3) — degrada para ordem de cosseno se indisponível."""
+        from motor.ml.reranker import BgeReranker
+
+        scores = BgeReranker().score_pairs([(query, c["texto"]) for c in candidates])
+        if scores is None:
+            return None
+        ranked = sorted(
+            zip(scores, candidates, strict=True), key=lambda x: x[0], reverse=True
+        )
+        return [c for _, c in ranked]
 
     def persist(self, db, trecho_id: str, texto: str) -> dict[str, Any]:
         vector = self.embed_texts([texto])[0]

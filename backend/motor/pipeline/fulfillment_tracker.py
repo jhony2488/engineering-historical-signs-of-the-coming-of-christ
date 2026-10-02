@@ -8,6 +8,7 @@ from typing import Any
 import structlog
 
 from motor.adapters.supabase import SupabaseClient, get_supabase
+from motor.config import get_settings
 from motor.domain.apocalyptic_signals import PROPHECY_SIGNAL_KEYWORDS
 from motor.pipeline.historical_baseline import (
     BASELINE_ID,
@@ -19,6 +20,7 @@ logger = structlog.get_logger()
 
 MATCH_THRESHOLD = 0.45
 PARTIAL_THRESHOLD = 0.3
+CE_PREFILTER = 0.15
 
 # Re-export para testes e documentação
 SIGNAL_KEYWORDS = PROPHECY_SIGNAL_KEYWORDS
@@ -67,7 +69,39 @@ class FulfillmentTracker:
 
     def __init__(self, db: SupabaseClient | None = None) -> None:
         self.db = db or get_supabase()
+        self.settings = get_settings()
         self.baseline_svc = HistoricalBaselineService(self.db)
+        self._reranker = None
+
+    def _get_reranker(self):
+        if self._reranker is None:
+            if not self.settings.reranker_enabled:
+                self._reranker = False
+            else:
+                from motor.ml.reranker import BgeReranker
+
+                self._reranker = BgeReranker()
+        return self._reranker if self._reranker is not False else None
+
+    def _ce_scores(
+        self, pending: list[dict], lexical: dict[str, float], corpus: str
+    ) -> dict[str, float]:
+        """Scores semânticos profecia↔corpus via cross-encoder (0-1, sigmoid)."""
+        reranker = self._get_reranker()
+        if reranker is None:
+            return {}
+        pairs, pids = [], []
+        for row in pending:
+            pid = str(row.get("id", ""))
+            if lexical.get(pid, 0.0) < CE_PREFILTER:
+                continue
+            text = f"{row.get('titulo', '')} {row.get('descricao', '')}".strip()[:800]
+            pairs.append((corpus[:1500], text))
+            pids.append(pid)
+        scores = reranker.score_pairs(pairs)
+        if scores is None:
+            return {}
+        return {pid: reranker.sigmoid(s) for pid, s in zip(pids, scores, strict=True)}
 
     def _pending_rows(self) -> list[dict[str, Any]]:
         return self.db.select("arquivo_profetico", filters={"status": "pendente"}, limit=500)
@@ -142,10 +176,21 @@ class FulfillmentTracker:
         pending = self._pending_rows()
         recorded: list[dict[str, Any]] = []
 
+        lexical = {
+            str(row.get("id", "")): _score_match(
+                str(row.get("id", "")), str(row.get("titulo", "")), corpus
+            )
+            for row in pending
+        }
+        ce = self._ce_scores(pending, lexical, corpus)
+        w_ce = float(self.settings.fulfillment_ce_weight) if ce else 0.0
+
         for row in pending:
             profecia_id = str(row.get("id", ""))
             titulo = str(row.get("titulo", ""))
-            score = _score_match(profecia_id, titulo, corpus)
+            score = lexical.get(profecia_id, 0.0)
+            if profecia_id in ce:
+                score = (1.0 - w_ce) * score + w_ce * ce[profecia_id]
             fase_alvo = (row.get("dados") or {}).get("fase_alvo") or row.get("fase_escatologica")
             if fase_alvo and fase_alvo == fase:
                 score += 0.1

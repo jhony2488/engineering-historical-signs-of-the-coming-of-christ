@@ -185,6 +185,49 @@ def archive_cold_storage(
     typer.echo(result.get("message", "postgres_only"))
 
 
+@app.command("export-extraction-dataset")
+def export_extraction_dataset(
+    out: str = typer.Option(
+        "config/extraction_dataset.jsonl", "--out", help="Caminho do JSONL de saída"
+    ),
+    min_rows: int = typer.Option(0, "--min-rows", help="0 = usa DISTILL_MIN_ROWS"),
+) -> None:
+    """Exporta pares trecho↔extração LLM para destilação do classificador local."""
+    from pathlib import Path
+
+    from motor.adapters.supabase import get_supabase
+    from motor.ml.distill import ExtractionDatasetExporter
+
+    result = ExtractionDatasetExporter(get_supabase()).export(
+        Path(out), min_rows=min_rows or None
+    )
+    if not result.get("ok"):
+        typer.echo(result.get("message"))
+        raise typer.Exit(1)
+    typer.echo(f"Dataset: {result['n_rows']} exemplos → {result['path']}")
+
+
+@app.command("train-event-classifier")
+def train_event_classifier_cmd(
+    dataset: str = typer.Option(
+        "config/extraction_dataset.jsonl", "--dataset", help="JSONL do export"
+    ),
+    out_dir: str = typer.Option(
+        "config/event_classifier", "--out-dir", help="Diretório dos artefatos"
+    ),
+) -> None:
+    """Treina classificadores locais (BGE + sklearn) destilados da camada 4."""
+    from pathlib import Path
+
+    from motor.ml.distill import train_event_classifier
+
+    result = train_event_classifier(Path(dataset), Path(out_dir))
+    if not result.get("ok"):
+        typer.echo(result.get("message"))
+        raise typer.Exit(1)
+    typer.echo(f"Treinado: {result['metrics']}")
+
+
 @app.command("worker-jobs")
 def worker_jobs(
     once: bool = typer.Option(False, "--once", help="Processa um job e encerra"),

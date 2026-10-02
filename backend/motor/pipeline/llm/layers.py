@@ -9,6 +9,7 @@ import structlog
 
 from motor.adapters.llm_router import LLMRouter
 from motor.config import get_settings
+from motor.ml.event_classifier import EventShadowClassifier
 from motor.pipeline.neutrality_filter import scrub_payload_narratives
 from motor.prompts.loader import PROMPT_VERSION, compose_prompt, with_system_debias
 from motor.schemas.validator import get_validator
@@ -19,10 +20,61 @@ logger = structlog.get_logger()
 class LLMPipeline:
     PROMPT_VERSION = PROMPT_VERSION
 
-    def __init__(self, router: LLMRouter | None = None) -> None:
+    def __init__(
+        self, router: LLMRouter | None = None, embeddings: Any | None = None
+    ) -> None:
         self.router = router or LLMRouter()
         self.settings = get_settings()
         self.validator = get_validator()
+        self.shadow = EventShadowClassifier(embeddings)
+        self._embeddings = embeddings
+        self._local_extractor = None
+
+    def _local_extract(self, text: str) -> dict[str, Any] | None:
+        """extraction_mode=classifier_first: destilado sklearn; LLM só em baixa confiança."""
+        if self.settings.extraction_mode != "classifier_first":
+            return None
+        if self._local_extractor is None:
+            from motor.ml.distill import LocalEventExtractor
+
+            self._local_extractor = LocalEventExtractor(self._embeddings)
+        out = self._local_extractor.extract(text)
+        if out and out.get("confianca_extracao", 0.0) >= self.settings.classifier_confidence_min:
+            return out
+        return None
+
+    def _shadow_audit(
+        self, chunk: dict[str, Any], parsed: dict[str, Any], db, model_name: str
+    ) -> None:
+        """Shadow mode: classificador local vs saída da extração — só registra divergências."""
+        if not self.settings.event_shadow_enabled:
+            return
+        try:
+            shadow = self.shadow.classify(chunk["texto"])
+            db.log_audit(
+                "camada_4_shadow",
+                "event_shadow_classifier_v1",
+                self.PROMPT_VERSION,
+                self._hash_input(chunk["texto"]),
+                "ok",
+                {
+                    "modelo_extracao": model_name,
+                    "extracao": {
+                        "evento": parsed.get("evento"),
+                        "energia": parsed.get("energia"),
+                        "dimensao": parsed.get("dimensao"),
+                    },
+                    "topicos_keyword": chunk.get("topicos"),
+                    "shadow": shadow,
+                    "agree": {
+                        "energia": shadow["energia"]["valor"] == parsed.get("energia"),
+                        "dimensao": shadow["dimensao"]["valor"] == parsed.get("dimensao"),
+                        "evento": shadow["evento"]["valor"] == parsed.get("evento"),
+                    },
+                },
+            )
+        except Exception as exc:
+            logger.warning("shadow_classifier_failed", error=str(exc))
 
     def _hash_input(self, text: str) -> str:
         return hashlib.sha256(text.encode()).hexdigest()[:16]
@@ -39,7 +91,7 @@ class LLMPipeline:
     ) -> list[dict[str, Any]]:
         results = []
         template = compose_prompt("extraction.txt")
-        for chunk in chunks[:10]:
+        for chunk in chunks[: self.settings.extraction_top_k]:
             rag_text = "\n".join(f"{r['referencia']}: {r['texto']}" for r in rag)
             prompt = template.replace("{{texto}}", chunk["texto"]).replace("{{rag}}", rag_text)
             messages = [
@@ -53,19 +105,26 @@ class LLMPipeline:
                 },
                 {"role": "user", "content": prompt},
             ]
-            content, provider = await self.router.complete(
-                self.settings.groq_model_extraction, messages, json_mode=True
-            )
+            parsed: dict[str, Any] | None = self._local_extract(chunk.get("texto", ""))
+            provider = "local_classifier"
+            model_name = "local_event_extractor_v1"
+            if parsed is None:
+                content, provider = await self.router.complete(
+                    self.settings.groq_model_extraction, messages, json_mode=True
+                )
+                model_name = self.settings.groq_model_extraction
             try:
-                parsed = self._parse_json(content)
+                if parsed is None:
+                    parsed = self._parse_json(content)
                 self.validator.validate("evento_estruturado", parsed)
                 parsed["fonte_id"] = chunk.get("id", "")
                 row = db.insert(
                     "eventos_estruturados", {"dados": parsed, "trecho_id": chunk.get("id")}
                 )
+                self._shadow_audit(chunk, parsed, db, model_name)
                 db.log_audit(
                     "camada_4",
-                    self.settings.groq_model_extraction,
+                    model_name,
                     self.PROMPT_VERSION,
                     self._hash_input(chunk["texto"]),
                     "ok",
@@ -75,7 +134,7 @@ class LLMPipeline:
             except Exception as exc:
                 db.log_audit(
                     "camada_4",
-                    self.settings.groq_model_extraction,
+                    model_name,
                     self.PROMPT_VERSION,
                     self._hash_input(chunk["texto"]),
                     "error",

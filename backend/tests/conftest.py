@@ -84,12 +84,58 @@ class FakeSupabase:
         rankings: dict[tuple[str, date], list[dict]] | None = None,
         latest_resultado: dict | None = None,
         snapshots: dict[str, dict] | None = None,
+        tables: dict[str, list[dict]] | None = None,
     ) -> None:
         self.historico = historico or []
         self.rankings = rankings or {}
         self.latest_resultado = latest_resultado
         self.snapshots = snapshots or {}
+        self.tables = tables or {}
         self.inserts: list[tuple[str, dict]] = []
+        self.audits: list[dict] = []
+
+    def select(
+        self,
+        table: str,
+        columns: str = "*",
+        filters: dict | None = None,
+        order: str | None = None,
+        limit: int | None = None,
+    ) -> list[dict]:
+        rows = list(self.tables.get(table, []))
+        for key, value in (filters or {}).items():
+            rows = [r for r in rows if r.get(key) == value]
+        if order:
+            desc = order.startswith("-")
+            col = order.lstrip("-")
+            rows.sort(key=lambda r: r.get(col) or "", reverse=desc)
+        if limit:
+            rows = rows[:limit]
+        return rows
+
+    def upsert(self, table: str, data: dict, on_conflict: str = "id") -> dict:
+        self.tables.setdefault(table, []).append(dict(data))
+        return data
+
+    def log_audit(
+        self,
+        camada: str,
+        modelo: str,
+        prompt_version: str,
+        input_hash: str,
+        decisao: str,
+        detalhes: dict | None = None,
+    ) -> None:
+        self.audits.append(
+            {
+                "camada": camada,
+                "modelo": modelo,
+                "prompt_version": prompt_version,
+                "input_hash": input_hash,
+                "decisao": decisao,
+                "detalhes": detalhes or {},
+            }
+        )
 
     def get_historico(self, desde: date | None = None, limit: int = 90) -> list[dict]:
         rows = self.historico

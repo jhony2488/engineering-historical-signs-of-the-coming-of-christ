@@ -265,7 +265,49 @@ class IngestionCollector:
                 continue
             hash_seen.add(doc.content_hash)
             unique.append(doc)
+        if self.settings.semantic_dedup_enabled:
+            unique = self._semantic_dedup(unique)
         return unique[: self.settings.max_documents_per_day]
+
+    def _semantic_dedup(self, docs: list[RawDocument]) -> list[RawDocument]:
+        """Dedup por similaridade de embedding (cosseno > threshold).
+
+        Complementa o dedup por hash: captura reescritas do mesmo conteúdo.
+        Sem modelo de embedding disponível, retorna a lista intacta.
+        """
+        try:
+            import numpy as np
+
+            from motor.pipeline.embeddings.service import EmbeddingService
+        except ImportError:
+            return docs
+
+        emb = EmbeddingService()
+        if not emb.is_available:
+            return docs
+        try:
+            vecs = emb.embed_texts([d.conteudo[:1000] for d in docs])
+        except Exception as exc:
+            logger.warning("semantic_dedup_failed", error=str(exc))
+            return docs
+
+        thr = float(self.settings.semantic_dedup_threshold)
+        kept: list[RawDocument] = []
+        seen: list = []
+        for doc, vec in zip(docs, vecs, strict=True):
+            v = np.array(vec, dtype=float)
+            norm = np.linalg.norm(v)
+            is_dup = norm > 1e-9 and any(
+                float(np.dot(v, s) / (norm * np.linalg.norm(s))) > thr for s in seen
+            )
+            if is_dup:
+                logger.info(
+                    "semantic_dedup_drop", fonte=doc.fonte, titulo=doc.titulo[:60]
+                )
+                continue
+            seen.append(v)
+            kept.append(doc)
+        return kept
 
     def persist(self, db: Any, docs: list[RawDocument]) -> list[dict[str, Any]]:
         saved = []

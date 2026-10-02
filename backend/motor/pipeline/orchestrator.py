@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import hashlib
 import json
 from datetime import date, timedelta
 from typing import Any
@@ -10,6 +11,7 @@ from motor.adapters.supabase import SupabaseClient, get_supabase
 from motor.config import CONFIG_DIR, get_settings
 from motor.math.mcda import rank_candidates
 from motor.ml.graph import PropheticGraph
+from motor.ml.relevance import RelevanceGate
 from motor.ml.spiritual_tone import SpiritualToneAnalyzer
 from motor.pipeline.abm_simulation import AbmSimulationService
 from motor.pipeline.adaptive_recommendations import AdaptiveRecommendationService
@@ -40,7 +42,8 @@ class DailyOrchestrator:
         self.collector = IngestionCollector()
         self.preprocessor = Preprocessor()
         self.embeddings = EmbeddingService()
-        self.llm = LLMPipeline()
+        self.llm = LLMPipeline(embeddings=self.embeddings)
+        self.relevance = RelevanceGate(self.embeddings)
         self.correlation = CorrelationEngine()
         self.reports = ReportGenerator()
         self.tone = SpiritualToneAnalyzer()
@@ -183,6 +186,19 @@ class DailyOrchestrator:
 
         # Tom espiritual nos trechos
         tones = [self.tone.analyze(c.get("texto", "")) for c in all_chunks[:5]]
+
+        # Camada 3.5 — gate de relevância (ordena chunks antes da extração LLM)
+        all_chunks = self.relevance.rank(all_chunks)
+        self.db.log_audit(
+            "camada_3_gate",
+            self.relevance.model_used,
+            LLMPipeline.PROMPT_VERSION,
+            hashlib.sha256(
+                "".join(str(c.get("id", "")) for c in all_chunks[:20]).encode()
+            ).hexdigest()[:16],
+            "ok",
+            {"scores": [c.get("relevancia") for c in all_chunks[:20]]},
+        )
 
         # Camadas 4-7 — LLM
         events = await self.llm.extract_events(all_chunks, rag, self.db)
