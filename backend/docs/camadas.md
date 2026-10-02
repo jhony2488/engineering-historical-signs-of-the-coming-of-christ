@@ -77,8 +77,11 @@ chamadas de LLM — auditoria em `audit_log` como `camada_3_gate`.
 | 7 | Hermenêutica bíblica | `hermeneutics.txt` | `GROQ_MODEL_HERMENEUTICS` (gemma2-9b-it) |
 
 Implementação: `motor/pipeline/llm/layers.py` (`LLMPipeline`) sobre
-`motor/adapters/llm_router.py` (`LLMRouter`: Ollama se `OLLAMA_ENABLED` →
-Groq → OpenRouter → dry-run). Toda chamada registra em `audit_log`
+`motor/adapters/llm_router.py` (`LLMRouter`: Local GGUF se `LOCAL_LLM_ENABLED`
+→ Ollama se `OLLAMA_ENABLED` → Groq → OpenRouter → dry-run). O tier local
+(`motor/adapters/local_llm.py`) tenta a cascata GGUF por alias —
+7B→3B→1.5B na camada 4 — com perfil de parâmetros por modelo; esgotada,
+cai na nuvem. Toda chamada registra em `audit_log`
 (modelo, prompt versionado `PROMPT_VERSION`, hash, decisão).
 
 Classificadores locais auxiliares (`motor/ml/`): `event_classifier.py`

@@ -130,19 +130,26 @@ cd front-end && npm run lint && npm run test && npm run build
 
 **Secrets de repositório**: `SUPABASE_URL`, `SUPABASE_SERVICE_ROLE_KEY`,
 `GROQ_API_KEY`, `OPENROUTER_API_KEY`, `ADMIN_API_KEY`.
-**Variável opcional**: `LLM_DRY_RUN=true` para CI sem chaves.
-**Cache**: `~/.cache/huggingface` (modelo BGE-M3) no workflow diário.
+**Variáveis opcionais (repo `vars`)**: `LLM_DRY_RUN`, `LOCAL_LLM_ENABLED`,
+`PROMPTS_LANG`, `TRANSLATE_NARRATIVES`, `CLASSIFIER_HINTS_ENABLED` — defaults
+no workflow ligam o tier SLM local + prompts EN.
+**Cache**: `~/.cache/huggingface` (BGE-M3, reranker, NLLB) e
+`backend/models_cache/` (GGUFs do SLM, chave = `local_llm.py`) no workflow
+diário; os GGUFs são baixados por `scripts/download_models.py --all`.
 
 > Não existe workflow de PR/push — lint, testes e build são responsabilidade
 > dos hooks locais + revisor.
 
 ### Provedores LLM
 
+Ordem do router: **Local GGUF → Ollama → Groq → OpenRouter → dry-run**.
+
 | Provedor | Papel | Variável |
 |----------|-------|----------|
-| Groq | Primário (extração, timeline, raciocínio, hermenêutica) | `GROQ_API_KEY` |
-| OpenRouter | Fallback | `OPENROUTER_API_KEY` |
+| Local GGUF (llama.cpp) | SLM in-process, cascata 7B→3B→1.5B por alias | `LOCAL_LLM_ENABLED`, `LOCAL_MODELS_DIR` |
 | Ollama | Opcional/local | `OLLAMA_ENABLED`, `OLLAMA_BASE_URL` |
+| Groq | Primário cloud | `GROQ_API_KEY` |
+| OpenRouter | Fallback | `OPENROUTER_API_KEY` |
 
 Detalhes: [backend/docs/model-providers.md](backend/docs/model-providers.md).
 

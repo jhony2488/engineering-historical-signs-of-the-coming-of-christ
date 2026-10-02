@@ -14,7 +14,9 @@
 | [setup-supabase.md](setup-supabase.md) | Criação do projeto Supabase e migrations |
 | [github-actions.md](github-actions.md) | Workflows, secrets e execução agendada |
 | [schemas-json.md](schemas-json.md) | Contratos JSON Schema e versionamento |
-| [model-providers.md](model-providers.md) | Provedores LLM (Groq, OpenRouter, Ollama) |
+| [model-providers.md](model-providers.md) | Provedores LLM (Local GGUF, Ollama, Groq, OpenRouter) |
+| [modelos-locais.md](modelos-locais.md) | Modelos locais: pré-treinados × paramétricos × treinados |
+| [treino-modelos.md](treino-modelos.md) | Runbook de treino/revisão/ativação dos modelos locais |
 
 ## Leitura recomendada
 

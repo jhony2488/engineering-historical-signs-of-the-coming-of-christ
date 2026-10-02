@@ -81,6 +81,19 @@ alias de `run-data-drift`. Workflow: `monthly-data-drift.yml`.
 No-op intencional — a política atual é retenção somente no Postgres
 (`postgres_only`); não exporta arquivos/S3.
 
+## Scripts auxiliares
+
+### `scripts/download_models.py`
+
+Baixa os GGUFs do tier SLM local para `backend/models_cache/` (cascata de
+`LOCAL_MODEL_MAP`). Não é comando Typer — roda como script.
+
+```bash
+python scripts/download_models.py          # 1º candidato de cada alias
+python scripts/download_models.py --all    # cascata inteira (7B→3B→1.5B)
+python scripts/download_models.py --list   # status sem baixar
+```
+
 ## Classificadores locais (destilação)
 
 Contexto completo sobre quais modelos treinam e quais são pré-treinados:

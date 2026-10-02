@@ -25,12 +25,17 @@ com profecias e publicação de rankings/fases em um dashboard.
   Supabase free; evite infra 24/7.
 - **Front-end só lê** — o dashboard nunca executa pipeline de IA, nunca chama
   LLMs e nunca grava em `resultados_escatologicos`.
+- **Cadeia de fallback LLM** — `Local GGUF (se LOCAL_LLM_ENABLED) → Ollama →
+  Groq → OpenRouter → dry-run`; dentro do tier local, cascata por alias
+  7B→3B→1.5B com perfis de parâmetros por modelo (`LOCAL_MODEL_MAP` em
+  `motor/adapters/local_llm.py`). O run diário nunca pode quebrar por falha
+  de modelo — degrade, nunca aborte.
 
 ## Mapa do monorepo
 
 | Caminho | Conteúdo |
 |---------|----------|
-| `backend/motor/` | Motor Python — pipeline (ingestão → embeddings/RAG → LLMs → Bayes/HMM/MCDA → relatórios + extensões L10–15). Subpacotes: `pipeline/` (camadas), `domain/` (fases, energias, bestas, falso líder), `math/` (Bayes, HMM, MCDA), `ml/` (relevance, reranker, GNN, classificadores), `adapters/` (Groq/OpenRouter/Ollama, Supabase, Redis, e-mail), `schemas/`, `prompts/v1/` |
+| `backend/motor/` | Motor Python — pipeline (ingestão → embeddings/RAG → LLMs → Bayes/HMM/MCDA → relatórios + extensões L10–15). Subpacotes: `pipeline/` (camadas), `domain/` (fases, energias, bestas, falso líder), `math/` (Bayes, HMM, MCDA), `ml/` (relevance, reranker, GNN, classificadores, destilação), `adapters/` (`local_llm.py` SLM GGUF, Groq/OpenRouter/Ollama, Supabase, Redis, e-mail), `i18n/` (tradução EN→PT NLLB), `schemas/`, `prompts/` (`v1/` PT, `v2_en/` EN — `PROMPTS_LANG`) |
 | `backend/api/` | API FastAPI (`api/main.py`) — ~20 endpoints; manter `docs/api-contrato.md` sincronizado |
 | `backend/config/` | Seeds e feeds (`feeds.yaml`, `candidatos_seed.json`, `corpus_teologico_seed.json`, `countries_focus.json`, `acled_seed.json`, …) |
 | `backend/supabase/migrations/` | DDL do Postgres (fonte única de schema) |
@@ -60,7 +65,9 @@ com profecias e publicação de rankings/fases em um dashboard.
 | [backend/docs/variaveis-ambiente.md](backend/docs/variaveis-ambiente.md) | Referência de env vars do motor |
 | [backend/docs/schemas-json.md](backend/docs/schemas-json.md) | Contratos JSON Schema e versionamento |
 | [backend/docs/setup-supabase.md](backend/docs/setup-supabase.md) | Setup do Supabase e migrations |
-| [backend/docs/model-providers.md](backend/docs/model-providers.md) | Provedores LLM (Groq, OpenRouter, Ollama) |
+| [backend/docs/model-providers.md](backend/docs/model-providers.md) | Provedores LLM (Local GGUF, Ollama, Groq, OpenRouter) + idioma do pipeline |
+| [backend/docs/modelos-locais.md](backend/docs/modelos-locais.md) | Modelos locais: pré-treinados × paramétricos × treinados |
+| [backend/docs/treino-modelos.md](backend/docs/treino-modelos.md) | Runbook de treino/revisão/ativação dos classificadores/HMM/GNN |
 | [backend/docs/modelos-locais.md](backend/docs/modelos-locais.md) | Modelos locais: pré-treinados × paramétricos × treinados |
 | [backend/docs/treino-modelos.md](backend/docs/treino-modelos.md) | Runbook de treino/recalibração (EM, destilação, GNN) |
 | [backend/docs/github-actions.md](backend/docs/github-actions.md) | Workflows, crons e secrets |
@@ -75,6 +82,8 @@ com profecias e publicação de rankings/fases em um dashboard.
 
 ```bash
 pip install -e ".[ml,dev]"              # instala motor + deps ML + dev
+pip install -e ".[local]"               # opcional: llama-cpp-python (SLM GGUF)
+python scripts/download_models.py --all # opcional: cascata GGUF → models_cache/
 cp .env.example .env                    # configure LLM_DRY_RUN=true sem chaves
 python -m motor.cli validate-schemas    # valida schemas JSON
 python -m motor.cli run-daily --dry-run # simula batch sem escrever

@@ -16,6 +16,8 @@ o que já vem pronto, o que é só configuração de pesos e o que realmente tre
 | MCDA rankings | `motor/math/mcda.py` | Não | Pesos `WEIGHTS_MAR`/`WEIGHTS_TERRA` (exige issue prévia) |
 | Classificador de extração | sklearn (LogReg/Ridge) sobre BGE-M3 | **Sim** (destilação) | `export-extraction-dataset` → `train-event-classifier` |
 | GNN | SAGEConv 2 camadas | **Opcional** (link prediction) | `train-gnn` → `config/gnn_weights.pt` |
+| SLM local (camada 4) | GGUF llama.cpp — Qwen2.5 7B→3B→1.5B | Não | `scripts/download_models.py` + `LOCAL_MODEL_MAP` |
+| Tradução EN→PT | `facebook/nllb-200-distilled-600M` | Não | `TRANSLATOR_MODEL` |
 
 ## Modelos pré-treinados (HuggingFace, CPU, lazy-load)
 
@@ -86,6 +88,26 @@ a ativação é manual após revisão, coerente com o fluxo de aprovação human
 No run diário, o orquestrador também passa o histórico de observações ao
 `CorrelationEngine` — o Viterbi enxerga a sequência de dias, não só os
 eventos do dia corrente.
+
+### SLM in-process — cascata GGUF (camada 4)
+
+`LocalLlamaClient` (`motor/adapters/local_llm.py`) carrega GGUFs em CPU no
+próprio processo — sem servidor. Cada alias resolve uma cascata ordenada
+(`LOCAL_MODEL_MAP`): **7B → 3B → 1.5B**, cada candidato com perfil de
+parâmetros próprio (menores = `temperature=0`, `n_ctx` menor,
+`repeat_penalty` maior). Arquivo ausente → skip; falha de load/inferência →
+próximo; esgotada → o `LLMRouter` cai para Ollama → Groq → OpenRouter →
+dry-run. `json_schema` vira gramática GBNF (JSON garantido no formato).
+Download: `python scripts/download_models.py --all` (extra `[local]`).
+
+### Tradução EN→PT (i18n)
+
+Com `PROMPTS_LANG=en` + `TRANSLATE_NARRATIVES=true`, o pipeline interno roda
+em inglês (`prompts/v2_en/`) e os campos narrativos passam por
+`TranslationService` (NLLB-200, `motor/i18n/translator.py`) antes de
+persistir — spec de campos em `motor/i18n/field_specs.py`, mapa de
+abreviações bíblicas EN→PT e glossário de termos protegidos. Indisponível →
+passthrough EN auditado; o pipeline nunca quebra pela tradução.
 
 ### GNN — link prediction auto-supervisionado
 

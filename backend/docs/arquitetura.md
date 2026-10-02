@@ -93,7 +93,7 @@ extra `pip install -e ".[ml]"`. Protótipos zero-shot em
   local responde primeiro e o LLM só entra em baixa confiança
   (`CLASSIFIER_CONFIDENCE_MIN`) ou falha de schema
 
-### 4–7 — LLM (Groq + fallback OpenRouter)
+### 4–7 — LLM (Local GGUF → Ollama → Groq + fallback OpenRouter)
 - **4:** extração JSON estruturada (assistida pelo gate 3.5 e pelo shadow
   classifier acima) — formato enforced por `json_schema`
   (`evento_estruturado.schema.json`) na chamada da API

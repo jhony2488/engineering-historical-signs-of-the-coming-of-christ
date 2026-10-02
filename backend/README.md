@@ -39,6 +39,14 @@ pip install -e ".[ml,dev]"
 copy .env.example .env
 ```
 
+Opcional — SLM local in-process (llama.cpp GGUF, camada 4):
+
+```bash
+pip install -e ".[local]"
+python scripts/download_models.py --all   # cascata 7B→3B→1.5B → models_cache/
+# LOCAL_LLM_ENABLED=true no .env
+```
+
 ### Supabase (do zero)
 
 1. Crie projeto em [supabase.com](https://supabase.com)

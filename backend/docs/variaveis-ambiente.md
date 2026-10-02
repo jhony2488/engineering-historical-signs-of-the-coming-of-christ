@@ -13,12 +13,13 @@ Referência completa de [`backend/.env.example`](../.env.example). Copie para
 
 ## LLMs
 
-Ordem do `LLMRouter`: **Ollama (se habilitado) → Groq → OpenRouter →
-dry-run**. Detalhes: [model-providers.md](model-providers.md).
+Ordem do `LLMRouter`: **Local GGUF → Ollama → Groq → OpenRouter → dry-run**
+(locais habilitáveis; dry-run sempre cobre). Detalhes:
+[model-providers.md](model-providers.md).
 
 | Variável | Default | Descrição |
 |----------|---------|-----------|
-| `GROQ_API_KEY` | — | Provedor primário |
+| `GROQ_API_KEY` | — | Provedor primário (fallback final) |
 | `OPENROUTER_API_KEY` | — | Fallback |
 | `LLM_DRY_RUN` | `false` | `true` simula LLMs sem chaves (CI/dev) |
 | `GROQ_MODEL_EXTRACTION` | `llama-3.1-8b-instant` | Camada 4 |
@@ -27,6 +28,28 @@ dry-run**. Detalhes: [model-providers.md](model-providers.md).
 | `GROQ_MODEL_HERMENEUTICS` | `gemma2-9b-it` | Camada 7 |
 | `OLLAMA_ENABLED` | `false` | Habilita Ollama local/RunPod |
 | `OLLAMA_BASE_URL` | `http://localhost:11434` | Endpoint Ollama |
+
+## SLM local in-process (llama.cpp)
+
+| Variável | Default | Descrição |
+|----------|---------|-----------|
+| `LOCAL_LLM_ENABLED` | `false` | Habilita o tier GGUF (extra `[local]`) |
+| `LOCAL_MODELS_DIR` | `models_cache` | Diretório dos GGUF (nunca commitado) |
+| `LOCAL_LLM_CTX` | `0` | `0` = usa o perfil do candidato |
+| `LOCAL_LLM_THREADS` | `0` | `0` = usa o perfil do candidato |
+
+Cascata e perfis por modelo: `LOCAL_MODEL_MAP` em
+[`motor/adapters/local_llm.py`](../motor/adapters/local_llm.py). Download:
+`python scripts/download_models.py`.
+
+## Idioma do pipeline (prompts EN + tradução)
+
+| Variável | Default | Descrição |
+|----------|---------|-----------|
+| `PROMPTS_LANG` | `pt` | `pt`=prompts `v1` \| `en`=`v2_en` (interno em inglês) |
+| `TRANSLATE_NARRATIVES` | `false` | Traduz campos narrativos EN→PT antes de persistir |
+| `TRANSLATOR_MODEL` | `facebook/nllb-200-distilled-600M` | Modelo MT (lazy, CPU) |
+| `CLASSIFIER_HINTS_ENABLED` | `false` | Shadow classifier preenche categóricos inválidos |
 
 ## Redis (opcional)
 

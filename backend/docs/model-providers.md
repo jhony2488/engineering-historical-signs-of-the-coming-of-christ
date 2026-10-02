@@ -1,8 +1,10 @@
-# Provedores de modelos (Groq → OpenRouter → Ollama)
+# Provedores de modelos (Local GGUF → Ollama → Groq → OpenRouter)
 
 O `doc.txt` original previa **Ollama** local (Llama, Mistral Nemo, DeepSeek-R1, Gemma 2).
 Na fase zero-custo, o motor usa **Groq Cloud** (tier gratuito) com **fallback OpenRouter**.
-**Ollama** entra na fila quando `OLLAMA_ENABLED=true` (local/RunPod).
+Antes deles, dois tiers locais podem responder primeiro (ambos opcionais):
+**SLM GGUF in-process** (`LocalLlamaClient`, extra `[local]`) e **Ollama**
+(quando `OLLAMA_ENABLED=true`).
 
 | Camada doc | Modelo doc | Alias config | Groq (mapa) | OpenRouter | Ollama |
 |------------|------------|--------------|-------------|------------|--------|
@@ -13,7 +15,34 @@ Na fase zero-custo, o motor usa **Groq Cloud** (tier gratuito) com **fallback Op
 
 \* Groq free tier não oferece Mistral Nemo; usa Llama 70B como proxy até OpenRouter/Ollama.
 
-Ordem do `LLMRouter`: **Ollama (se habilitado) → Groq → OpenRouter → dry-run**.
+Ordem do `LLMRouter`: **Local GGUF (se habilitado) → Ollama → Groq → OpenRouter → dry-run**.
+
+## SLM local in-process (llama.cpp / GGUF)
+
+`motor/adapters/local_llm.py` (`LocalLlamaClient`) roda modelos GGUF em CPU
+no próprio processo — sem servidor, análogo ao WebLLM mas sem GPU. Ativado
+por `LOCAL_LLM_ENABLED=true` + arquivos em `LOCAL_MODELS_DIR`
+(`backend/models_cache/`, ignorado pelo git).
+
+Cada alias de camada resolve para uma **cascata ordenada de candidatos** em
+`LOCAL_MODEL_MAP`, cada um com perfil de parâmetros próprio (modelos menores
+→ `temperature=0`, `n_ctx` menor, `repeat_penalty` maior). Falha de arquivo
+ausente, load ou inferência → próximo candidato; esgotada a cascata, o
+router segue para Ollama → Groq.
+
+| Alias | Candidatos (ordem) | Perfis |
+|-------|--------------------|--------|
+| `llama-3.1-8b-instant` (camada 4) | Qwen2.5-7B Q4_K_M → 3B Q4_K_M → 1.5B Q4_K_M | 7B: ctx 8192, temp 0.1; 3B: ctx 8192, temp 0; 1.5B: ctx 4096, temp 0 |
+
+```bash
+pip install -e ".[local]"   # llama-cpp-python
+python scripts/download_models.py          # 1º candidato de cada alias
+python scripts/download_models.py --all    # cascata inteira
+python scripts/download_models.py --list   # status sem baixar
+```
+
+Aliases sem entrada em `LOCAL_MODEL_MAP` (camadas 5–7 por ora) pulam o tier
+local e vão direto para a nuvem.
 
 ## Modelos locais (não-LLM)
 
@@ -47,6 +76,7 @@ só no prompt — `LLMRouter.complete(json_mode=..., json_schema=...)`:
 
 | Provedor | `json_mode=True` | `json_schema` informado |
 |----------|------------------|-------------------------|
+| Local GGUF | `response_format=json_object` | `response_format` + schema → gramática GBNF |
 | Groq | `response_format=json_object` | `response_format=json_schema` (strict) |
 | OpenRouter | `response_format=json_object` | `response_format=json_schema` (strict) |
 | Ollama | `format="json"` | `format=<schema dict>` |
@@ -64,6 +94,14 @@ Além dos LLMs, o motor usa modelos HF pré-treinados locais em CPU:
 | Embeddings | `BAAI/bge-m3` | `BGE_MODEL_NAME` |
 | Reranker | `BAAI/bge-reranker-v2-m3` | `RERANKER_MODEL_NAME` |
 | Sentimento (tom espiritual) | `cardiffnlp/twitter-xlm-roberta-base-sentiment` | `SENTIMENT_MODEL_NAME` |
+| Tradução EN→PT | `facebook/nllb-200-distilled-600M` | `TRANSLATOR_MODEL` |
+
+## Idioma do pipeline (`PROMPTS_LANG`)
+
+`pt` (default, `prompts/v1/`) | `en` (`prompts/v2_en/`). Com `en`, os campos
+narrativos são gerados em inglês e traduzidos EN→PT por NLLB-200 antes de
+persistir (`TRANSLATE_NARRATIVES=true`) — schemas e enums permanecem em PT.
+Glossário e mapa de referências bíblicas EN→PT em `motor/i18n/translator.py`.
 
 Detalhes (o que treina e o que só recebe parâmetros):
 [modelos-locais.md](modelos-locais.md).

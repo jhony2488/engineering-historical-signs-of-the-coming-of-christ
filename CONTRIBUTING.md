@@ -118,6 +118,12 @@ próprios — leia-os antes de contribuir:
 
 - Nunca commite chaves de API, tokens, arquivos `.env`/`.env.local` ou dados
   pessoais.
+- Nunca commite pesos/artefatos de modelos (`backend/models_cache/`,
+  `*.gguf`, `*.pt`, `*.joblib`) — eles são baixados/treinados localmente
+  (`scripts/download_models.py`, comandos `train-*`) ou no workflow.
+- Prompts novos seguem a convenção `prompts/v1/` (PT) + `prompts/v2_en/` (EN),
+  selecionados por `PROMPTS_LANG`; markers `{{...}}`, slugs e enums do JSON
+  de saída são parte do contrato — não traduza valores de schema.
 - `SUPABASE_SERVICE_ROLE_KEY`, `GROQ_API_KEY` e `ADMIN_API_KEY` só existem no
   motor batch — nunca no front-end.
 - Se encontrar uma vulnerabilidade, avise em particular antes de abrir uma
