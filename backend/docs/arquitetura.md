@@ -10,8 +10,19 @@ flowchart LR
   prep --> embed[Camada3_Embeddings]
   embed --> llm[Camadas4_a_7_LLM]
   llm --> corr[Camada8_Correlacao]
-  corr --> report[Camada9_Relatorios]
+  corr --> L11[Camada11_Ecos]
+  corr --> L10[Camada10_Ameacas]
+  L11 --> L10
+  L10 --> L12[Camada12_ABM]
+  corr --> L13[Camada13_RedTeam]
+  L12 --> L13
+  L10 --> L15[Camada15_Adaptativa]
+  L12 --> L15
+  L13 --> L15
+  corr --> L14[Camada14_Proveniencia]
+  L15 --> report[Camada9_Relatorios]
   report --> db[(Supabase)]
+  report --> globe[Front_Globo3D]
 ```
 
 ## Motores hierárquicos
@@ -42,8 +53,9 @@ python -m motor.cli run-hybrid-analysis --window annual
 
 ### 1 — Ingestão
 - RSS (`config/feeds.yaml`) — geopolítica + UFO/disclosure + engano apocalíptico
-- GDELT API (inclui UAP/disclosure e narrativas de engano)
-- ACLED (stub, API key opcional)
+- GDELT: themes de `feeds.yaml`, corpo/snippet quando URL disponível; fallback sintético só se `ALLOW_GDELT_SYNTHETIC_FALLBACK`
+- ACLED: API key opcional; sem credenciais usa seed `config/acled_seed.json`
+- OCR de imagens em `OCR_IMAGES_DIR` (opcional)
 - Dedup por `content_hash`
 
 ### 2 — Pré-processamento
@@ -52,9 +64,11 @@ python -m motor.cli run-hybrid-analysis --window annual
 - Tags de tópico heurísticas
 
 ### 3 — Embeddings
-- BGE-M3 (`sentence-transformers`) ou fallback hash
+- BGE-M3 (`sentence-transformers`) ou fallback hash (log `embedding_hash_fallback_active`)
+- Cap configurável `EMBED_CHUNK_LIMIT`
 - pgvector para busca semântica
 - RAG teológico (`corpus_teologico`)
+- Drift mensal: CLI `run-data-drift` + prompt `embeddings_curation.txt`
 
 ### 4–7 — LLM (Groq + fallback OpenRouter)
 - **4:** extração JSON estruturada
@@ -68,15 +82,58 @@ python -m motor.cli run-hybrid-analysis --window annual
 - Falso líder (incongruência discurso vs estrutura)
 - Scores besta mar / terra
 - MCDA Top-10
+- Proximidade espiritual
+
+### 10 — Ameaças por país
+- ~15 países foco (`config/countries_focus.json`)
+- Métricas: instabilidade jurídica, controle financeiro, ameaça à liberdade religiosa, intensidade de conflito
+- Matriz prescritiva física / financeira / espiritual
+- Tabela `ameacas_pais` + payload `ameacas_paises`
+
+### 11 — Ecos históricos
+- Análogos seed (`config/historical_echoes_seed.json`)
+- Similaridade por keywords + DTW leve + embeddings
+- Ajusta urgência das prescrições na L10
+
+### 12 — ABM leve
+- Agentes Governo / Finanças / Cidadão / Corporação / Mídia (Python puro)
+- 100 runs × 24 meses por país foco
+- `fragility_index`, `probabilistic_outcomes`, gatilhos críticos
+
+### 13 — Red team adversarial
+- Top-5 países de maior risco
+- Bootstrap removendo ~20% dos eventos + síntese LLM (dry-run seguro)
+- `resilience_score` e contratese
+
+### 14 — Proveniência (ledger Postgres)
+- Cadeia SHA-256 por estágio (`provenance_log`) + Merkle root do dia
+- **L14 = Postgres only** — sem publicação Polygon/Ethereum nesta entrega
+- UI: botão “Verificar integridade” no drawer do `/globo` (API `provenance/verify`)
+- Se `verify_chain` falhar → L15 força `urgency: condicional`
+
+### 15 — Recomendações adaptativas
+- Triggers `SE metric > limiar ENTÃO ação em N horas`
+- Urgência agora / semana / mês / condicional (se L13 < 0.5 ou falha L14)
+- Ordem: selar threats/ABM/adversarial → verify → L15 → relatório → root final
+
+### Joshua Project (BFF + motor)
+- **BFF Next:** `GET /api/joshua/sync` (cron + `JOSHUA_SYNC_TOKEN`) e `GET /api/joshua/data`
+- Tabelas `joshua_project_data` e `missiological_analysis`
+- **Motor:** `joshua_analysis.py` (heurística Expansão/Contração) enriquece L10 por país
+- FastAPI: `POST /api/v1/missiological/analyze`, `GET /api/v1/missiological/results`
+- UI: bloco Joshua no drawer do país em `/globo`
 
 ### 9 — Relatórios
-- HTML via Jinja2 embutido no JSON
-- Rankings e métricas para dashboard
+- HTML enriquecido (L10–15, terra ranking, Merkle) via gerador Jinja2
+- Rankings, ameaças, proveniência e métricas para dashboard + `/globo`
+
+## Fora de escopo (adiado)
+Camadas **16–22** (rede de nós, consenso, tokenomia, DAO, Nostr, mesh Atos), publicação on-chain do Merkle root, lastro BTC e smart contracts SIG — **não implementados** neste núcleo centralizado.
 
 ## GNN v1
 
 Centralidade via **NetworkX** como proxy de message-passing. Tabelas `grafo_nos` e `grafo_arestas` prontas para migração futura para PyG/DGL.
 
-## Idempotência
+## Persistência
 
-`run-daily` ignora datas já processadas, exceto com `--force`. Falhas na Camada 8 impedem publicação de fase com `status: partial`.
+Dados de longo prazo ficam **somente no PostgreSQL (Supabase)** — resultados diários, arquivo profético, snapshots, inscritos, ameaças, ABM, adversarial, proveniência, recomendações e cache Joshua. Cold storage em S3/arquivos locais foi desativado. L14 = ledger local no Postgres (Merkle root no DB).

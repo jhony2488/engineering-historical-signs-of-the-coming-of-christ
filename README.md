@@ -35,6 +35,8 @@ npm run dev
 
 - Documentação backend: [backend/docs/](backend/docs/)
 - Dashboard: [front-end/README.md](front-end/README.md)
+- Contribuição: [CONTRIBUTING.md](CONTRIBUTING.md)
+- Agentes de IA: [AGENTS.md](AGENTS.md) · Nuvem/infra: [CLOUD.md](CLOUD.md)
 - Contribuição backend: [backend/docs/REQUISITOS_CONTRIBUICAO.md](backend/docs/REQUISITOS_CONTRIBUICAO.md)
 - Contribuição front-end: [front-end/docs/REQUISITOS_CONTRIBUICAO.md](front-end/docs/REQUISITOS_CONTRIBUICAO.md)
 - Setup rápido: [backend/README.md](backend/README.md)
