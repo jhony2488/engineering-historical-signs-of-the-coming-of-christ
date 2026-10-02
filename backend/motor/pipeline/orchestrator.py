@@ -233,7 +233,20 @@ class DailyOrchestrator:
         if latest:
             prior = latest.get("probabilidade_fase", 0.2)
 
-        correlacao = self.correlation.correlate(events, reasoning, prior_conviction=prior)
+        historical_obs: list[int] = []
+        try:
+            from motor.math.hmm import observations_from_resultados
+
+            historical_obs = observations_from_resultados(self.db.get_historico(limit=90))
+        except Exception as exc:
+            logger.warning("hmm_history_unavailable", error=str(exc))
+
+        correlacao = self.correlation.correlate(
+            events,
+            reasoning,
+            prior_conviction=prior,
+            historical_observations=historical_obs,
+        )
 
         if correlacao["confianca"] < self.settings.phase_confidence_min:
             logger.warning("low_confidence", confianca=correlacao["confianca"])

@@ -110,7 +110,11 @@ class LLMPipeline:
             model_name = "local_event_extractor_v1"
             if parsed is None:
                 content, provider = await self.router.complete(
-                    self.settings.groq_model_extraction, messages, json_mode=True
+                    self.settings.groq_model_extraction,
+                    messages,
+                    json_mode=True,
+                    json_schema=self.validator.get_schema("evento_estruturado"),
+                    schema_name="evento_estruturado",
                 )
                 model_name = self.settings.groq_model_extraction
             try:

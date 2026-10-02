@@ -35,6 +35,8 @@ class OpenRouterClient:
         messages: list[dict[str, str]],
         json_mode: bool = False,
         temperature: float = 0.2,
+        json_schema: dict | None = None,
+        schema_name: str = "motor_output",
     ) -> str:
         if not self._api_key:
             raise RuntimeError("OpenRouter API key não configurada")
@@ -45,7 +47,16 @@ class OpenRouterClient:
             "messages": messages,
             "temperature": temperature,
         }
-        if json_mode:
+        if json_schema:
+            payload["response_format"] = {
+                "type": "json_schema",
+                "json_schema": {
+                    "name": schema_name,
+                    "strict": True,
+                    "schema": json_schema,
+                },
+            }
+        elif json_mode:
             payload["response_format"] = {"type": "json_object"}
 
         async with httpx.AsyncClient(timeout=120.0) as client:

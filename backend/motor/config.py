@@ -80,6 +80,19 @@ class Settings(BaseSettings):
     extraction_mode: str = "llm"  # llm | classifier_first
     classifier_confidence_min: float = 0.6
     distill_min_rows: int = 300
+    sentiment_model_name: str = "cardiffnlp/twitter-xlm-roberta-base-sentiment"
+
+    # HMM — treino EM offline (Baum-Welch) via `train-phase-hmm`
+    hmm_em_min_days: int = 30
+    hmm_em_max_iter: int = 100
+    hmm_em_tol: float = 1e-4
+
+    # GNN — link prediction auto-supervisionado via `train-gnn` (extra [gnn])
+    gnn_weights_path: Path = Field(default=CONFIG_DIR / "gnn_weights.pt")
+    gnn_train_epochs: int = 200
+    gnn_train_lr: float = 0.01
+    gnn_neg_ratio: int = 1
+    gnn_text_features_enabled: bool = False
 
     feeds_config_path: Path = Field(default=CONFIG_DIR / "feeds.yaml")
 

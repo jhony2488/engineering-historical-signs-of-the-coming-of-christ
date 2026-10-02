@@ -6,7 +6,7 @@
   "methodology": {
     "resumo": "Score final = blend ponderado de (1) frequência de indicadores lexicais e (2) sentimento RoBERTa mapeado para eixos espirituais.",
     "keyword_scoring": "Contagem de ocorrências (substring) em EXPANSAO_INDICATORS/CONTRACAO_INDICATORS + labels deste arquivo; normalizado por total.",
-    "roberta_scoring": "Modelo cardiffnlp/twitter-roberta-base-sentiment-latest; rótulos positive/negative/neutral projetados via roberta_mapping, suavizados pela confiança.",
+    "roberta_scoring": "Modelo de sentimento via SENTIMENT_MODEL_NAME (default cardiffnlp/twitter-xlm-roberta-base-sentiment, multilíngue); rótulos positive/negative/neutral projetados via roberta_mapping, suavizados pela confiança.",
     "fallback": "Se RoBERTa indisponível, blend_weights.roberta=0 e apenas keywords (modelo spiritual_keywords_v1).",
     "energia_decisao": "energia = expansao se expansao_score >= contracao_score; caso contrário contracao."
   },
@@ -176,7 +176,8 @@
     "nota": "Usados por camadas superiores (alertas/UI). O classificador base só compara expansao_score vs contracao_score."
   },
   "model_reference": {
-    "sentiment": "cardiffnlp/twitter-roberta-base-sentiment-latest",
+    "sentiment": "cardiffnlp/twitter-xlm-roberta-base-sentiment",
+    "env_override": "SENTIMENT_MODEL_NAME",
     "max_chars": 512,
     "keyword_modelo_fallback": "spiritual_keywords_v1"
   },
@@ -185,6 +186,7 @@
     "Frases compostas (ex.: paz falsa, falso lider) aumentam especificidade escatológica.",
     "labels.* alimentam keyword_scores; label_categories é documentação/auditoria e não altera o score.",
     "Ajuste fino: altere blend_weights e roberta_mapping sem re-treinar o modelo.",
+    "O modelo de sentimento é multilíngue (XLM-RoBERTa) e configurável via SENTIMENT_MODEL_NAME; mantenha o label space positive/negative/neutral ao trocar.",
     "Não use este classificador para datar a Parusia — apenas para polaridade espiritual de trechos."
   ]
 }

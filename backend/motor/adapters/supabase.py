@@ -136,6 +136,29 @@ class SupabaseClient:
         rows = self.select("parametros_fase", filters={"ativo": True}, limit=1)
         return rows[0] if rows else None
 
+    def next_parametros_fase_versao(self) -> int:
+        rows = self.select("parametros_fase", columns="versao", order="-versao", limit=1)
+        return int(rows[0]["versao"]) + 1 if rows else 1
+
+    def insert_parametros_fase(
+        self,
+        versao: int,
+        emissoes: list[list[float]],
+        transicoes: dict[str, Any],
+    ) -> dict[str, Any]:
+        """Nova versão de parâmetros HMM — sempre inativa e não aprovada;
+        a ativação (`ativo=true`) é manual após revisão humana."""
+        return self.insert(
+            "parametros_fase",
+            {
+                "versao": versao,
+                "ativo": False,
+                "aprovado": False,
+                "emissoes": emissoes,
+                "transicoes": transicoes,
+            },
+        )
+
     def get_snapshots(
         self,
         janela: str,

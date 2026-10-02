@@ -1,7 +1,7 @@
 """Phase HMM and observation discretization tests."""
 
 from motor.domain.phases import FaseEscatologica
-from motor.math.hmm import PhaseHMM, discretize_observation
+from motor.math.hmm import PhaseHMM, discretize_observation, observations_from_resultados
 
 
 def test_discretize_observation_high_tension_contraction():
@@ -61,3 +61,53 @@ def test_hmm_load_parametros_from_row():
     )
     assert abs(hmm.startprob.sum() - 1.0) < 0.01
     assert abs(hmm.transmat.sum(axis=1) - 1.0).max() < 0.01
+
+
+def test_hmm_fit_empty_observations():
+    hmm = PhaseHMM()
+    assert hmm.fit([])["ok"] is False
+
+
+def test_hmm_fit_baum_welch_normalizes():
+    hmm = PhaseHMM()
+    obs = [0, 0, 1, 0, 1, 0] * 10
+    result = hmm.fit(obs)
+    assert result["ok"]
+    assert result["n_observations"] == len(obs)
+    assert abs(hmm.startprob.sum() - 1.0) < 1e-6
+    assert abs(hmm.transmat.sum(axis=1) - 1.0).max() < 1e-6
+    assert abs(hmm.emissionprob.sum(axis=1) - 1.0).max() < 1e-6
+
+
+def test_hmm_fit_learns_dominant_emission():
+    hmm = PhaseHMM()
+    obs = [7] * 60
+    hmm.fit(obs)
+    # EM deve concentrar a emissão de algum estado na observação dominante
+    assert hmm.emissionprob[:, 7].max() > 0.9
+
+
+def test_observations_from_resultados_uses_metricas():
+    rows = [
+        {
+            "data_referencia": "2026-01-01",
+            "json_analise_ia": {
+                "correlacao": {
+                    "metricas": {
+                        "avg_tension": 0.9,
+                        "avg_impact": 0.9,
+                        "contracao_ratio": 0.9,
+                    }
+                }
+            },
+        },
+        {"data_referencia": "2025-12-31", "indice_global": 0.05},
+    ]
+    obs = observations_from_resultados(rows)
+    assert len(obs) == 2
+    assert obs[0] <= 2  # 2025-12-31 ordenado primeiro, índice baixo
+    assert obs[1] >= 5
+
+
+def test_observations_from_resultados_empty():
+    assert observations_from_resultados([]) == []

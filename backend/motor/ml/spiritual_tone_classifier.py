@@ -2,8 +2,10 @@ from __future__ import annotations
 
 import json
 import re
+from functools import lru_cache
 from pathlib import Path
 
+from motor.config import get_settings
 from motor.domain.energies import CONTRACAO_INDICATORS, EXPANSAO_INDICATORS
 
 _WEIGHTS_PATH = Path(__file__).resolve().parents[1] / "config" / "spiritual_tone_weights.json"
@@ -38,18 +40,25 @@ def keyword_scores(text: str) -> tuple[float, float]:
     return min(1.0, exp / total), min(1.0, con / total)
 
 
-def roberta_scores(text: str) -> tuple[float, float, str | None]:
+@lru_cache(maxsize=4)
+def _get_sentiment_pipeline(model_name: str):
     try:
         from transformers import pipeline
     except ImportError:
+        return None
+    try:
+        return pipeline("sentiment-analysis", model=model_name, truncation=True)
+    except Exception:
+        return None
+
+
+def roberta_scores(text: str) -> tuple[float, float, str | None]:
+    model_name = get_settings().sentiment_model_name
+    pipe = _get_sentiment_pipeline(model_name)
+    if pipe is None:
         return 0.5, 0.5, None
 
     try:
-        pipe = pipeline(
-            "sentiment-analysis",
-            model="cardiffnlp/twitter-roberta-base-sentiment-latest",
-            truncation=True,
-        )
         result = pipe(text[:512])[0]
         label = re.sub(r"[^a-z]", "", result["label"].lower())
         conf = float(result["score"])
@@ -60,7 +69,7 @@ def roberta_scores(text: str) -> tuple[float, float, str | None]:
         m = mapping.get(key, {"expansao": 0.5, "contracao": 0.5})
         exp = m["expansao"] * conf + 0.5 * (1 - conf)
         con = m["contracao"] * conf + 0.5 * (1 - conf)
-        return min(1.0, exp), min(1.0, con), "cardiffnlp/twitter-roberta-base-sentiment-latest"
+        return min(1.0, exp), min(1.0, con), model_name
     except Exception:
         return 0.5, 0.5, None
 

@@ -37,6 +37,8 @@ class OllamaClient:
         messages: list[dict[str, str]],
         json_mode: bool = False,
         temperature: float = 0.2,
+        json_schema: dict | None = None,
+        schema_name: str = "motor_output",
     ) -> str:
         if not self._enabled:
             raise RuntimeError("Ollama não habilitado (OLLAMA_ENABLED=false)")
@@ -48,7 +50,9 @@ class OllamaClient:
             "stream": False,
             "options": {"temperature": temperature},
         }
-        if json_mode:
+        if json_schema:
+            payload["format"] = json_schema
+        elif json_mode:
             payload["format"] = "json"
 
         async with httpx.AsyncClient(timeout=180.0) as client:

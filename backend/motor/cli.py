@@ -198,9 +198,7 @@ def export_extraction_dataset(
     from motor.adapters.supabase import get_supabase
     from motor.ml.distill import ExtractionDatasetExporter
 
-    result = ExtractionDatasetExporter(get_supabase()).export(
-        Path(out), min_rows=min_rows or None
-    )
+    result = ExtractionDatasetExporter(get_supabase()).export(Path(out), min_rows=min_rows or None)
     if not result.get("ok"):
         typer.echo(result.get("message"))
         raise typer.Exit(1)
@@ -226,6 +224,85 @@ def train_event_classifier_cmd(
         typer.echo(result.get("message"))
         raise typer.Exit(1)
     typer.echo(f"Treinado: {result['metrics']}")
+
+
+@app.command("train-phase-hmm")
+def train_phase_hmm(
+    persist: bool = typer.Option(
+        False, "--persist", help="Grava nova versão inativa em parametros_fase"
+    ),
+    limit: int = typer.Option(365, "--limit", help="Dias de histórico considerados"),
+) -> None:
+    """Treina o HMM de fases via EM (Baum-Welch) sobre o histórico diário.
+
+    Com --persist grava versão inativa em `parametros_fase` — a ativação
+    (`ativo=true`) é manual após revisão humana.
+    """
+    from motor.adapters.supabase import get_supabase
+    from motor.config import get_settings
+    from motor.math.hmm import PhaseHMM, observations_from_resultados
+
+    settings = get_settings()
+    db = get_supabase()
+    rows = db.get_historico(limit=limit)
+    observations = observations_from_resultados(rows)
+    if len(observations) < settings.hmm_em_min_days:
+        typer.echo(
+            f"Histórico insuficiente: {len(observations)} dias "
+            f"< {settings.hmm_em_min_days} (HMM_EM_MIN_DAYS)"
+        )
+        raise typer.Exit(1)
+
+    hmm = PhaseHMM.from_db(db)
+    result = hmm.fit(observations)
+    typer.echo(f"EM: {result}")
+    if persist and result.get("ok"):
+        versao = db.next_parametros_fase_versao()
+        db.insert_parametros_fase(
+            versao=versao,
+            emissoes=hmm.emissionprob.tolist(),
+            transicoes={
+                "startprob": hmm.startprob.tolist(),
+                "matrix": hmm.transmat.tolist(),
+            },
+        )
+        typer.echo(
+            f"parametros_fase v{versao} gravado inativo — "
+            "ative manualmente após revisão (ativo=true)"
+        )
+
+
+@app.command("train-gnn")
+def train_gnn(
+    epochs: int = typer.Option(0, "--epochs", help="0 = usa GNN_TRAIN_EPOCHS"),
+    out: str = typer.Option("", "--out", help="Caminho dos pesos (default: GNN_WEIGHTS_PATH)"),
+) -> None:
+    """Treina o PropheticGNN por link prediction sobre o grafo persistido.
+
+    Auto-supervisionado: arestas reais de `grafo_arestas` são os positivos.
+    Requer `pip install -e '.[gnn]'` (torch + torch_geometric).
+    """
+    from pathlib import Path
+
+    from motor.config import get_settings
+    from motor.ml.gnn import PropheticGNN
+    from motor.pipeline.graph_service import GraphService
+
+    settings = get_settings()
+    graph = GraphService().load_graph().graph
+    gnn = PropheticGNN(graph)
+    if gnn.backend == "numpy_proxy":
+        typer.echo("torch_geometric não instalado — pip install -e '.[gnn]'")
+        raise typer.Exit(1)
+
+    result = gnn.train_link_prediction(epochs=epochs or None)
+    if not result.get("ok"):
+        typer.echo(result.get("message", "falha no treino"))
+        raise typer.Exit(1)
+
+    path = Path(out) if out else settings.gnn_weights_path
+    gnn.save_weights(path, meta=result)
+    typer.echo(f"Treinado: {result} → {path}")
 
 
 @app.command("worker-jobs")

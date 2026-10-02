@@ -36,6 +36,8 @@ class GroqClient:
         messages: list[dict[str, str]],
         json_mode: bool = False,
         temperature: float = 0.2,
+        json_schema: dict | None = None,
+        schema_name: str = "motor_output",
     ) -> str:
         settings = get_settings()
         if settings.llm_dry_run or not self._client:
@@ -48,7 +50,16 @@ class GroqClient:
             "temperature": temperature,
             "max_tokens": 4096,
         }
-        if json_mode:
+        if json_schema:
+            kwargs["response_format"] = {
+                "type": "json_schema",
+                "json_schema": {
+                    "name": schema_name,
+                    "strict": True,
+                    "schema": json_schema,
+                },
+            }
+        elif json_mode:
             kwargs["response_format"] = {"type": "json_object"}
 
         response = self._client.chat.completions.create(**kwargs)

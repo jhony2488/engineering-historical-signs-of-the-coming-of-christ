@@ -31,7 +31,7 @@ LLM_JSON = json.dumps(
 
 
 class FakeRouter:
-    async def complete(self, model, messages, json_mode=False, temperature=0.2):
+    async def complete(self, model, messages, json_mode=False, temperature=0.2, **_kwargs):
         return LLM_JSON, "fake"
 
 

@@ -15,11 +15,15 @@ class SchemaValidator:
 
     def _load(self, name: str) -> Draft202012Validator:
         if name not in self._validators:
-            path = SCHEMAS_DIR / f"{name}.schema.json"
-            with path.open(encoding="utf-8") as f:
-                schema = json.load(f)
-            self._validators[name] = Draft202012Validator(schema)
+            self._validators[name] = Draft202012Validator(self.get_schema(name))
         return self._validators[name]
+
+    def get_schema(self, name: str) -> dict[str, Any]:
+        """Retorna o JSON Schema bruto — insumo do `response_format`
+        `json_schema` nos adapters LLM (Groq/OpenRouter/Ollama)."""
+        path = SCHEMAS_DIR / f"{name}.schema.json"
+        with path.open(encoding="utf-8") as f:
+            return json.load(f)
 
     def validate(self, name: str, data: Any) -> None:
         validator = self._load(name)

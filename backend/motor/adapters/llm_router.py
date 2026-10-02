@@ -30,28 +30,36 @@ class LLMRouter:
         messages: list[dict[str, str]],
         json_mode: bool = False,
         temperature: float = 0.2,
+        json_schema: dict | None = None,
+        schema_name: str = "motor_output",
     ) -> tuple[str, str]:
-        """Retorna (conteúdo, provedor_usado)."""
+        """Retorna (conteúdo, provedor_usado).
+
+        `json_schema` ativa enforcement de formato na API do provedor
+        (`response_format` json_schema / `format` no Ollama); sem ele,
+        `json_mode` garante apenas JSON válido.
+        """
         settings = get_settings()
         prefer_ollama = settings.ollama_enabled and not self._force_fallback
+        kw = {"json_schema": json_schema, "schema_name": schema_name}
 
         if prefer_ollama and self._ollama.is_configured:
             try:
-                content = await self._ollama.complete(model, messages, json_mode, temperature)
+                content = await self._ollama.complete(model, messages, json_mode, temperature, **kw)
                 return content, "ollama"
             except Exception as exc:
                 logger.warning("ollama_failed_fallback", error=str(exc), model=model)
 
         if not self._force_fallback and self._groq.is_configured:
             try:
-                content = await self._groq.complete(model, messages, json_mode, temperature)
+                content = await self._groq.complete(model, messages, json_mode, temperature, **kw)
                 return content, "groq"
             except Exception as exc:
                 logger.warning("groq_failed_fallback", error=str(exc), model=model)
 
         if self._openrouter.is_configured:
-            content = await self._openrouter.complete(model, messages, json_mode, temperature)
+            content = await self._openrouter.complete(model, messages, json_mode, temperature, **kw)
             return content, "openrouter"
 
-        content = await self._groq.complete(model, messages, json_mode, temperature)
+        content = await self._groq.complete(model, messages, json_mode, temperature, **kw)
         return content, "dry_run"
