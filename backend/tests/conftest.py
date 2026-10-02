@@ -60,10 +60,10 @@ def ref_date() -> date:
 
 
 @pytest.fixture
-def historico_mock_rows(ref_date: date) -> list[dict]:
+def historico_mock_rows() -> list[dict]:
     rows = []
     for i in range(7):
-        d = ref_date - timedelta(days=6 - i)
+        d = date.today() - timedelta(days=6 - i)
         rows.append(
             {
                 "data_referencia": d.isoformat(),

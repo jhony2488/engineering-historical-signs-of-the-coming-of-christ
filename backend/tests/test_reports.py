@@ -23,7 +23,7 @@ def test_generate_html_contains_key_sections():
     assert "<!DOCTYPE html>" in html
     assert "2026-06-04" in html
     assert "FASE_II" in html
-    assert "Alerta Falso Líder" in html
+    assert "Alerta de incongruência" in html
     assert "Coalizão Global" in html
     assert "conflito" in html
 
@@ -41,4 +41,4 @@ def test_generate_html_without_alerta():
             "ranking_mar": [],
         }
     )
-    assert "Alerta Falso Líder" not in html
+    assert "Alerta de incongruência" not in html

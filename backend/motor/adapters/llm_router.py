@@ -23,7 +23,7 @@ class LLMRouter:
     def force_fallback(self, enabled: bool = True) -> None:
         self._force_fallback = enabled
 
-    @retry(stop_after_attempt(2), wait=wait_exponential(multiplier=1, min=1, max=8))
+    @retry(stop=stop_after_attempt(2), wait=wait_exponential(multiplier=1, min=1, max=8))
     async def complete(
         self,
         model: str,
