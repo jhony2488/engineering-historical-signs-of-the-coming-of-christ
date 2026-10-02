@@ -10,7 +10,7 @@ import { applySecurityHeaders } from "@/lib/auth/security-headers";
 import { verifySessionToken } from "@/lib/auth/session";
 
 const STATIC_ASSET =
-  /^\/(?:_next\/static|_next\/image|favicon\.ico|.*\.(?:svg|png|jpg|jpeg|gif|webp|ico|wasm|spline|splinecode|txt|webmanifest))$/i;
+  /^\/(?:_next\/static|_next\/image|favicon\.ico|sw\.js|offline\.html|.*\.(?:svg|png|jpg|jpeg|gif|webp|ico|wasm|spline|splinecode|txt|webmanifest))$/i;
 
 export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
@@ -48,6 +48,6 @@ export async function middleware(request: NextRequest) {
 
 export const config = {
   matcher: [
-    "/((?!_next/static|_next/image|favicon\\.ico|.*\\.(?:svg|png|jpg|jpeg|gif|webp|ico|wasm|spline|splinecode|txt|webmanifest)$).*)",
+    "/((?!_next/static|_next/image|favicon\\.ico|sw\\.js|offline\\.html|.*\\.(?:svg|png|jpg|jpeg|gif|webp|ico|wasm|spline|splinecode|txt|webmanifest)$).*)",
   ],
 };
