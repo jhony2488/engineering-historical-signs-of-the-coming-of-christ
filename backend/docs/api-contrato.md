@@ -1,8 +1,10 @@
 # Contrato API — FastAPI v1
 
-Base URL local: `http://localhost:8000`
+Base URL local: `http://localhost:8000` · implementação:
+[`api/main.py`](../api/main.py). Todos os endpoints públicos respeitam
+`API_RATE_LIMIT` (default `30/minute`, por IP).
 
-## Endpoints públicos
+## Saúde
 
 ### `GET /health`
 
@@ -10,9 +12,12 @@ Base URL local: `http://localhost:8000`
 { "status": "ok", "service": "motor-escatologico" }
 ```
 
+## Resultados diários
+
 ### `GET /api/v1/resultado/atual`
 
-Retorna o último `json_analise_ia` processado.
+Retorna o último `json_analise_ia` processado. **404** se nenhum batch foi
+executado.
 
 **Resposta 200** — campos principais:
 
@@ -24,31 +29,30 @@ Retorna o último `json_analise_ia` processado.
 | `probabilidade_fase` | float | 0–1 |
 | `indice_global` | float | 0–1 |
 | `confianca` | float | 0–1 |
-| `correlacao` | object | Bayes, HMM, alertas |
-| `ranking_mar` | array | Top-10 Besta do Mar |
-| `ranking_terra` | array | Top-10 Besta da Terra |
+| `correlacao` | object | Bayes, HMM, alertas, falso líder, bestas |
+| `ranking_mar` / `ranking_terra` | array | Top-10 Besta do Mar / da Terra |
+| `ameacas_paises` | array | Camada 10 |
+| `simulacoes_abm` / `adversarial` / `recomendacoes_adaptativas` | array | Camadas 12/13/15 |
+| `provenance` | object | Merkle root + estágios (Camada 14) |
+| `baseline_historico` | object | Profecias cumpridas (Camada 0) |
 | `relatorio_html` | string | HTML embutido |
-
-**Resposta 404** — nenhum batch executado ainda.
+| `status` | enum | `complete` / `pending_review` / `reverted` / `rejected` |
 
 ### `GET /api/v1/resultado/historico`
-
-Query params:
 
 | Param | Tipo | Default |
 |-------|------|---------|
 | `desde` | `YYYY-MM-DD` | — |
-| `limit` | int | 90 |
+| `limit` | int (1–365) | 90 |
 
-Retorna array de payloads `json_analise_ia` ordenados por data.
+Array de payloads `json_analise_ia` ordenados por data.
+
+## Rankings
 
 ### `GET /api/v1/ranking/{personagem}`
 
-`personagem`: `besta_mar`, `besta_terra`, `mar` ou `terra`
-
-Query opcional: `data=YYYY-MM-DD`
-
-**Item do ranking:**
+`personagem`: `besta_mar`, `besta_terra`, `mar` ou `terra` · query opcional
+`data=YYYY-MM-DD`. Fallback para o ranking do último resultado.
 
 ```json
 {
@@ -62,32 +66,70 @@ Query opcional: `data=YYYY-MM-DD`
 }
 ```
 
-## Endpoint admin
+## Baseline (Camada 0)
 
-### `POST /api/v1/admin/run-daily`
+| Endpoint | Descrição |
+|----------|-----------|
+| `GET /api/v1/baseline/historico` | Overview de profecias cumpridas (inicializa se vazio) |
+| `GET /api/v1/baseline/arquivo?status=&limit=` | Arquivo profético (`status`: `cumprida`/`parcial`/`pendente`; `limit` ≤ 500) |
+| `GET /api/v1/baseline/atualizacoes?limit=` | Profecias detectadas após o baseline (limit ≤ 100) |
 
-Header obrigatório: `X-Admin-Key: <ADMIN_API_KEY>`
+## Snapshots (Motores Nível 2/3)
 
-Query params:
+| Endpoint | Descrição |
+|----------|-----------|
+| `GET /api/v1/snapshot/{janela}` | Snapshot mais recente — 404 se inexistente |
+| `GET /api/v1/snapshot/{janela}/historico?limit=` | Histórico (limit ≤ 52) |
 
-| Param | Descrição |
-|-------|-----------|
-| `ref_date` | `YYYY-MM-DD` (opcional) |
-| `force` | `true` para reprocessar data existente |
+`janela`: `weekly`, `monthly`, `quarterly`, `semiannual`, `annual` e variantes
+`*_hybrid` do Nível 3.
 
-**Resposta 202:**
+## Grafo e cenários
 
-```json
-{ "status": "accepted", "data_referencia": "2026-06-04" }
-```
+| Endpoint | Descrição |
+|----------|-----------|
+| `GET /api/v1/grafo` | Payload do grafo profético (nós/arestas) |
+| `GET /api/v1/cenarios` | Cenários ativos construídos do grafo |
+| `POST /api/v1/cenarios/what-if` | Simulação Monte Carlo — body `{ativos: [], base_indice: 0.58, trials: 200}` (rate `20/minute`) |
 
-## Rate limit
+## Ameaças por país
 
-Padrão: `30/minute` por IP (configurável via `API_RATE_LIMIT`).
+| Endpoint | Descrição |
+|----------|-----------|
+| `GET /api/v1/ameacas/paises?data=` | Lista de ameaças (fallback: último resultado) |
+| `GET /api/v1/ameacas/paises/{code}?data=` | Detalhe: `ameaca` + `abm` + `adversarial` + `recomendacoes` + `provenance` — 404 se país ausente |
+
+## Missiológico (Joshua Project)
+
+| Endpoint | Descrição |
+|----------|-----------|
+| `POST /api/v1/missiological/analyze` | Roda análise sobre `joshua_project_data` e persiste (rate `10/minute`) |
+| `GET /api/v1/missiological/results?country=&limit=` | Resultados; fallback computa on-the-fly |
+
+## Proveniência e relatório
+
+| Endpoint | Descrição |
+|----------|-----------|
+| `GET /api/v1/provenance/day/{day}` | Entradas `provenance_log` + `verify_chain` do dia (`YYYY-MM-DD`) |
+| `GET /api/v1/relatorio/pdf` | PDF do último resultado (`application/pdf`); 503 se gerador indisponível |
+
+## Endpoints admin
+
+Header obrigatório: `X-Admin-Key: <ADMIN_API_KEY>` (401 se inválido).
+
+| Endpoint | Rate | Descrição |
+|----------|------|-----------|
+| `POST /api/v1/admin/run-daily?ref_date=&force=` | `5/minute` | Enfileira batch diário → `{status: accepted, job_id}` |
+| `POST /api/v1/admin/run-synthesis?window=` | `5/minute` | Motor Nível 2 (`weekly`…`annual`) → `job_id` |
+| `POST /api/v1/admin/run-hybrid-analysis?window=` | `3/minute` | Motor Nível 3 (`quarterly`/`semiannual`/`annual`) → `job_id` |
+| `GET /api/v1/admin/jobs/{job_id}` | padrão | Status do job na fila Redis |
+| `POST /api/v1/admin/approve-review?data_referencia=` | `10/minute` | Aprova transição `pending_review` → `complete` |
+| `POST /api/v1/admin/reject-review?data_referencia=` | `10/minute` | Rejeita transição → `status: rejected` (append-only) |
 
 ## Integração Next.js
 
 1. Cache localStorage com expiração diária (mesmo dia = não chamar API)
 2. Buscar `/api/v1/resultado/atual` após horário do batch (~04:00 BRT)
 3. Histórico para gráficos: `/api/v1/resultado/historico?desde=2026-01-01`
-4. Nunca expor `SUPABASE_SERVICE_ROLE_KEY` no frontend — use esta API ou Supabase `anon` com RLS
+4. Nunca expor `SUPABASE_SERVICE_ROLE_KEY` no frontend — use esta API ou
+   Supabase `anon` com RLS

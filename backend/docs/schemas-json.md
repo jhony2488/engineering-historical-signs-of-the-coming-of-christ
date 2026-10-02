@@ -10,6 +10,7 @@ Schemas em `motor/schemas/`. Validação obrigatória antes de persistir.
 | `resultado_correlacao.schema.json` | Saída Camada 8 |
 | `resultado_escatologico.schema.json` | Payload final diário |
 | `ranking_candidato.schema.json` | Itens Top-10 |
+| `ameaca_pais.schema.json` | Itens de ameaça por país (Camada 10) |
 
 ## Validação
 

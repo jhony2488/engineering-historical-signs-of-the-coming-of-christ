@@ -30,14 +30,15 @@ com profecias e publicação de rankings/fases em um dashboard.
 
 | Caminho | Conteúdo |
 |---------|----------|
-| `backend/motor/` | Motor Python — pipeline de 9 camadas (ingestão → embeddings/RAG → LLMs → Bayes/HMM/MCDA → relatórios) |
-| `backend/api/` | API FastAPI (`api/main.py`) |
+| `backend/motor/` | Motor Python — pipeline (ingestão → embeddings/RAG → LLMs → Bayes/HMM/MCDA → relatórios + extensões L10–15). Subpacotes: `pipeline/` (camadas), `domain/` (fases, energias, bestas, falso líder), `math/` (Bayes, HMM, MCDA), `ml/` (relevance, reranker, GNN, classificadores), `adapters/` (Groq/OpenRouter/Ollama, Supabase, Redis, e-mail), `schemas/`, `prompts/v1/` |
+| `backend/api/` | API FastAPI (`api/main.py`) — ~20 endpoints; manter `docs/api-contrato.md` sincronizado |
+| `backend/config/` | Seeds e feeds (`feeds.yaml`, `candidatos_seed.json`, `corpus_teologico_seed.json`, `countries_focus.json`, `acled_seed.json`, …) |
 | `backend/supabase/migrations/` | DDL do Postgres (fonte única de schema) |
 | `backend/tests/` | Testes pytest |
 | `backend/docs/` | Documentação técnica do motor |
-| `front-end/src/app/` | App Router — páginas, layouts SEO, route handlers `api/db/` |
-| `front-end/src/components/` | Componentes React (dashboard, charts, ui) |
-| `front-end/src/lib/` | `api.ts`, `cache.ts`, `types.ts`, `db/`, `seo/` |
+| `front-end/src/app/` | App Router — páginas (`(painel)`, `historico`, `rankings`, `globo`, `grafo`, `profecias`, `simulador`, `revisao`, `joshua`, …) e route handlers `api/db/`, `api/admin/`, `api/auth/`, `api/joshua/` |
+| `front-end/src/components/` | Componentes React (dashboard, charts, globo, grafo, ui) |
+| `front-end/src/lib/` | `api.ts`, `cache.ts`, `types.ts`, `db/`, `seo/`, `auth/`, `mock*.ts` |
 | `front-end/prisma/` | Schema Prisma (espelha Supabase — não crie DDL aqui) + seed |
 | `front-end/docs/` | Documentação do dashboard |
 | `.github/workflows/` | 10 workflows agendados (batch diário, sínteses, drift, híbridos) |
@@ -52,13 +53,18 @@ com profecias e publicação de rankings/fases em um dashboard.
 | [backend/docs/REQUISITOS_CONTRIBUICAO.md](backend/docs/REQUISITOS_CONTRIBUICAO.md) | Regras específicas do backend |
 | [front-end/docs/REQUISITOS_CONTRIBUICAO.md](front-end/docs/REQUISITOS_CONTRIBUICAO.md) | Regras específicas do front-end |
 | [backend/docs/arquitetura.md](backend/docs/arquitetura.md) | As 9 camadas do motor e fluxo batch |
+| [backend/docs/camadas.md](backend/docs/camadas.md) | Referência detalhada camada → módulo → config → saída |
+| [backend/docs/cli.md](backend/docs/cli.md) | Comandos `python -m motor.cli` |
 | [backend/docs/api-contrato.md](backend/docs/api-contrato.md) | Contrato REST consumido pelo dashboard |
+| [backend/docs/fontes-dados.md](backend/docs/fontes-dados.md) | Fontes de ingestão (RSS, GDELT, ACLED, API.Bible, Joshua) |
+| [backend/docs/variaveis-ambiente.md](backend/docs/variaveis-ambiente.md) | Referência de env vars do motor |
 | [backend/docs/schemas-json.md](backend/docs/schemas-json.md) | Contratos JSON Schema e versionamento |
 | [backend/docs/setup-supabase.md](backend/docs/setup-supabase.md) | Setup do Supabase e migrations |
 | [backend/docs/model-providers.md](backend/docs/model-providers.md) | Provedores LLM (Groq, OpenRouter, Ollama) |
 | [backend/docs/github-actions.md](backend/docs/github-actions.md) | Workflows, crons e secrets |
 | [backend/README.md](backend/README.md) | Visão geral e CLI do motor |
 | [front-end/README.md](front-end/README.md) | Visão geral do dashboard |
+| [front-end/docs/arquitetura.md](front-end/docs/arquitetura.md) | App Router, rotas BFF, cache e componentes |
 | [front-end/prisma/README.md](front-end/prisma/README.md) | Schema Prisma e seed |
 
 ## Comandos essenciais
@@ -115,7 +121,10 @@ npm run test   # Vitest + pytest — usado pelo pre-push
      pesos MCDA, thresholds de fase, provedor LLM primário
    - `src/lib/types.ts` (quebra de contrato), `prisma/schema.prisma`,
      headers de `middleware.ts`, remoção do fallback mock
-9. **Verificação antes de finalizar**: `npm run lint` e `npm run test` na raiz.
+9. **Docs em pt-BR** — toda a documentação é em português; ao alterar
+   endpoints de `api/main.py`, sincronize `backend/docs/api-contrato.md`; ao
+   alterar CLI/env vars, sincronize `cli.md`/`variaveis-ambiente.md`.
+10. **Verificação antes de finalizar**: `npm run lint` e `npm run test` na raiz.
 
 ## Viabilidade — estado atual do projeto
 
@@ -142,7 +151,6 @@ npm run test   # Vitest + pytest — usado pelo pre-push
 - **`package-lock.json` não versionado** — está no `.gitignore`; `npm ci` não
   funciona e builds não são reproduzíveis.
 - **`doc.txt`** (especificação original do projeto, ~56KB) existe localmente
-  mas não está versionado.
+  mas não está versionado — referencie o conteúdo nos docs sem linkar o arquivo.
 - **`front-end/.env copy.local`** — arquivo solto não versionado; verificar se
   não contém segredos antes de qualquer commit.
-- Muitas alterações em `backend/` ainda não commitadas na `master`.

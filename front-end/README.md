@@ -2,7 +2,9 @@
 
 Next.js 15 + TypeScript + Tailwind CSS + Recharts.
 
-> Contribuição: [docs/REQUISITOS_CONTRIBUICAO.md](docs/REQUISITOS_CONTRIBUICAO.md)
+> Contribuição: [docs/REQUISITOS_CONTRIBUICAO.md](docs/REQUISITOS_CONTRIBUICAO.md) ·
+> Arquitetura detalhada: [docs/arquitetura.md](docs/arquitetura.md) ·
+> Índice: [docs/README.md](docs/README.md)
 
 ## Funcionalidades
 

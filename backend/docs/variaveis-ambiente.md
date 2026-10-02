@@ -1,0 +1,111 @@
+# Variáveis de ambiente — Backend
+
+Referência completa de [`backend/.env.example`](../.env.example). Copie para
+`backend/.env` e ajuste — nunca commite valores reais.
+
+## Supabase
+
+| Variável | Descrição |
+|----------|-----------|
+| `SUPABASE_URL` | URL do projeto |
+| `SUPABASE_SERVICE_ROLE_KEY` | Escrita no batch — **nunca no front-end** |
+| `SUPABASE_ANON_KEY` | Leitura pública (dashboard) |
+
+## LLMs
+
+Ordem do `LLMRouter`: **Ollama (se habilitado) → Groq → OpenRouter →
+dry-run**. Detalhes: [model-providers.md](model-providers.md).
+
+| Variável | Default | Descrição |
+|----------|---------|-----------|
+| `GROQ_API_KEY` | — | Provedor primário |
+| `OPENROUTER_API_KEY` | — | Fallback |
+| `LLM_DRY_RUN` | `false` | `true` simula LLMs sem chaves (CI/dev) |
+| `GROQ_MODEL_EXTRACTION` | `llama-3.1-8b-instant` | Camada 4 |
+| `GROQ_MODEL_TIMELINE` | `mistral-nemo` | Camada 5 |
+| `GROQ_MODEL_REASONING` | `deepseek-r1-distill` | Camada 6 |
+| `GROQ_MODEL_HERMENEUTICS` | `gemma2-9b-it` | Camada 7 |
+| `OLLAMA_ENABLED` | `false` | Habilita Ollama local/RunPod |
+| `OLLAMA_BASE_URL` | `http://localhost:11434` | Endpoint Ollama |
+
+## Redis (opcional)
+
+| Variável | Descrição |
+|----------|-----------|
+| `REDIS_URL` | Fila de jobs (`motor:jobs:pending`) e cache |
+
+## API FastAPI
+
+| Variável | Default | Descrição |
+|----------|---------|-----------|
+| `ADMIN_API_KEY` | `change-me-in-production` | Header `X-Admin-Key` nos endpoints `/admin/*` |
+| `API_RATE_LIMIT` | `30/minute` | Rate limit por IP (slowapi) |
+
+## Batch
+
+| Variável | Default | Descrição |
+|----------|---------|-----------|
+| `BATCH_CRON_TZ` | `America/Sao_Paulo` | Fuso do agendamento |
+| `BATCH_HOUR` | `4` | Hora do batch diário |
+| `MAX_DOCUMENTS_PER_DAY` | `50` | Cap de documentos por run |
+| `EMBEDDING_BATCH_SIZE` | `8` | Lote de embeddings |
+| `BGE_MODEL_NAME` | `BAAI/bge-m3` | Modelo de embeddings |
+| `EMBED_CHUNK_LIMIT` | `40` | Cap de chunks embutidos por run |
+| `OCR_IMAGES_DIR` | — | Diretório de imagens para OCR |
+| `ALLOW_GDELT_SYNTHETIC_FALLBACK` | `true` | Permite docs sintéticos se GDELT falhar |
+| `FEEDS_CONFIG_PATH` | `config/feeds.yaml` | Caminho do arquivo de feeds RSS |
+| `ARCHIVE_DIR` | `backend/archive/` | Diretório legado de cold storage (no-op) |
+| `COLD_STORAGE_YEARS` | `2` | Janela de retenção legada (Postgres-only hoje) |
+
+## Thresholds e pesos (Camada 8)
+
+| Variável | Default | Descrição |
+|----------|---------|-----------|
+| `FALSE_LEADER_INCONGRUENCE_THRESHOLD` | `0.7` | Limiar do alerta de falso líder |
+| `PHASE_CONFIDENCE_MIN` | `0.55` | Confiança mínima para publicar fase |
+| `PHASE_TRANSITION_MARGIN_MAX` | `0.15` | Margem máxima para transição |
+| `AUTO_APPROVE_CRITERIA` | `false` | `false` → transição exige revisão humana |
+| `WEIGHT_BAYES` / `WEIGHT_HMM` / `WEIGHT_LLM` | `0.35/0.35/0.30` | Pesos da correlação |
+
+> Alterar pesos/thresholds exige issue prévia (ver
+> [REQUISITOS_CONTRIBUICAO.md](REQUISITOS_CONTRIBUICAO.md)).
+
+## Fontes externas (opcionais)
+
+| Variável | Descrição |
+|----------|-----------|
+| `ACLED_API_KEY` + `ACLED_EMAIL` | API de conflitos; sem elas usa `config/acled_seed.json` |
+| `API_BIBLE_KEY` + `API_BIBLE_ID` | Corpus teológico expandido |
+| `REDDIT_ENABLED` + `REDDIT_USER_AGENT` | Dados micro (Reddit) |
+| `GOOGLE_TRENDS_ENABLED` | Dados micro (Trends) |
+| `JOSHUA_API_KEY` | Joshua Project — usada pelo sync no BFF Next (`/api/joshua/sync`); presente no `.env.example` por referência |
+
+## Classificadores locais (`motor/ml/`)
+
+Sem chave de API — rodam em CPU.
+
+| Variável | Default | Descrição |
+|----------|---------|-----------|
+| `RELEVANCE_GATE_ENABLED` | `true` | Gate de relevância antes da extração |
+| `EXTRACTION_TOP_K` | `10` | Chunks enviados à camada 4 |
+| `RELEVANCE_MIN_SCORE` | `0.0` | Score mínimo do gate |
+| `EVENT_SHADOW_ENABLED` | `true` | Shadow classifier vs. LLM (audit `camada_4_shadow`) |
+| `RERANKER_ENABLED` | `true` | Cross-encoder BGE (rerank RAG + match profecia↔evento) |
+| `RERANKER_MODEL_NAME` | `BAAI/bge-reranker-v2-m3` | Modelo reranker |
+| `RERANKER_CANDIDATE_MULTIPLIER` | `4` | Candidatos por item no rerank |
+| `FULFILLMENT_CE_WEIGHT` | `0.5` | Peso do cross-encoder no fulfillment tracker |
+| `SEMANTIC_DEDUP_ENABLED` | `true` | Dedup semântico por embedding na ingestão |
+| `SEMANTIC_DEDUP_THRESHOLD` | `0.92` | Limiar de similaridade |
+| `EXTRACTION_MODE` | `llm` | `llm` ou `classifier_first` (destilação) |
+| `CLASSIFIER_CONFIDENCE_MIN` | `0.6` | Confiança mínima do classificador local |
+| `DISTILL_MIN_ROWS` | `300` | Linhas mínimas para destilação |
+
+## Site e e-mail (digest diário)
+
+| Variável | Descrição |
+|----------|-----------|
+| `SITE_URL` | URL pública do dashboard (links no e-mail) |
+| `EMAIL_FROM` | Remetente |
+| `EMAIL_DRY_RUN` | `true` simula envio |
+| `RESEND_API_KEY` | Resend (recomendado) |
+| `SMTP_HOST`/`SMTP_PORT`/`SMTP_USER`/`SMTP_PASSWORD` | Alternativa SMTP |
