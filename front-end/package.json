@@ -19,6 +19,8 @@
     "db:studio": "prisma studio",
     "auth:hash-password": "tsx scripts/hash-password.ts",
     "indexnow:all": "dotenv -e .env.local -- tsx scripts/indexnow-all.ts",
+    "ai:download-models": "tsx scripts/download-local-models.ts",
+    "ai:gen-icons": "node scripts/gen-pwa-icons.mjs",
     "google-indexing": "dotenv -e .env.local -- tsx scripts/google-indexing.ts",
     "storybook": "storybook dev -p 6006",
     "build-storybook": "storybook build"
@@ -27,6 +29,8 @@
     "seed": "tsx prisma/seed.ts"
   },
   "dependencies": {
+    "@huggingface/transformers": "^4.3.0",
+    "@mlc-ai/web-llm": "^0.2.85",
     "@prisma/client": "^6.1.0",
     "@splinetool/react-spline": "^4.1.0",
     "clsx": "^2.1.1",
@@ -67,6 +71,7 @@
     "postcss": "^8.4.49",
     "prettier": "^3.5.3",
     "prisma": "^6.1.0",
+    "sharp": "^0.35.5",
     "storybook": "^8.6.14",
     "tailwindcss": "^3.4.16",
     "tsx": "^4.19.0",

@@ -7,3 +7,6 @@ out/
 .DS_Store
 package-lock.json
 storybook-static/
+
+# modelos on-device baixados via `npm run ai:download-models`
+/public/models/
