@@ -7,11 +7,13 @@ import pytest
 PROMPTS_DIR = Path(__file__).resolve().parents[1] / "motor" / "prompts" / "v1"
 
 REQUIRED_PLACEHOLDERS = {
-    "extraction.txt": ["{{texto}}", "{{rag}}"],
-    "reasoning.txt": ["{{dados}}"],
-    "hermeneutics.txt": ["{{eventos}}", "{{rag}}"],
-    "timeline.txt": ["{{eventos}}"],
-    "hybrid_analysis.txt": [],
+    "extraction.txt": ["{{texto}}", "{{rag}}", "{{debiasing}}"],
+    "reasoning.txt": ["{{dados}}", "{{debiasing}}"],
+    "hermeneutics.txt": ["{{eventos}}", "{{rag}}", "{{debiasing}}"],
+    "timeline.txt": ["{{eventos}}", "{{debiasing}}"],
+    "hybrid_analysis.txt": ["{{debiasing}}"],
+    "abm_synthesis.txt": ["{{debiasing}}"],
+    "adversarial_redteam.txt": ["{{debiasing}}"],
 }
 
 REQUIRED_OUTPUT_KEYS = {

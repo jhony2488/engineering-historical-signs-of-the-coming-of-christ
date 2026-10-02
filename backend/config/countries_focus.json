@@ -1,0 +1,107 @@
+[
+  {
+    "code": "BRA",
+    "name": "Brasil",
+    "lat": -14.235,
+    "lng": -51.9253,
+    "regioes": ["america_sul", "global"]
+  },
+  {
+    "code": "USA",
+    "name": "Estados Unidos",
+    "lat": 37.0902,
+    "lng": -95.7129,
+    "regioes": ["america_norte", "global"]
+  },
+  {
+    "code": "ISR",
+    "name": "Israel",
+    "lat": 31.0461,
+    "lng": 34.8516,
+    "regioes": ["oriente_medio"]
+  },
+  {
+    "code": "RUS",
+    "name": "Rússia",
+    "lat": 61.524,
+    "lng": 105.3188,
+    "regioes": ["russia_eurasia", "global"]
+  },
+  {
+    "code": "CHN",
+    "name": "China",
+    "lat": 35.8617,
+    "lng": 104.1954,
+    "regioes": ["asia_pacifico", "global"]
+  },
+  {
+    "code": "IRN",
+    "name": "Irã",
+    "lat": 32.4279,
+    "lng": 53.688,
+    "regioes": ["oriente_medio"]
+  },
+  {
+    "code": "TUR",
+    "name": "Turquia",
+    "lat": 38.9637,
+    "lng": 35.2433,
+    "regioes": ["oriente_medio", "europa"]
+  },
+  {
+    "code": "DEU",
+    "name": "Alemanha",
+    "lat": 51.1657,
+    "lng": 10.4515,
+    "regioes": ["europa"]
+  },
+  {
+    "code": "GBR",
+    "name": "Reino Unido",
+    "lat": 55.3781,
+    "lng": -3.436,
+    "regioes": ["europa"]
+  },
+  {
+    "code": "FRA",
+    "name": "França",
+    "lat": 46.2276,
+    "lng": 2.2137,
+    "regioes": ["europa"]
+  },
+  {
+    "code": "ARG",
+    "name": "Argentina",
+    "lat": -38.4161,
+    "lng": -63.6167,
+    "regioes": ["america_sul"]
+  },
+  {
+    "code": "MEX",
+    "name": "México",
+    "lat": 23.6345,
+    "lng": -102.5528,
+    "regioes": ["america_norte"]
+  },
+  {
+    "code": "IND",
+    "name": "Índia",
+    "lat": 20.5937,
+    "lng": 78.9629,
+    "regioes": ["asia_pacifico"]
+  },
+  {
+    "code": "UKR",
+    "name": "Ucrânia",
+    "lat": 48.3794,
+    "lng": 31.1656,
+    "regioes": ["europa", "russia_eurasia"]
+  },
+  {
+    "code": "SAU",
+    "name": "Arábia Saudita",
+    "lat": 23.8859,
+    "lng": 45.0792,
+    "regioes": ["oriente_medio"]
+  }
+]

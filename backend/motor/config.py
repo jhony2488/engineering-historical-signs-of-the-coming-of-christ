@@ -54,11 +54,17 @@ class Settings(BaseSettings):
 
     archive_dir: Path = Field(default=BACKEND_ROOT / "archive")
     cold_storage_years: int = 2
+    embed_chunk_limit: int = 40
+    ocr_images_dir: Path | None = None
+    allow_gdelt_synthetic_fallback: bool = True
 
     groq_model_extraction: str = "llama-3.1-8b-instant"
-    groq_model_timeline: str = "llama-3.3-70b-versatile"
-    groq_model_reasoning: str = "llama-3.3-70b-versatile"
-    groq_model_hermeneutics: str = "llama-3.3-70b-versatile"
+    groq_model_timeline: str = "mistral-nemo"
+    groq_model_reasoning: str = "deepseek-r1-distill"
+    groq_model_hermeneutics: str = "gemma2-9b-it"
+
+    ollama_enabled: bool = False
+    ollama_base_url: str = "http://localhost:11434"
 
     feeds_config_path: Path = Field(default=CONFIG_DIR / "feeds.yaml")
 
@@ -70,6 +76,8 @@ class Settings(BaseSettings):
     smtp_port: int = 587
     smtp_user: str = ""
     smtp_password: str = ""
+
+    # Retenção: dados ficam no Postgres (Supabase). Sem S3 / arquivos locais de cold storage.
 
 
 @lru_cache

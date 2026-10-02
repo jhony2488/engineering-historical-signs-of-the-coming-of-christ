@@ -30,9 +30,28 @@ def test_graph_to_records_structure():
     assert all("source" in e and "target" in e for e in edges)
 
 
-def test_graph_custom_nodes():
+def test_graph_enrich_from_events_adds_day_nodes():
     g = PropheticGraph()
-    g.add_node("evt_a", "evento")
-    g.add_node("evt_b", "evento")
-    g.add_edge("evt_a", "evt_b", "precede")
-    assert g.leader_centrality("evt_a") >= 0
+    g.seed_default()
+    before = g.graph.number_of_nodes()
+    added = g.enrich_from_events(
+        [
+            {
+                "evento": "conflito_militar",
+                "regiao": "oriente_medio",
+                "grau_tensao": 0.8,
+                "energia": "contracao",
+                "dimensao": "macro",
+            },
+            {
+                "evento": "cbdc_piloto",
+                "regiao": "global",
+                "grau_tensao": 0.6,
+                "energia": "contracao",
+                "dimensao": "macro",
+            },
+        ]
+    )
+    assert added >= 2
+    assert g.graph.number_of_nodes() > before
+    assert any(n.startswith("day_") for n in g.graph.nodes)

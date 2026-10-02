@@ -4,13 +4,18 @@ import structlog
 from tenacity import retry, stop_after_attempt, wait_exponential
 
 from motor.adapters.groq import GroqClient
+from motor.adapters.ollama import OllamaClient
 from motor.adapters.openrouter import OpenRouterClient
+from motor.config import get_settings
 
 logger = structlog.get_logger()
 
 
 class LLMRouter:
+    """Ordem: Ollama (se habilitado) → Groq → OpenRouter → dry-run via GroqClient."""
+
     def __init__(self) -> None:
+        self._ollama = OllamaClient()
         self._groq = GroqClient()
         self._openrouter = OpenRouterClient()
         self._force_fallback = False
@@ -18,7 +23,7 @@ class LLMRouter:
     def force_fallback(self, enabled: bool = True) -> None:
         self._force_fallback = enabled
 
-    @retry(stop=stop_after_attempt(2), wait=wait_exponential(multiplier=1, min=1, max=8))
+    @retry(stop_after_attempt(2), wait=wait_exponential(multiplier=1, min=1, max=8))
     async def complete(
         self,
         model: str,
@@ -27,6 +32,16 @@ class LLMRouter:
         temperature: float = 0.2,
     ) -> tuple[str, str]:
         """Retorna (conteúdo, provedor_usado)."""
+        settings = get_settings()
+        prefer_ollama = settings.ollama_enabled and not self._force_fallback
+
+        if prefer_ollama and self._ollama.is_configured:
+            try:
+                content = await self._ollama.complete(model, messages, json_mode, temperature)
+                return content, "ollama"
+            except Exception as exc:
+                logger.warning("ollama_failed_fallback", error=str(exc), model=model)
+
         if not self._force_fallback and self._groq.is_configured:
             try:
                 content = await self._groq.complete(model, messages, json_mode, temperature)

@@ -10,6 +10,15 @@ from motor.config import get_settings
 
 logger = structlog.get_logger()
 
+# Aliases de camada → IDs Groq (free tier). Modelos doc (Mistral/DeepSeek/Gemma) mapeados.
+GROQ_MODEL_MAP = {
+    "mistral-nemo": "llama-3.3-70b-versatile",  # janela longa via Llama até Ollama/OR
+    "deepseek-r1-distill": "deepseek-r1-distill-llama-70b",
+    "gemma2-9b-it": "gemma2-9b-it",
+    "llama-3.1-8b-instant": "llama-3.1-8b-instant",
+    "llama-3.3-70b-versatile": "llama-3.3-70b-versatile",
+}
+
 
 class GroqClient:
     def __init__(self) -> None:
@@ -32,8 +41,9 @@ class GroqClient:
         if settings.llm_dry_run or not self._client:
             return self._dry_run_response(messages, json_mode)
 
+        groq_model = GROQ_MODEL_MAP.get(model, model)
         kwargs: dict[str, Any] = {
-            "model": model,
+            "model": groq_model,
             "messages": messages,
             "temperature": temperature,
             "max_tokens": 4096,

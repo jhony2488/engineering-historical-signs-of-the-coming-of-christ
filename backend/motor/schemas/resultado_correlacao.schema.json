@@ -11,6 +11,7 @@
   ],
   "properties": {
     "indice_global": { "type": "number", "minimum": 0, "maximum": 1 },
+    "proximidade_espiritual": { "type": "number", "minimum": 0, "maximum": 1 },
     "fase": { "type": "string", "enum": ["FASE_I", "FASE_II", "FASE_III", "FASE_IV"] },
     "confianca": { "type": "number", "minimum": 0, "maximum": 1 },
     "posterior_bayes": { "type": "number", "minimum": 0, "maximum": 1 },

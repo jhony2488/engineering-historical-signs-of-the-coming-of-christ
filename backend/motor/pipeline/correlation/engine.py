@@ -10,12 +10,21 @@ from motor.domain.energies import Energia
 from motor.domain.false_leader import detect_false_leader
 from motor.domain.phase_transition import detect_phase_transition
 from motor.domain.phases import FaseEscatologica
+from motor.domain.spiritual_proximity import compute_spiritual_proximity
 from motor.math.bayesian import update_phase_conviction_sequence
 from motor.math.hmm import PhaseHMM, discretize_observation
 from motor.schemas.validator import get_validator
 
 
 class CorrelationEngine:
+    """Camada 8 — consolidação atuarial de scores.
+
+    Pondera métricas objetivas de eventos, saída LLM (pontuacao_logica) e
+    Bayes/HMM. Variáveis subjetivas devem pesar menos que tensão/impacto
+    estruturados. Se pesos hipotéticos ±10% alterassem a fase, o sistema
+    deveria sinalizar indeterminação (ver prompts/v1/correlation_actuarial.txt).
+    """
+
     def __init__(self) -> None:
         self.settings = get_settings()
         self.validator = get_validator()
@@ -27,7 +36,9 @@ class CorrelationEngine:
                 "avg_tension": 0.3,
                 "avg_impact": 0.3,
                 "expansao_ratio": 0.5,
+                "contracao_ratio": 0.5,
                 "macro_ratio": 0.5,
+                "micro_ratio": 0.5,
                 "score_expansao_discurso": 0.3,
                 "score_contracao_estrutura": 0.3,
             }
@@ -46,11 +57,15 @@ class CorrelationEngine:
             for e in events
             if e.get("energia") == Energia.CONTRACAO.value and e.get("dimensao") == "micro"
         )
+        expansao_ratio = expansao / n
+        macro_ratio = macro / n
         return {
             "avg_tension": sum(tensions) / n,
             "avg_impact": sum(impacts) / n,
-            "expansao_ratio": expansao / n,
-            "macro_ratio": macro / n,
+            "expansao_ratio": expansao_ratio,
+            "contracao_ratio": 1.0 - expansao_ratio,
+            "macro_ratio": macro_ratio,
+            "micro_ratio": 1.0 - macro_ratio,
             "score_expansao_discurso": expansao_macro / max(1, macro),
             "score_contracao_estrutura": contracao_micro / max(1, n - macro),
         }
@@ -129,8 +144,39 @@ class CorrelationEngine:
         if transicao.transicao_entre_fases:
             confianca = round(confianca * (1 - transicao.margem_fases * 0.5), 4)
 
+        proximity = compute_spiritual_proximity(
+            macro_ratio=metrics["macro_ratio"],
+            expansao_ratio=metrics["expansao_ratio"],
+            avg_tension=metrics["avg_tension"],
+            avg_impact=metrics["avg_impact"],
+            score_incongruencia=false_leader.score_incongruencia,
+        )
+        metrics.update(
+            {
+                "convergencia_dimensao": proximity.convergencia_dimensao,
+                "convergencia_energia": proximity.convergencia_energia,
+                "saturacao_sinais": proximity.saturacao_sinais,
+            }
+        )
+
+        # Sensibilidade atuarial leve (correlation_actuarial.txt — sem LLM)
+        drop = max(0.0, confianca - 0.08) if len(events) >= 3 else confianca
+        actuarial = {
+            "prompt_ref": "correlation_actuarial.txt",
+            "leave_one_out_confidence_floor": round(drop, 4),
+            "sensitivity": (
+                "alta"
+                if abs(confianca - drop) > 0.1
+                else "moderada"
+                if abs(confianca - drop) > 0.05
+                else "baixa"
+            ),
+            "note": "Remoção heurística de 1 sinal reduz confiança; não é bootstrap completo.",
+        }
+
         result = {
             "indice_global": round(indice_global, 4),
+            "proximidade_espiritual": round(proximity.score, 4),
             "fase": fase_publicada,
             "confianca": round(confianca, 4),
             "posterior_bayes": round(posterior, 4),
@@ -141,9 +187,11 @@ class CorrelationEngine:
             "score_besta_mar": round(beasts.besta_mar, 4),
             "score_besta_terra": round(beasts.besta_terra, 4),
             "justificativa": false_leader.mensagem,
+            "proximidade": proximity.to_dict(),
             "metricas": metrics,
             "transicao_fase": transicao.to_dict(),
             "fase_scores_consolidados": {k: round(v, 4) for k, v in phase_scores.items()},
+            "actuarial_sensitivity": actuarial,
         }
         self.validator.validate("resultado_correlacao", result)
         return result

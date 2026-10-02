@@ -2,16 +2,35 @@ from __future__ import annotations
 
 import networkx as nx
 import numpy as np
+import structlog
+
+logger = structlog.get_logger()
+
+
+def _try_torch_geometric():
+    try:
+        import torch
+        from torch_geometric.nn import SAGEConv  # noqa: F401
+
+        return torch
+    except ImportError:
+        return None
 
 
 class PropheticGNN:
-    """Message-passing leve (2 camadas) — proxy GNN sem PyTorch Geometric."""
+    """
+    Message-passing 2 camadas.
+    Usa PyTorch Geometric quando `[ml]` + torch_geometric estão instalados;
+    caso contrário, proxy NumPy/NetworkX (zero-custo).
+    """
 
     def __init__(self, graph: nx.DiGraph, hidden_dim: int = 8) -> None:
         self.graph = graph
         self.hidden_dim = hidden_dim
         self._node_index = {n: i for i, n in enumerate(graph.nodes())}
         self._adj = self._build_adjacency()
+        self._torch = _try_torch_geometric()
+        self.backend = "pytorch_geometric" if self._torch is not None else "numpy_proxy"
 
     def _build_adjacency(self) -> np.ndarray:
         n = len(self._node_index)
@@ -41,12 +60,42 @@ class PropheticGNN:
     def forward(self, steps: int = 2) -> dict[str, float]:
         if self._adj.size == 0:
             return {}
+        if self._torch is not None:
+            try:
+                return self._forward_pyg(steps)
+            except Exception as exc:
+                logger.warning("gnn_pyg_fallback", error=str(exc))
+        return self._forward_numpy(steps)
+
+    def _forward_numpy(self, steps: int) -> dict[str, float]:
         h = self._node_features()
         for _ in range(steps):
             h = np.tanh(self._adj @ h)
         scores = {}
         for node_id, idx in self._node_index.items():
             scores[node_id] = float(np.mean(h[idx]))
+        return scores
+
+    def _forward_pyg(self, steps: int) -> dict[str, float]:
+        import torch
+        from torch_geometric.nn import SAGEConv
+
+        x = torch.tensor(self._node_features(), dtype=torch.float32)
+        edges = []
+        for u, v in self.graph.edges():
+            edges.append([self._node_index[u], self._node_index[v]])
+        if not edges:
+            return self._forward_numpy(steps)
+        edge_index = torch.tensor(edges, dtype=torch.long).t().contiguous()
+        conv1 = SAGEConv(self.hidden_dim, self.hidden_dim)
+        conv2 = SAGEConv(self.hidden_dim, self.hidden_dim)
+        with torch.no_grad():
+            h = torch.tanh(conv1(x, edge_index))
+            if steps > 1:
+                h = torch.tanh(conv2(h, edge_index))
+        scores = {}
+        for node_id, idx in self._node_index.items():
+            scores[node_id] = float(h[idx].mean().item())
         return scores
 
     def phase_convergence_score(self, phase_nodes: list[str]) -> float:

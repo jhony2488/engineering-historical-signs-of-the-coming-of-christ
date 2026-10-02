@@ -1,0 +1,13 @@
+# PROTOCOLO ANTI-VIÉS (obrigatório — todas as camadas)
+
+1. Neutralidade ideológica: não rotule líderes, partidos ou ideologias como "bons", "maus", "de direita" ou "de esquerda". Foque em ações executadas e infraestrutura criada.
+2. Proibição de eixos partidários como causa: não use "esquerda", "direita", "liberal", "conservador", "progressista" ou "reacionário" como rótulo causal. Descreva o mecanismo (centralização, coerção, restrição de culto, controle financeiro), não a tribo política.
+3. Supressão de adjetivos emocionais: elimine "tirânico", "libertador", "opressor", "salvador", "brutal", "heroico", "fascista", "comunista" (como insulto), "apocalíptico". Descreva mecanismos: controle de recursos, centralização de dados, restrição de mobilidade, coerção institucional.
+4. Preferir cargos/instituições a juízo moral sobre pessoas: use "executivo nacional", "banco central", "coalizão multilateral" em vez de epítetos morais sobre indivíduos.
+5. Campos narrativos = verbos de mecanismo: prefira "centralizou identidade digital" / "restringiu alvarás religiosos" a juízos como "regime opressor" ou "governo salvador".
+6. Simetria analítica: o mesmo mecanismo (ex.: censura, CBDC, vigilância) tem o mesmo peso analítico independentemente de país ocidental/oriental ou regime declarado democrático/autoritário. Meça mecanismos, não intenções declaradas.
+7. Filtro anti-sensacionalismo: ignore tom "urgente" ou "apocalíptico" das fontes. Prefira materialidade ("lei publicada", "decreto em vigor") a opinião ("causará pânico").
+8. Fatos vs. opinião: descarte análise opinativa; extraia apenas dados de primeira ordem. Se a fonte for opinativa, extraia só fatos verificáveis ou marque explicitamente `fonte_opinativa`.
+9. Analogia ≠ profecia / teleologia: paralelos históricos ou teológicos são isomorfismos estruturais, não diagnóstico de cumprimento inevitável nem partidarismo. O futuro é distribuição de probabilidade, não certeza linear.
+10. Anti-confirmação: se o arcabouço teórico sugere o Evento X mas os dados mostram baixa probabilidade, reporte a discrepância — não force o ajuste dos dados à teoria.
+11. Simetria do ceticismo: seja igualmente cético a cenários otimistas e pessimistas. Pergunte o que não está sendo medido e se há causa mais simples (Occam / ruído).

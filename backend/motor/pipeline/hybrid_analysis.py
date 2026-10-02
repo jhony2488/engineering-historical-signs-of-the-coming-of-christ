@@ -3,7 +3,6 @@ from __future__ import annotations
 import json
 import re
 from datetime import date, timedelta
-from pathlib import Path
 from typing import Any
 
 import structlog
@@ -12,10 +11,10 @@ from motor.adapters.llm_router import LLMRouter
 from motor.adapters.supabase import SupabaseClient
 from motor.config import get_settings
 from motor.pipeline.embeddings.service import EmbeddingService
+from motor.pipeline.neutrality_filter import scrub_payload_narratives
+from motor.prompts.loader import PROMPT_VERSION, compose_prompt, with_system_debias
 
 logger = structlog.get_logger()
-
-PROMPT_PATH = Path(__file__).resolve().parents[1] / "prompts" / "v1" / "hybrid_analysis.txt"
 
 WINDOW_CONFIG: dict[str, dict[str, Any]] = {
     "quarterly": {
@@ -54,7 +53,7 @@ class HybridAnalysisEngine:
         self.settings = get_settings()
 
     def _load_prompt(self) -> str:
-        return PROMPT_PATH.read_text(encoding="utf-8")
+        return compose_prompt("hybrid_analysis.txt")
 
     def _parse_json(self, content: str) -> dict[str, Any]:
         text = content.strip()
@@ -143,23 +142,33 @@ class HybridAnalysisEngine:
         reasoning_content, reasoning_provider = await self.router.complete(
             self.settings.groq_model_reasoning,
             [
-                {"role": "system", "content": system_prompt},
+                {
+                    "role": "system",
+                    "content": with_system_debias(
+                        system_prompt
+                        + "\n\nResponda somente em JSON válido. Enfatize incerteza e contrapontos."
+                    ),
+                },
                 {"role": "user", "content": user_prompt},
             ],
             json_mode=True,
         )
-        reasoning = self._parse_json(reasoning_content)
+        reasoning = scrub_payload_narratives(
+            self._parse_json(reasoning_content),
+            keys=("panorama", "raciocinio", "disclaimer"),
+            layer="hybrid_reasoning",
+        )
 
         hermeneutics_content, herm_provider = await self.router.complete(
             self.settings.groq_model_hermeneutics,
             [
                 {
                     "role": "system",
-                    "content": (
-                        "Refine a análise híbrida Nível 3 com hermenêutica bíblica. "
+                    "content": with_system_debias(
+                        "Refine a análise híbrida Nível 3 com hermenêutica histórico-comparativa. "
                         "Preserve todos os campos do raciocínio híbrido e acrescente "
-                        "aderencia_profetica (0-1). As Escrituras ancoram a síntese; "
-                        "não predizer datas. Responda somente em JSON válido."
+                        "aderencia_profetica (0-1). Analogia estrutural, não profecia datada. "
+                        "Responda somente em JSON válido."
                     ),
                 },
                 {
@@ -172,7 +181,12 @@ class HybridAnalysisEngine:
             ],
             json_mode=True,
         )
-        hermeneutica = self._parse_json(hermeneutics_content)
+        hermeneutica = scrub_payload_narratives(
+            self._parse_json(hermeneutics_content),
+            keys=("panorama", "adherence_caution"),
+            list_keys=("similaridades", "divergencias"),
+            layer="hybrid_hermeneutics",
+        )
 
         result = {
             **payload,
@@ -197,7 +211,7 @@ class HybridAnalysisEngine:
         self.db.log_audit(
             camada="nivel_3_hybrid",
             modelo=f"{self.settings.groq_model_reasoning}+{self.settings.groq_model_hermeneutics}",
-            prompt_version="v1/hybrid_analysis",
+            prompt_version=PROMPT_VERSION,
             input_hash=str(hash(json.dumps(payload, default=str))),
             decisao=payload["janela_out"],
             detalhes={"window": window, "sub_windows": payload["sub_windows_esperadas"]},

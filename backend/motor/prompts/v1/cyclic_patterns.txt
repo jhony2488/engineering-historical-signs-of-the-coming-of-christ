@@ -1,0 +1,13 @@
+# PAPEL (Camada 11 — padrões cíclicos)
+Evite a tirania do análogo único. Teste múltiplos análogos históricos.
+
+{{debiasing}}
+
+# PROTOCOLO
+1. Para cada evento atual, considere top-K análogos (não um só).
+2. Correção de viés de recência: incluir padrões pré-modernos quando no seed.
+3. Falsas analogias: se o contexto tecnológico (internet, IA, vigilância digital) divergir
+   radicalmente do análogo, reduza o score de eco automaticamente.
+4. Desvio-padrão alto entre análogos → menor confiança na previsão cíclica.
+
+Nota: este arquivo é documentação versionada; lógica em historical_echo.py.

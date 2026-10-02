@@ -160,23 +160,42 @@ def revert_day(
 
 @app.command("run-data-drift")
 def run_data_drift() -> None:
-    """Refinamento mensal de critérios de fase (data drift)."""
+    """Refinamento mensal de critérios de fase (data drift / embeddings_curation)."""
     from motor.pipeline.data_drift import DataDriftEngine
 
     result = asyncio.run(DataDriftEngine().run())
     typer.echo(f"Data drift: {result.get('analise', {}).get('resumo', 'ok')}")
 
 
+@app.command("run-drift-recalibration")
+def run_drift_recalibration() -> None:
+    """Alias de run-data-drift (recalibração de jargões / critérios)."""
+    run_data_drift()
+
+
 @app.command("archive-cold-storage")
 def archive_cold_storage(
-    cutoff: str | None = typer.Option(None, "--cutoff", help="YYYY-MM-DD"),
+    cutoff: str | None = typer.Option(None, "--cutoff", help="YYYY-MM-DD (ignorado)"),
 ) -> None:
-    """Exporta histórico antigo para JSON/Parquet local."""
+    """Política atual: retenção somente no Postgres (sem exportar arquivos/S3)."""
     from motor.pipeline.archive import ColdStorageArchiver
 
     d = _parse_date(cutoff) if cutoff else None
     result = ColdStorageArchiver().archive_before(d)
-    typer.echo(f"Arquivados {result['archived_count']} registros em {result['json_path']}")
+    typer.echo(result.get("message", "postgres_only"))
+
+
+@app.command("worker-jobs")
+def worker_jobs(
+    once: bool = typer.Option(False, "--once", help="Processa um job e encerra"),
+    max_jobs: int = typer.Option(50, "--max-jobs"),
+) -> None:
+    """Worker Redis: consome fila motor:jobs:pending (substituto leve de Celery)."""
+    from motor.adapters.job_worker import JobWorker
+
+    worker = JobWorker()
+    processed = asyncio.run(worker.run(once=once, max_jobs=max_jobs))
+    typer.echo(f"Jobs processados: {processed}")
 
 
 if __name__ == "__main__":

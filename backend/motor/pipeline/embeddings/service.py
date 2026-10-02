@@ -36,6 +36,7 @@ class EmbeddingService:
     def embed_texts(self, texts: list[str]) -> list[list[float]]:
         model = self._get_model()
         if model is None:
+            logger.warning("embedding_hash_fallback_active", n=len(texts))
             return [self._hash_embedding(t) for t in texts]
         vectors = model.encode(
             texts,

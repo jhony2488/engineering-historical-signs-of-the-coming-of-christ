@@ -1,0 +1,35 @@
+[
+  {
+    "country": "Israel",
+    "country_code": "ISR",
+    "event_type": "Battles",
+    "location": "Gaza / border",
+    "event_date": "2026-08-01",
+    "actor1": "armed_group",
+    "actor2": "state_forces",
+    "fatalities": 12,
+    "notes": "Seed ACLED — conflito regional persistente (sem API key)."
+  },
+  {
+    "country": "Ukraine",
+    "country_code": "UKR",
+    "event_type": "Explosions/Remote violence",
+    "location": "Eastern front",
+    "event_date": "2026-08-01",
+    "actor1": "state_forces",
+    "actor2": "state_forces",
+    "fatalities": 8,
+    "notes": "Seed ACLED — intensidade de conflito elevada."
+  },
+  {
+    "country": "Nigeria",
+    "country_code": "NGA",
+    "event_type": "Violence against civilians",
+    "location": "Middle Belt",
+    "event_date": "2026-07-28",
+    "actor1": "militia",
+    "actor2": "civilians",
+    "fatalities": 5,
+    "notes": "Seed ACLED — violência contra civis / pressão religiosa local."
+  }
+]

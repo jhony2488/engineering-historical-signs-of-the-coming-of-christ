@@ -47,14 +47,21 @@ class DataDriftEngine:
         }
 
     async def run(self) -> dict[str, Any]:
+        from motor.pipeline.prompt_compose import load_prompt
+
         context = self.build_context(30)
-        prompt = (
-            "Revise se os critérios de cada FASE escatológica ainda fazem sentido com a realidade global recente. "
-            "Detecte data drift semântico. Responda JSON: "
-            "criterios_revisados (objeto FASE_I..IV), drift_detectado (bool), "
-            "recomendacoes (lista), resumo.\n\n"
-            f"{json.dumps(context, ensure_ascii=False)}"
-        )
+        try:
+            prompt = load_prompt(
+                "embeddings_curation.txt",
+                contexto=json.dumps(context, ensure_ascii=False),
+            )
+        except Exception:
+            prompt = (
+                "Revise se os critérios de cada FASE escatológica ainda fazem sentido "
+                "com a realidade global recente. Detecte data drift semântico. "
+                "Responda JSON: criterios_revisados, drift_detectado, recomendacoes, resumo.\n\n"
+                f"{json.dumps(context, ensure_ascii=False)}"
+            )
         content, provider = await self.router.complete(
             self.settings.groq_model_timeline,
             [{"role": "user", "content": prompt}],

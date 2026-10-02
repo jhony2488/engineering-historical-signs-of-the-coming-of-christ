@@ -11,15 +11,23 @@ from motor.config import CONFIG_DIR, get_settings
 from motor.math.mcda import rank_candidates
 from motor.ml.graph import PropheticGraph
 from motor.ml.spiritual_tone import SpiritualToneAnalyzer
+from motor.pipeline.abm_simulation import AbmSimulationService
+from motor.pipeline.adaptive_recommendations import AdaptiveRecommendationService
+from motor.pipeline.adversarial_validation import AdversarialValidationService
+from motor.pipeline.chronological_archive import ChronologicalArchiveService
 from motor.pipeline.correlation.engine import CorrelationEngine
 from motor.pipeline.embeddings.service import EmbeddingService
 from motor.pipeline.fulfillment_tracker import FulfillmentTracker
 from motor.pipeline.historical_baseline import HistoricalBaselineService
+from motor.pipeline.historical_echo import HistoricalEchoService
 from motor.pipeline.ingestion.collector import IngestionCollector
+from motor.pipeline.joshua_analysis import JoshuaAnalysisService
 from motor.pipeline.llm.layers import LLMPipeline
 from motor.pipeline.newsletter_service import NewsletterDigestService
 from motor.pipeline.preprocessing.processor import Preprocessor
+from motor.pipeline.provenance import ProvenanceService
 from motor.pipeline.reports.generator import ReportGenerator
+from motor.pipeline.threat_analysis import ThreatAnalysisService
 from motor.schemas.validator import get_validator
 
 logger = structlog.get_logger()
@@ -110,8 +118,10 @@ class DailyOrchestrator:
 
         return ranking_mar, ranking_terra
 
-    def _persist_graph(self) -> None:
+    def _persist_graph(self, events: list[dict] | None = None) -> None:
         self.graph.seed_default()
+        if events:
+            self.graph.enrich_from_events(events)
         nodes, edges = self.graph.to_records()
         for n in nodes:
             self.db.upsert(
@@ -160,14 +170,15 @@ class DailyOrchestrator:
 
         # Camada 3 — Embeddings + RAG
         self.embeddings.seed_corpus(self.db)
-        for chunk in all_chunks[:20]:
+        embed_limit = max(5, int(self.settings.embed_chunk_limit))
+        for chunk in all_chunks[:embed_limit]:
             cid = str(chunk.get("id", ""))
             texto = chunk.get("texto", "")
             if texto:
                 self.embeddings.persist(self.db, cid, texto)
 
         rag = self.embeddings.rag_teologico(
-            " ".join(c.get("texto", "")[:200] for c in all_chunks[:3])
+            " ".join(c.get("texto", "")[:200] for c in all_chunks[: min(5, embed_limit)])
         )
 
         # Tom espiritual nos trechos
@@ -212,7 +223,7 @@ class DailyOrchestrator:
             logger.warning("low_confidence", confianca=correlacao["confianca"])
 
         # Grafo
-        self._persist_graph()
+        self._persist_graph(events)
         graph_score = self.graph.detect_convergent_influence(["lider_global"])
 
         # Rankings
@@ -226,7 +237,113 @@ class DailyOrchestrator:
             correlacao["fase"],
             correlacao["confianca"],
         )
+        cataloged = ChronologicalArchiveService(self.db).catalog_daily_events(
+            ref_date, events, correlacao["fase"]
+        )
         baseline = HistoricalBaselineService(self.db).get_overview() or baseline
+
+        # Camadas 10-15 (antes do relatorio)
+        provenance = ProvenanceService(self.db)
+        provenance.seal_stage(ref_date, "ingestion", {"chunks": len(all_chunks), "docs": len(docs)})
+        provenance.seal_stage(ref_date, "extraction", events)
+        provenance.seal_stage(ref_date, "correlation", correlacao)
+
+        echo_svc = HistoricalEchoService(embeddings=self.embeddings)
+        ecos_historicos = echo_svc.match_for_events(events, correlacao, top_k=3)
+        echoes_by_country = echo_svc.match_by_country(
+            ThreatAnalysisService().countries, events, correlacao
+        )
+
+        joshua_svc = JoshuaAnalysisService()
+        joshua_rows = self.db.select("joshua_project_data", limit=200)
+        joshua_analyses = joshua_svc.analyze_many(joshua_rows) if joshua_rows else []
+        if joshua_analyses:
+            joshua_svc.persist(self.db, joshua_analyses)
+        joshua_by_country = joshua_svc.country_aggregates(joshua_rows) if joshua_rows else {}
+
+        ameacas_paises = ThreatAnalysisService().analyze(
+            events,
+            correlacao,
+            echoes_by_country=echoes_by_country,
+            joshua_by_country=joshua_by_country,
+        )
+        provenance.seal_stage(ref_date, "threats", ameacas_paises)
+
+        simulacoes_abm = await AbmSimulationService(runs=100, horizon_months=24).simulate_all_async(
+            ameacas_paises,
+            router=self.llm.router,
+        )
+        abm_map = {s["country_code"]: s for s in simulacoes_abm}
+        provenance.seal_stage(ref_date, "simulation", simulacoes_abm)
+
+        adversarial = await AdversarialValidationService(top_n=5).review_top(
+            ameacas_paises,
+            events,
+            correlacao,
+            abm_by_country=abm_map,
+            router=self.llm.router,
+        )
+        provenance.seal_stage(ref_date, "adversarial", adversarial)
+
+        chain_check = provenance.verify_chain(provenance.entries)
+        provenance_preview = {
+            "integrity_ok": bool(chain_check.get("ok")),
+            "stages": [e["stage"] for e in provenance.entries],
+            "verification": chain_check,
+        }
+        recomendacoes_adaptativas = AdaptiveRecommendationService().build(
+            ameacas_paises,
+            simulacoes_abm,
+            adversarial,
+            provenance_preview,
+        )
+
+        for row in ameacas_paises:
+            self.db.upsert(
+                "ameacas_pais",
+                {
+                    "data_referencia": ref_date.isoformat(),
+                    "country_code": row["country_code"],
+                    "country_name": row["country_name"],
+                    "risk_score": row["risk_score"],
+                    "metrics": row["metrics"],
+                    "prescriptions": row["prescriptions"],
+                    "historical_echo": row.get("historical_echo") or {},
+                },
+                on_conflict="data_referencia,country_code",
+            )
+        for sim in simulacoes_abm:
+            self.db.upsert(
+                "simulacoes_abm",
+                {
+                    "data_referencia": ref_date.isoformat(),
+                    "country_code": sim["country_code"],
+                    "resultado": sim,
+                },
+                on_conflict="data_referencia,country_code",
+            )
+        for adv in adversarial:
+            self.db.insert(
+                "adversarial_reviews",
+                {
+                    "data_referencia": ref_date.isoformat(),
+                    "country_code": adv.get("country_code"),
+                    "resilience_score": adv.get("resilience_score", 0.5),
+                    "payload": adv,
+                },
+            )
+        for rec in recomendacoes_adaptativas:
+            self.db.insert(
+                "recomendacoes_adaptativas",
+                {
+                    "data_referencia": ref_date.isoformat(),
+                    "country_code": rec.get("country_code"),
+                    "urgency": rec["urgency"],
+                    "triggers": rec.get("triggers") or [],
+                    "actions": rec.get("actions") or [],
+                    "payload": rec.get("payload") or {},
+                },
+            )
 
         # Camada 9 — Relatório
         transicao = correlacao.get("transicao_fase", {})
@@ -245,6 +362,7 @@ class DailyOrchestrator:
                 ),
                 "novas_cumpridas_hoje": novas_cumpridas,
                 "atualizacoes_recentes": (baseline.get("atualizacoes") or [])[:5],
+                "eventos_catalogados_hoje": cataloged,
             },
             "data_referencia": ref_date.isoformat(),
             "fase_atual": correlacao["fase"],
@@ -252,6 +370,7 @@ class DailyOrchestrator:
                 correlacao["fase"], correlacao["confianca"]
             ),
             "indice_global": correlacao["indice_global"],
+            "proximidade_espiritual": correlacao.get("proximidade_espiritual", correlacao["indice_global"]),
             "confianca": correlacao["confianca"],
             "correlacao": correlacao,
             "transicao_fase": correlacao.get("transicao_fase", {}),
@@ -265,6 +384,15 @@ class DailyOrchestrator:
             "interpretacao": interpretation,
             "ranking_mar": ranking_mar,
             "ranking_terra": ranking_terra,
+            "ameacas_paises": ameacas_paises,
+            "ecos_historicos": ecos_historicos,
+            "simulacoes_abm": simulacoes_abm,
+            "adversarial": adversarial,
+            "recomendacoes_adaptativas": recomendacoes_adaptativas,
+            "missiological": {
+                "peoples_analyzed": len(joshua_analyses),
+                "countries": joshua_by_country,
+            },
             "revisao_humana": not needs_review,
             "status": "pending_review" if needs_review else "complete",
         }
@@ -277,6 +405,9 @@ class DailyOrchestrator:
             )
         except Exception:
             payload["relatorio_pdf_b64"] = None
+
+        provenance_final = provenance.finalize_day(ref_date, payload)
+        payload["provenance"] = provenance_final
 
         self.validator.validate("resultado_escatologico", payload)
 

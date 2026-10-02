@@ -225,6 +225,189 @@ async def cenarios(request: Request) -> list[dict]:
     return GraphService().build_cenarios()
 
 
+@app.post("/api/v1/cenarios/what-if")
+@limiter.limit("20/minute")
+async def cenarios_what_if(request: Request) -> dict:
+    """Simulação what-if / Monte Carlo sobre cenários ativos."""
+    from motor.pipeline.scenario_whatif import ScenarioWhatIfSimulator
+
+    body: dict = {}
+    try:
+        body = await request.json()
+    except Exception:
+        body = {}
+    active_ids = body.get("ativos") or body.get("active_ids") or []
+    if not isinstance(active_ids, list):
+        raise HTTPException(status_code=400, detail="ativos deve ser lista de ids")
+    base = float(body.get("base_indice", 0.58))
+    trials = int(body.get("trials", 200))
+    return ScenarioWhatIfSimulator().simulate(
+        active_ids=[str(x) for x in active_ids],
+        base_indice=base,
+        trials=trials,
+    )
+
+
+@app.get("/api/v1/ameacas/paises")
+@limiter.limit(settings.api_rate_limit)
+async def ameacas_paises(
+    request: Request,
+    data: str | None = Query(None, description="YYYY-MM-DD"),
+) -> list[dict]:
+    db = get_supabase()
+    ref = datetime.strptime(data, "%Y-%m-%d").date() if data else None
+    if ref:
+        rows = db.select(
+            "ameacas_pais",
+            filters={"data_referencia": ref.isoformat()},
+            order="-risk_score",
+        )
+        if rows:
+            return rows
+    latest = db.get_latest_resultado()
+    if latest:
+        payload = latest.get("json_analise_ia") or {}
+        return payload.get("ameacas_paises") or []
+    rows = db.select("ameacas_pais", order="-data_referencia", limit=50)
+    return rows
+
+
+@app.post("/api/v1/missiological/analyze")
+@limiter.limit("10/minute")
+async def missiological_analyze(request: Request) -> dict:
+    from motor.pipeline.joshua_analysis import JoshuaAnalysisService
+
+    db = get_supabase()
+    rows = db.select("joshua_project_data", limit=300)
+    svc = JoshuaAnalysisService()
+    analyses = svc.analyze_many(rows)
+    written = svc.persist(db, analyses) if analyses else 0
+    return {
+        "analyzed": len(analyses),
+        "written": written,
+        "countries": svc.country_aggregates(rows),
+    }
+
+
+@app.get("/api/v1/missiological/results")
+@limiter.limit(settings.api_rate_limit)
+async def missiological_results(
+    request: Request,
+    country: str | None = Query(None),
+    limit: int = Query(50, ge=1, le=200),
+) -> list[dict]:
+    db = get_supabase()
+    filters = {"country_code": country.upper()} if country else None
+    rows = db.select(
+        "missiological_analysis",
+        filters=filters,
+        order="-analyzed_at",
+        limit=limit,
+    )
+    if rows:
+        return rows
+    # Fallback: compute on the fly from raw Joshua rows
+    from motor.pipeline.joshua_analysis import JoshuaAnalysisService
+
+    raw = db.select(
+        "joshua_project_data",
+        filters={"country_code": country.upper()} if country else None,
+        limit=limit,
+    )
+    return JoshuaAnalysisService().analyze_many(raw)
+
+
+@app.get("/api/v1/ameacas/paises/{code}")
+@limiter.limit(settings.api_rate_limit)
+async def ameacas_pais_detail(
+    request: Request,
+    code: str,
+    data: str | None = Query(None, description="YYYY-MM-DD"),
+) -> dict:
+    code = code.upper()
+    db = get_supabase()
+    filters: dict = {"country_code": code}
+    if data:
+        filters["data_referencia"] = data
+    rows = db.select("ameacas_pais", filters=filters, order="-data_referencia", limit=1)
+    threat = rows[0] if rows else None
+    if not threat:
+        latest = db.get_latest_resultado()
+        payload = (latest or {}).get("json_analise_ia") or {}
+        threat = next(
+            (t for t in payload.get("ameacas_paises") or [] if t.get("country_code") == code),
+            None,
+        )
+    if not threat:
+        raise HTTPException(status_code=404, detail="País não encontrado")
+
+    ref = threat.get("data_referencia") or data
+    abm_filters: dict = {"country_code": code}
+    adv_filters: dict = {"country_code": code}
+    rec_filters: dict = {"country_code": code}
+    if ref:
+        abm_filters["data_referencia"] = ref
+        adv_filters["data_referencia"] = ref
+        rec_filters["data_referencia"] = ref
+    abm_rows = db.select("simulacoes_abm", filters=abm_filters, limit=1)
+    adv_rows = db.select(
+        "adversarial_reviews", filters=adv_filters, order="-created_at", limit=1
+    )
+    rec_rows = db.select("recomendacoes_adaptativas", filters=rec_filters, limit=5)
+    latest = db.get_latest_resultado()
+    payload = (latest or {}).get("json_analise_ia") or {}
+    return {
+        "ameaca": threat,
+        "abm": (abm_rows[0].get("resultado") if abm_rows else None)
+        or next(
+            (s for s in payload.get("simulacoes_abm") or [] if s.get("country_code") == code),
+            None,
+        ),
+        "adversarial": (adv_rows[0].get("payload") if adv_rows else None)
+        or next(
+            (a for a in payload.get("adversarial") or [] if a.get("country_code") == code),
+            None,
+        ),
+        "recomendacoes": rec_rows
+        or [
+            r
+            for r in payload.get("recomendacoes_adaptativas") or []
+            if r.get("country_code") == code
+        ],
+        "provenance": payload.get("provenance"),
+    }
+
+
+@app.get("/api/v1/provenance/day/{day}")
+@limiter.limit(settings.api_rate_limit)
+async def provenance_day(request: Request, day: str) -> dict:
+    from motor.pipeline.provenance import ProvenanceService
+
+    db = get_supabase()
+    try:
+        datetime.strptime(day, "%Y-%m-%d")
+    except ValueError as exc:
+        raise HTTPException(status_code=400, detail="data inválida") from exc
+    rows = db.select(
+        "provenance_log",
+        filters={"data_referencia": day},
+        order="created_at",
+    )
+    verification = ProvenanceService().verify_chain(rows)
+    latest = db.get_latest_resultado()
+    payload_prov = None
+    if latest:
+        latest_date = str(latest.get("data_referencia", ""))
+        if latest_date.startswith(day):
+            payload_prov = (latest.get("json_analise_ia") or {}).get("provenance")
+    return {
+        "data_referencia": day,
+        "entries": rows,
+        "verification": verification,
+        "payload_provenance": payload_prov,
+    }
+
+
 @app.get("/api/v1/relatorio/pdf")
 @limiter.limit(settings.api_rate_limit)
 async def relatorio_pdf(request: Request) -> Response:
@@ -272,11 +455,41 @@ async def approve_review(
     payload = row.get("json_analise_ia", {})
     payload["revisao_humana"] = True
     payload["status"] = "complete"
+    payload["revisao_aprovada_em"] = datetime.now().isoformat()
     if db.is_configured:
         db._client.table("resultados_escatologicos").update({"json_analise_ia": payload}).eq(
             "id", row["id"]
         ).execute()
     return {"status": "approved", "data_referencia": data_referencia}
+
+
+@app.post("/api/v1/admin/reject-review")
+@limiter.limit("10/minute")
+async def reject_review(
+    request: Request,
+    _: None = Depends(verify_admin),
+    data_referencia: str = Query(..., description="YYYY-MM-DD"),
+) -> dict:
+    """Rejeita transição de fase — mantém registro append-only com status rejected."""
+    db = get_supabase()
+    rows = db.select(
+        "resultados_escatologicos",
+        filters={"data_referencia": data_referencia},
+        limit=1,
+    )
+    if not rows:
+        raise HTTPException(status_code=404, detail="Resultado não encontrado")
+    row = rows[0]
+    payload = dict(row.get("json_analise_ia") or {})
+    payload["revisao_humana"] = True
+    payload["status"] = "rejected"
+    payload["revisao_rejeitada_em"] = datetime.now().isoformat()
+    payload["revisao_motivo"] = "Rejeitado na revisão humana — transição não publicada."
+    if db.is_configured:
+        db._client.table("resultados_escatologicos").update({"json_analise_ia": payload}).eq(
+            "id", row["id"]
+        ).execute()
+    return {"status": "rejected", "data_referencia": data_referencia}
 
 
 @app.post("/api/v1/admin/run-daily")

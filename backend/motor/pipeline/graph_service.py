@@ -61,6 +61,7 @@ class GraphService:
                 ),
                 4,
             ),
+            "gnn_backend": gnn.backend,
             "leader_anomaly": round(gnn.leader_influence_anomaly("lider_global"), 4),
         }
 

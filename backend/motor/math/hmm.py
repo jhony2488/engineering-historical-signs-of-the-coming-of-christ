@@ -11,7 +11,7 @@ if TYPE_CHECKING:
 
 
 class PhaseHMM:
-    """HMM discreto com Viterbi — implementação pura NumPy (sem hmmlearn)."""
+    """HMM discreto com Viterbi — implementação pura NumPy"""
 
     N_STATES = 4
     N_EMISSIONS = 8

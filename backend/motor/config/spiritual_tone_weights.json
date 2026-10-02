@@ -1,13 +1,190 @@
 {
-  "version": "1.0.0",
+  "version": "1.1.0",
+  "schema_version": "1.1.0",
+  "updated_at": "2026-08-04",
+  "description": "Pesos e léxico para classificação de tom espiritual (expansão × contração) no motor escatológico. Combina keywords hermenêuticas com mapeamento RoBERTa de sentimento.",
+  "methodology": {
+    "resumo": "Score final = blend ponderado de (1) frequência de indicadores lexicais e (2) sentimento RoBERTa mapeado para eixos espirituais.",
+    "keyword_scoring": "Contagem de ocorrências (substring) em EXPANSAO_INDICATORS/CONTRACAO_INDICATORS + labels deste arquivo; normalizado por total.",
+    "roberta_scoring": "Modelo cardiffnlp/twitter-roberta-base-sentiment-latest; rótulos positive/negative/neutral projetados via roberta_mapping, suavizados pela confiança.",
+    "fallback": "Se RoBERTa indisponível, blend_weights.roberta=0 e apenas keywords (modelo spiritual_keywords_v1).",
+    "energia_decisao": "energia = expansao se expansao_score >= contracao_score; caso contrário contracao."
+  },
   "labels": {
-    "expansao": ["esperanca", "fe", "caridade", "despertamento", "evangelho", "unificacao", "sabedoria", "remanescente"],
-    "contracao": ["apostasia", "engano", "perseguicao", "totalitarismo", "vigilancia", "cbdc", "controle", "conflito", "desespero"]
+    "expansao": [
+      "esperanca",
+      "fe",
+      "caridade",
+      "despertamento",
+      "evangelho",
+      "unificacao",
+      "sabedoria",
+      "remanescente",
+      "discernimento",
+      "fidelidade",
+      "santidade",
+      "arrependimento",
+      "avivamento",
+      "oracao",
+      "intercessao",
+      "missoes",
+      "testemunho",
+      "perseguicao redentora",
+      "consolacao",
+      "paz de deus",
+      "fruto do espirito",
+      "unidade",
+      "reconciliacao",
+      "misericordia",
+      "justica",
+      "verdade",
+      "luz",
+      "vida eterna",
+      "reino de deus",
+      "parusia esperanca",
+      "perseveranca",
+      "pacciencia",
+      "humildade",
+      "servico",
+      "generosidade",
+      "adoracao",
+      "louvor",
+      "comunhao",
+      "edificacao",
+      "discipulado"
+    ],
+    "contracao": [
+      "apostasia",
+      "engano",
+      "perseguicao",
+      "totalitarismo",
+      "vigilancia",
+      "cbdc",
+      "controle",
+      "conflito",
+      "desespero",
+      "catastrofe",
+      "identidade digital",
+      "coercao",
+      "censura",
+      "idolatria",
+      "falso profeta",
+      "falso lider",
+      "besta",
+      "marca",
+      "babilonia",
+      "iniquidade",
+      "incredulidade",
+      "frialdade",
+      "escandalo",
+      "heresias",
+      "sincretismo",
+      "relativismo",
+      "materialismo",
+      "guerra",
+      "fome",
+      "peste",
+      "terremoto",
+      "caos",
+      "medo",
+      "panico",
+      "opressao",
+      "tirania",
+      "surveillance",
+      "biometria obrigatoria",
+      "exclusao financeira",
+      "narrativa unica",
+      "cancelamento",
+      "engano sistemico",
+      "paz falsa",
+      "tribulacao"
+    ]
+  },
+  "label_categories": {
+    "expansao": [
+      {
+        "id": "virtudes_espirituais",
+        "titulo": "Virtudes e frutos espirituais",
+        "termos": ["fe", "esperanca", "caridade", "misericordia", "humildade", "fidelidade", "santidade", "pacciencia", "perseveranca"]
+      },
+      {
+        "id": "missao_igreja",
+        "titulo": "Missão, testemunho e edificação",
+        "termos": ["evangelho", "missoes", "testemunho", "discipulado", "edificacao", "comunhao", "avivamento", "despertamento"]
+      },
+      {
+        "id": "discernimento",
+        "titulo": "Discernimento e sabedoria",
+        "termos": ["discernimento", "sabedoria", "verdade", "luz", "arrependimento"]
+      },
+      {
+        "id": "esperanca_escatologica",
+        "titulo": "Esperança escatológica",
+        "termos": ["remanescente", "reino de deus", "vida eterna", "parusia esperanca", "consolacao", "paz de deus"]
+      }
+    ],
+    "contracao": [
+      {
+        "id": "engano_apostasia",
+        "titulo": "Engano, apostasia e falsos mestres",
+        "termos": ["apostasia", "engano", "falso profeta", "falso lider", "heresias", "sincretismo", "relativismo", "idolatria"]
+      },
+      {
+        "id": "controle_tecnopolitico",
+        "titulo": "Controle tecnopolítico e coerção",
+        "termos": ["totalitarismo", "vigilancia", "cbdc", "controle", "identidade digital", "coercao", "censura", "biometria obrigatoria", "exclusao financeira", "narrativa unica"]
+      },
+      {
+        "id": "sinais_de_julgamento",
+        "titulo": "Sinais de julgamento e tribulação",
+        "termos": ["conflito", "guerra", "fome", "peste", "terremoto", "catastrofe", "tribulacao", "besta", "marca", "babilonia"]
+      },
+      {
+        "id": "clima_espiritual_negativo",
+        "titulo": "Clima espiritual negativo",
+        "termos": ["desespero", "medo", "panico", "caos", "frialdade", "incredulidade", "iniquidade", "opressao", "paz falsa"]
+      }
+    ]
   },
   "roberta_mapping": {
-    "positive": { "expansao": 0.75, "contracao": 0.25 },
-    "negative": { "expansao": 0.25, "contracao": 0.75 },
-    "neutral": { "expansao": 0.5, "contracao": 0.5 }
+    "positive": {
+      "expansao": 0.75,
+      "contracao": 0.25,
+      "nota": "Sentimento positivo tende a expansão (esperança, união), mas não implica automaticamente fidelidade bíblica."
+    },
+    "negative": {
+      "expansao": 0.25,
+      "contracao": 0.75,
+      "nota": "Sentimento negativo tende a contração (medo, conflito); perseguição redentora ainda pode ser expansão via keywords."
+    },
+    "neutral": {
+      "expansao": 0.5,
+      "contracao": 0.5,
+      "nota": "Neutro não desloca o eixo; o desempate fica com o léxico escatológico."
+    }
   },
-  "blend_weights": { "keywords": 0.45, "roberta": 0.55 }
+  "blend_weights": {
+    "keywords": 0.45,
+    "roberta": 0.55,
+    "nota": "RoBERTa levemente dominante quando disponível; keywords carregam o eixo hermenêutico específico do domínio."
+  },
+  "thresholds": {
+    "energia_empate": 0.0,
+    "confianca_baixa": 0.55,
+    "sinal_forte_expansao": 0.65,
+    "sinal_forte_contracao": 0.65,
+    "nota": "Usados por camadas superiores (alertas/UI). O classificador base só compara expansao_score vs contracao_score."
+  },
+  "model_reference": {
+    "sentiment": "cardiffnlp/twitter-roberta-base-sentiment-latest",
+    "max_chars": 512,
+    "keyword_modelo_fallback": "spiritual_keywords_v1"
+  },
+  "notes": [
+    "Termos sem acento para matching robusto (perseguicao, fe, esperanca).",
+    "Frases compostas (ex.: paz falsa, falso lider) aumentam especificidade escatológica.",
+    "labels.* alimentam keyword_scores; label_categories é documentação/auditoria e não altera o score.",
+    "Ajuste fino: altere blend_weights e roberta_mapping sem re-treinar o modelo.",
+    "Não use este classificador para datar a Parusia — apenas para polaridade espiritual de trechos."
+  ]
 }

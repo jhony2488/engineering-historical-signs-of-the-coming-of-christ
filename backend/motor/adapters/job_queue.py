@@ -11,7 +11,7 @@ RESULT_PREFIX = "motor:jobs:result:"
 
 
 class RedisJobQueue:
-    """Fila leve de jobs em Redis (substituto inicial de Celery/RabbitMQ)."""
+    """Fila leve de jobs em Redis"""
 
     def __init__(self) -> None:
         self.redis = get_redis()

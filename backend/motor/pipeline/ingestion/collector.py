@@ -4,6 +4,7 @@ import hashlib
 import re
 from dataclasses import dataclass, field
 from datetime import datetime
+from pathlib import Path
 from typing import Any
 
 import feedparser
@@ -36,13 +37,38 @@ class IngestionCollector:
     def __init__(self) -> None:
         self.settings = get_settings()
 
-    def _load_feeds(self) -> list[dict[str, str]]:
+    def _load_yaml(self) -> dict[str, Any]:
         path = self.settings.feeds_config_path
         if not path.exists():
             path = CONFIG_DIR / "feeds.yaml"
         with path.open(encoding="utf-8") as f:
-            data = yaml.safe_load(f)
-        return data.get("feeds", [])
+            return yaml.safe_load(f) or {}
+
+    def _load_feeds(self) -> list[dict[str, str]]:
+        return self._load_yaml().get("feeds", [])
+
+    def _gdelt_query(self) -> str:
+        themes = self._load_yaml().get("gdelt_themes") or []
+        theme_q = " OR ".join(str(t) for t in themes[:8]) if themes else ""
+        base = (
+            "middle east conflict OR digital currency OR religious persecution "
+            "OR (UFO OR UAP OR extraterrestrial disclosure) "
+            "OR (false prophet OR apocalyptic deception OR lying signs)"
+        )
+        return f"({base}) OR ({theme_q})" if theme_q else base
+
+    async def _fetch_article_snippet(self, client: httpx.AsyncClient, url: str) -> str:
+        if not url or not url.startswith("http"):
+            return ""
+        try:
+            r = await client.get(url, follow_redirects=True, timeout=8.0)
+            if r.status_code != 200 or not r.text:
+                return ""
+            text = re.sub(r"<[^>]+>", " ", r.text)
+            text = re.sub(r"\s+", " ", text).strip()
+            return text[:1200]
+        except Exception:
+            return ""
 
     async def collect_rss(self) -> list[RawDocument]:
         docs: list[RawDocument] = []
@@ -66,11 +92,7 @@ class IngestionCollector:
 
     async def collect_gdelt(self) -> list[RawDocument]:
         docs: list[RawDocument] = []
-        query = (
-            "middle east conflict OR digital currency OR religious persecution "
-            "OR (UFO OR UAP OR extraterrestrial disclosure) "
-            "OR (false prophet OR apocalyptic deception OR lying signs)"
-        )
+        query = self._gdelt_query()
         url = (
             "https://api.gdeltproject.org/api/v2/doc/doc"
             f"?query={query}&mode=ArtList&maxrecords=15&format=json"
@@ -82,21 +104,29 @@ class IngestionCollector:
                     return self._gdelt_fallback()
                 data = response.json()
                 for art in data.get("articles", [])[: self.settings.max_documents_per_day]:
+                    art_url = art.get("url", "")
+                    body = await self._fetch_article_snippet(client, art_url)
+                    conteudo = (
+                        f"{art.get('seendate', '')} {art.get('title', '')} {body}".strip()
+                    )
                     docs.append(
                         RawDocument(
                             titulo=art.get("title", "GDELT"),
-                            conteudo=art.get("seendate", "") + " " + art.get("title", ""),
+                            conteudo=conteudo,
                             fonte="gdelt",
-                            url=art.get("url", ""),
+                            url=art_url,
                             categoria="geopolitica",
                         )
                     )
         except Exception as exc:
             logger.warning("gdelt_failed", error=str(exc))
             return self._gdelt_fallback()
-        return docs
+        return docs if docs else self._gdelt_fallback()
 
     def _gdelt_fallback(self) -> list[RawDocument]:
+        if not self.settings.allow_gdelt_synthetic_fallback:
+            logger.warning("gdelt_fallback_disabled")
+            return []
         return [
             RawDocument(
                 titulo="Tensão geopolítica no Oriente Médio persiste",
@@ -110,9 +140,39 @@ class IngestionCollector:
             )
         ]
 
+    def _acled_seed_docs(self) -> list[RawDocument]:
+        path = CONFIG_DIR / "acled_seed.json"
+        if not path.exists():
+            return []
+        import json
+
+        with path.open(encoding="utf-8") as f:
+            rows = json.load(f)
+        docs: list[RawDocument] = []
+        for evt in rows:
+            titulo = f"{evt.get('event_type', 'ACLED')} — {evt.get('country', '')}"
+            conteudo = (
+                f"{evt.get('event_date', '')} {evt.get('location', '')} "
+                f"{evt.get('actor1', '')} vs {evt.get('actor2', '')} "
+                f"fatalities={evt.get('fatalities', 0)} {evt.get('notes', '')}"
+            )
+            docs.append(
+                RawDocument(
+                    titulo=titulo.strip(),
+                    conteudo=conteudo.strip(),
+                    fonte="acled:seed",
+                    url="",
+                    categoria="conflito",
+                )
+            )
+        return docs
+
     async def collect_acled(self) -> list[RawDocument]:
         if not self.settings.acled_api_key or not self.settings.acled_email:
-            return []
+            seed = self._acled_seed_docs()
+            if seed:
+                logger.info("acled_using_seed", n=len(seed))
+            return seed
 
         url = "https://api.acleddata.com/acled/read"
         params = {
@@ -127,7 +187,7 @@ class IngestionCollector:
                 response = await client.get(url, params=params)
                 if response.status_code != 200:
                     logger.warning("acled_http_error", status=response.status_code)
-                    return []
+                    return self._acled_seed_docs()
                 payload = response.json()
                 for evt in payload.get("data", [])[: params["limit"]]:
                     titulo = evt.get("event_type", "ACLED") + " — " + evt.get("country", "")
@@ -147,6 +207,32 @@ class IngestionCollector:
                     )
         except Exception as exc:
             logger.warning("acled_failed", error=str(exc))
+            return self._acled_seed_docs()
+        return docs or self._acled_seed_docs()
+
+    async def collect_ocr_images(self) -> list[RawDocument]:
+        from motor.pipeline.preprocessing.ocr import extract_text_from_image
+
+        raw_dir = self.settings.ocr_images_dir
+        if not raw_dir:
+            raw_dir = CONFIG_DIR / "images"
+        path = Path(raw_dir)
+        if not path.exists():
+            return []
+        docs: list[RawDocument] = []
+        for img in list(path.glob("*.png")) + list(path.glob("*.jpg")) + list(path.glob("*.jpeg")):
+            text = extract_text_from_image(img)
+            if not text or len(text) < 20:
+                continue
+            docs.append(
+                RawDocument(
+                    titulo=f"OCR {img.name}",
+                    conteudo=text[:4000],
+                    fonte="ocr:image",
+                    url=str(img),
+                    categoria="documento",
+                )
+            )
         return docs
 
     async def collect_all(self) -> list[RawDocument]:
@@ -163,11 +249,12 @@ class IngestionCollector:
         gdelt = await self.collect_gdelt()
         acled = await self.collect_acled()
         pdfs = await collect_pdfs_from_dir()
+        ocr = await self.collect_ocr_images()
         bible = await collect_api_bible()
         reddit = await collect_reddit()
         trends = await collect_google_trends()
         wef_cbdc = await collect_wef_cbdc()
-        all_docs = rss + gdelt + acled + pdfs + bible + reddit + trends + wef_cbdc
+        all_docs = rss + gdelt + acled + pdfs + ocr + bible + reddit + trends + wef_cbdc
         hash_seen: set[str] = set()
         semantic_seen: set[str] = set()
         unique: list[RawDocument] = []

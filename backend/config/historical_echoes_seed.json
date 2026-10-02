@@ -1,0 +1,67 @@
+[
+  {
+    "id": "echo_weimar",
+    "titulo": "Hiperinflação e congelamento de ativos (Weimar / anos 80-90)",
+    "keywords": ["inflacao", "moeda", "banco", "cbdc", "congelamento", "liquidez", "hiperinflacao"],
+    "pattern_phase": "Asfixia Monetária Pré-Transição",
+    "projected_cycle_months": [18, 24],
+    "series_signature": [0.3, 0.35, 0.45, 0.55, 0.7, 0.78, 0.82],
+    "prescription_bias": {
+      "financial": "high",
+      "physical": "medium",
+      "spiritual": "medium"
+    }
+  },
+  {
+    "id": "echo_roma_cerco",
+    "titulo": "Cerco comercial e controle de subsistência (Império Romano tardio)",
+    "keywords": ["sancoes", "comercio", "exportacao", "alimentos", "fome", "logistica", "bloqueio"],
+    "pattern_phase": "Cerco / Asfixia Econômica",
+    "projected_cycle_months": [12, 36],
+    "series_signature": [0.25, 0.4, 0.5, 0.55, 0.65, 0.72],
+    "prescription_bias": {
+      "financial": "high",
+      "physical": "high",
+      "spiritual": "low"
+    }
+  },
+  {
+    "id": "echo_persecucao_xx",
+    "titulo": "Leis de exceção e perseguição religiosa (séc. XX)",
+    "keywords": ["perseguicao", "igreja", "liberdade", "discurso", "odio", "censura", "cancelamento"],
+    "pattern_phase": "Erosão da Liberdade e Perseguição",
+    "projected_cycle_months": [12, 24],
+    "series_signature": [0.2, 0.3, 0.4, 0.55, 0.7, 0.8],
+    "prescription_bias": {
+      "financial": "medium",
+      "physical": "high",
+      "spiritual": "high"
+    }
+  },
+  {
+    "id": "echo_apostasia",
+    "titulo": "Esfriamento da fé / acomodação ideológica (era apostólica tardia)",
+    "keywords": ["apostasia", "secularismo", "heresia", "falso", "mestre", "ortodoxia", "relativo"],
+    "pattern_phase": "Esfriamento da Fé / Apostasia em Massa",
+    "projected_cycle_months": [24, 48],
+    "series_signature": [0.15, 0.25, 0.35, 0.45, 0.5, 0.55],
+    "prescription_bias": {
+      "financial": "low",
+      "physical": "medium",
+      "spiritual": "high"
+    }
+  },
+  {
+    "id": "echo_totalitarismo",
+    "titulo": "Centralização e vigilância totalitária (regimes séc. XX)",
+    "keywords": ["vigilancia", "controle", "identidade", "biometria", "credito", "social", "estado"],
+    "pattern_phase": "Centralização Autoritária",
+    "projected_cycle_months": [18, 30],
+    "series_signature": [0.35, 0.45, 0.55, 0.65, 0.75, 0.85],
+    "prescription_bias": {
+      "financial": "high",
+      "physical": "high",
+      "spiritual": "high"
+    }
+  }
+]

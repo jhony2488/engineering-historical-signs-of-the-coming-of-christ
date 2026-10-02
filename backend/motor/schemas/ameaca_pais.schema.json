@@ -1,0 +1,33 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "required": ["country_code", "country_name", "risk_score", "metrics", "prescriptions"],
+  "properties": {
+    "country_code": { "type": "string", "minLength": 2, "maxLength": 3 },
+    "country_name": { "type": "string" },
+    "risk_score": { "type": "number", "minimum": 0, "maximum": 1 },
+    "lat": { "type": "number" },
+    "lng": { "type": "number" },
+    "metrics": {
+      "type": "object",
+      "properties": {
+        "juridical_instability": { "type": "number", "minimum": 0, "maximum": 1 },
+        "financial_control_level": { "type": "number", "minimum": 0, "maximum": 1 },
+        "religious_freedom_threat": { "type": "number", "minimum": 0, "maximum": 1 },
+        "conflict_intensity": { "type": "number", "minimum": 0, "maximum": 1 }
+      },
+      "additionalProperties": true
+    },
+    "prescriptions": {
+      "type": "object",
+      "properties": {
+        "physical": { "type": "array", "items": { "type": "string" } },
+        "financial": { "type": "array", "items": { "type": "string" } },
+        "spiritual": { "type": "array", "items": { "type": "string" } }
+      },
+      "additionalProperties": true
+    },
+    "historical_echo": { "type": "object" }
+  },
+  "additionalProperties": true
+}

@@ -28,7 +28,7 @@
     "ranking_terra": { "type": "array" },
     "relatorio_html": { "type": "string" },
     "revisao_humana": { "type": "boolean" },
-    "status": { "type": "string", "enum": ["complete", "partial", "reverted"] }
+    "status": { "type": "string", "enum": ["complete", "partial", "reverted", "pending_review", "rejected"] }
   },
   "additionalProperties": true
 }

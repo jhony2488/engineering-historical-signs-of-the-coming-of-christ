@@ -34,6 +34,26 @@ class Preprocessor:
         text = re.sub(r"\s+", " ", text).strip()
         return text
 
+    def strip_sensational_title(self, text: str) -> str:
+        """Remove primeira linha se parecer título sensacionalista (Curadoria L3)."""
+        lines = [ln.strip() for ln in text.split(". ") if ln.strip()]
+        if len(lines) < 2:
+            return text
+        first = lines[0].lower()
+        sensational = (
+            "brutal",
+            "chocante",
+            "apocalipse",
+            "massacre",
+            "urgente",
+            "explod",
+            "colapso total",
+            "fim do mundo",
+        )
+        if any(w in first for w in sensational) and len(first) < 160:
+            return ". ".join(lines[1:]).strip()
+        return text
+
     def detect_language(self, text: str) -> str:
         if not detect or len(text) < 20:
             return "unknown"
@@ -88,7 +108,7 @@ class Preprocessor:
         return chunks
 
     def process_document(self, documento_id: str, raw_text: str) -> list[ProcessedChunk]:
-        cleaned = self.clean_text(raw_text)
+        cleaned = self.strip_sensational_title(self.clean_text(raw_text))
         lang = self.detect_language(cleaned)
         topics = enrich_topics(cleaned, self.infer_topics(cleaned))
         return [
