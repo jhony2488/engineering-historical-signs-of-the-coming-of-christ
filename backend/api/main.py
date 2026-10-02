@@ -492,6 +492,56 @@ async def reject_review(
     return {"status": "rejected", "data_referencia": data_referencia}
 
 
+@app.get("/api/v1/admin/propostas-ajuste")
+@limiter.limit("30/minute")
+async def list_propostas(
+    request: Request,
+    _: None = Depends(verify_admin),
+    status: str | None = Query(None, description="pendente|aprovada|rejeitada|aplicada"),
+    limit: int = Query(50, ge=1, le=200),
+) -> dict:
+    """Lista propostas de ajuste geradas por LLM aguardando revisão."""
+    propostas = get_supabase().list_propostas_ajuste(status=status, limit=limit)
+    return {"propostas": propostas, "count": len(propostas)}
+
+
+@app.post("/api/v1/admin/propostas-ajuste/{proposta_id}/aprovar")
+@limiter.limit("10/minute")
+async def aprovar_proposta(
+    request: Request,
+    proposta_id: str,
+    _: None = Depends(verify_admin),
+    marcar_aplicada: bool = Query(
+        False, description="true quando o ajuste já foi aplicado no alvo"
+    ),
+) -> dict:
+    """Aprova proposta — a aplicação no alvo (JSON/config/tabela) é manual."""
+    db = get_supabase()
+    status = "aplicada" if marcar_aplicada else "aprovada"
+    updated = db.set_proposta_status(proposta_id, status)
+    if not updated:
+        raise HTTPException(status_code=404, detail="Proposta não encontrada")
+    return {"status": status, "id": proposta_id}
+
+
+@app.post("/api/v1/admin/propostas-ajuste/{proposta_id}/rejeitar")
+@limiter.limit("10/minute")
+async def rejeitar_proposta(
+    request: Request,
+    proposta_id: str,
+    _: None = Depends(verify_admin),
+    motivo: str = Query("", description="Motivo da rejeição"),
+) -> dict:
+    """Rejeita proposta — o registro permanece append-only com motivo."""
+    db = get_supabase()
+    updated = db.set_proposta_status(
+        proposta_id, "rejeitada", motivo=motivo or None
+    )
+    if not updated:
+        raise HTTPException(status_code=404, detail="Proposta não encontrada")
+    return {"status": "rejeitada", "id": proposta_id}
+
+
 @app.post("/api/v1/admin/run-daily")
 @limiter.limit("5/minute")
 async def admin_run_daily(

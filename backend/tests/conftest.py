@@ -117,6 +117,55 @@ class FakeSupabase:
         self.tables.setdefault(table, []).append(dict(data))
         return data
 
+    def update(self, table: str, filters: dict, data: dict) -> list[dict]:
+        rows = self.tables.get(table, [])
+        matched = [
+            row for row in rows if all(row.get(k) == v for k, v in filters.items())
+        ]
+        for row in matched:
+            row.update(data)
+        return matched
+
+    def insert_proposta_ajuste(
+        self,
+        tipo: str,
+        alvo: str,
+        valor_proposto,
+        valor_atual=None,
+        justificativa=None,
+        modelo=None,
+        origem: str = "manual",
+    ) -> dict:
+        return self.insert(
+            "propostas_ajuste",
+            {
+                "tipo": tipo,
+                "alvo": alvo,
+                "valor_atual": valor_atual,
+                "valor_proposto": valor_proposto,
+                "justificativa": justificativa,
+                "modelo": modelo,
+                "origem": origem,
+                "status": "pendente",
+            },
+        )
+
+    def list_propostas_ajuste(self, status=None, limit: int = 50) -> list[dict]:
+        filters = {"status": status} if status else None
+        return self.select(
+            "propostas_ajuste", filters=filters, order="-created_at", limit=limit
+        )
+
+    def set_proposta_status(self, proposta_id, status, revisado_por=None, motivo=None):
+        data = {"status": status, "revisado_em": "now"}
+        if revisado_por:
+            data["revisado_por"] = revisado_por
+        if motivo:
+            data["revisao_motivo"] = motivo
+        if status == "aplicada":
+            data["aplicado_em"] = "now"
+        return self.update("propostas_ajuste", {"id": proposta_id}, data)
+
     def log_audit(
         self,
         camada: str,

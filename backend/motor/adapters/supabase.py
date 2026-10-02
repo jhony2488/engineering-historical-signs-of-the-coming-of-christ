@@ -159,6 +159,59 @@ class SupabaseClient:
             },
         )
 
+    def insert_proposta_ajuste(
+        self,
+        tipo: str,
+        alvo: str,
+        valor_proposto: Any,
+        valor_atual: Any | None = None,
+        justificativa: str | None = None,
+        modelo: str | None = None,
+        origem: str = "manual",
+    ) -> dict[str, Any]:
+        """Proposta de ajuste gerada por LLM — sempre `pendente`; a
+        aprovação/aplicação é decisão humana via endpoints admin."""
+        return self.insert(
+            "propostas_ajuste",
+            {
+                "tipo": tipo,
+                "alvo": alvo,
+                "valor_atual": valor_atual,
+                "valor_proposto": valor_proposto,
+                "justificativa": justificativa,
+                "modelo": modelo,
+                "origem": origem,
+                "status": "pendente",
+            },
+        )
+
+    def list_propostas_ajuste(
+        self, status: str | None = None, limit: int = 50
+    ) -> list[dict[str, Any]]:
+        filters = {"status": status} if status else None
+        return self.select(
+            "propostas_ajuste", filters=filters, order="-created_at", limit=limit
+        )
+
+    def set_proposta_status(
+        self,
+        proposta_id: str,
+        status: str,
+        revisado_por: str | None = None,
+        motivo: str | None = None,
+    ) -> list[dict[str, Any]]:
+        data: dict[str, Any] = {
+            "status": status,
+            "revisado_em": datetime.now().isoformat(),
+        }
+        if revisado_por:
+            data["revisado_por"] = revisado_por
+        if motivo:
+            data["revisao_motivo"] = motivo
+        if status == "aplicada":
+            data["aplicado_em"] = datetime.now().isoformat()
+        return self.update("propostas_ajuste", {"id": proposta_id}, data)
+
     def get_snapshots(
         self,
         janela: str,

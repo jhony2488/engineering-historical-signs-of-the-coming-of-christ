@@ -93,5 +93,46 @@ class DataDriftEngine:
                 "detalhes": result,
             },
         )
-        logger.info("data_drift_complete", drift=analise.get("drift_detectado"))
+        propostas = self._persist_propostas(analise, provider)
+        result["propostas_geradas"] = propostas
+        logger.info(
+            "data_drift_complete",
+            drift=analise.get("drift_detectado"),
+            propostas=propostas,
+        )
         return result
+
+    def _persist_propostas(self, analise: dict[str, Any], provider: str) -> int:
+        """Recomendações da LLM viram `propostas_ajuste` pendentes — a
+        aplicação exige revisão humana via endpoints admin."""
+        recs = analise.get("recomendacoes") or []
+        if isinstance(recs, str):
+            recs = [recs]
+        count = 0
+        for rec in recs:
+            if isinstance(rec, dict):
+                proposta = {
+                    "tipo": rec.get("tipo", "criterio_fase"),
+                    "alvo": rec.get("alvo", "fase_criteria"),
+                    "valor_atual": rec.get("valor_atual"),
+                    "valor_proposto": rec.get("valor_proposto", rec),
+                    "justificativa": rec.get("justificativa") or rec.get("motivo"),
+                }
+            else:
+                proposta = {
+                    "tipo": "criterio_fase",
+                    "alvo": "fase_criteria",
+                    "valor_atual": None,
+                    "valor_proposto": {"texto": rec},
+                    "justificativa": None,
+                }
+            try:
+                self.db.insert_proposta_ajuste(
+                    **proposta,
+                    modelo=f"{self.settings.groq_model_timeline}@{provider}",
+                    origem="data_drift_monthly",
+                )
+                count += 1
+            except Exception as exc:
+                logger.warning("proposta_ajuste_failed", error=str(exc))
+        return count
