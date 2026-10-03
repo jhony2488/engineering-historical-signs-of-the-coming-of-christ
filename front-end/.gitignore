@@ -10,3 +10,6 @@ storybook-static/
 
 # modelos on-device baixados via `npm run ai:download-models`
 /public/models/
+
+# worker da IA gerado por scripts/build-ai-worker.mjs (dev/build)
+/public/local-ai.worker.js

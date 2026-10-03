@@ -21,6 +21,8 @@ const eslintConfig = [
       "out/**",
       "storybook-static/**",
       "next-env.d.ts",
+      // artefatos servidos estaticamente (worker bundlado, SW, modelos)
+      "public/**",
     ],
   },
 ];
