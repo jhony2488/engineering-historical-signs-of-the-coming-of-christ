@@ -59,9 +59,9 @@ class EmbeddingService:
 
     def rag_teologico(self, query: str, top_k: int = 3, db=None) -> list[dict[str, str]]:
         if db is None:
-            from motor.adapters.supabase import get_supabase
+            from motor.adapters.postgres import get_postgres
 
-            db = get_supabase()
+            db = get_postgres()
 
         candidates: list[dict[str, str]] = []
         if db.is_configured:

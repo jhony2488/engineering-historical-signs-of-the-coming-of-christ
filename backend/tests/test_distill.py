@@ -9,10 +9,10 @@ from motor.ml.distill import ExtractionDatasetExporter, LocalEventExtractor
 from motor.pipeline.embeddings.service import EmbeddingService
 from motor.pipeline.llm.layers import LLMPipeline
 
-from .conftest import FakeSupabase
+from .conftest import FakePostgres
 
 
-def _db_with_pairs(n: int) -> FakeSupabase:
+def _db_with_pairs(n: int) -> FakePostgres:
     trechos = [{"id": f"t{i}", "texto": f"texto do trecho {i} sobre conflito"} for i in range(n)]
     eventos = [
         {
@@ -29,7 +29,7 @@ def _db_with_pairs(n: int) -> FakeSupabase:
         }
         for i in range(n)
     ]
-    return FakeSupabase(
+    return FakePostgres(
         tables={"trechos_processados": trechos, "eventos_estruturados": eventos}
     )
 

@@ -15,9 +15,7 @@ class Settings(BaseSettings):
         extra="ignore",
     )
 
-    supabase_url: str = ""
-    supabase_service_role_key: str = ""
-    supabase_anon_key: str = ""
+    database_url: str = ""
 
     groq_api_key: str = ""
     openrouter_api_key: str = ""
@@ -34,7 +32,7 @@ class Settings(BaseSettings):
     batch_hour: int = 4
     max_documents_per_day: int = 50
     embedding_batch_size: int = 8
-    bge_model_name: str = "all-MiniLM-L6-v2"
+    bge_model_name: str = "BAAI/bge-m3"
 
     false_leader_incongruence_threshold: float = 0.7
     phase_confidence_min: float = 0.55
@@ -129,7 +127,7 @@ class Settings(BaseSettings):
     smtp_user: str = ""
     smtp_password: str = ""
 
-    # Retenção: dados ficam no Postgres (Supabase). Sem S3 / arquivos locais de cold storage.
+    # Retenção: dados ficam no PostgreSQL. Sem S3 / arquivos locais de cold storage.
 
 
 @lru_cache

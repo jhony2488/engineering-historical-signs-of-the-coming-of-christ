@@ -12,11 +12,13 @@ from psycopg_pool import ConnectionPool
 
 from motor.config import get_settings
 
+_JSONB_SCALAR_COLUMNS = {"valor_atual", "valor_proposto"}
+
 
 def _adapt_value(column: str, value: Any) -> Any:
     if column == "embedding" and isinstance(value, list):
         return "[" + ",".join(str(float(item)) for item in value) + "]"
-    if isinstance(value, (dict, list)):
+    if (column in _JSONB_SCALAR_COLUMNS and value is not None) or isinstance(value, (dict, list)):
         return Jsonb(value)
     return value
 
@@ -40,15 +42,17 @@ class PostgresClient:
                 open=False,
             )
 
+    def close(self) -> None:
+        if self._pool is not None and not self._pool.closed:
+            self._pool.close()
+
     @property
     def is_configured(self) -> bool:
         return self._pool is not None
 
     def _require_pool(self) -> ConnectionPool:
         if self._pool is None:
-            raise RuntimeError(
-                "PostgreSQL is not configured. Set DATABASE_URL in backend/.env."
-            )
+            raise RuntimeError("PostgreSQL is not configured. Set DATABASE_URL in backend/.env.")
         if not self._pool.closed:
             return self._pool
         self._pool.open(wait=True)
@@ -71,8 +75,7 @@ class PostgresClient:
         columns = list(data)
         values = [_adapt_value(column, data[column]) for column in columns]
         placeholders = [
-            sql.SQL("%s::vector") if column == "embedding" else sql.SQL("%s")
-            for column in columns
+            sql.SQL("%s::vector") if column == "embedding" else sql.SQL("%s") for column in columns
         ]
         statement = sql.SQL("INSERT INTO {} ({}) VALUES ({})").format(
             sql.Identifier(table),
@@ -104,9 +107,7 @@ class PostgresClient:
         rows = self._execute(statement, params)
         return rows[0] if rows else data
 
-    def upsert(
-        self, table: str, data: dict[str, Any], on_conflict: str = "id"
-    ) -> dict[str, Any]:
+    def upsert(self, table: str, data: dict[str, Any], on_conflict: str = "id") -> dict[str, Any]:
         statement, params = self._insert_statement(table, data, on_conflict)
         rows = self._execute(statement, params)
         return rows[0] if rows else data
@@ -114,6 +115,8 @@ class PostgresClient:
     def update(
         self, table: str, filters: dict[str, Any], data: dict[str, Any]
     ) -> list[dict[str, Any]]:
+        if not filters or not data:
+            raise ValueError("PostgreSQL updates require at least one filter and one field.")
         assignments = sql.SQL(", ").join(
             sql.SQL("{} = {}").format(
                 sql.Identifier(column),

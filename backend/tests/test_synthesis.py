@@ -3,7 +3,7 @@
 import pytest
 
 from motor.pipeline.synthesis import WINDOW_META, SynthesisEngine
-from tests.conftest import FakeSupabase
+from tests.conftest import FakePostgres
 
 
 def test_window_meta_covers_doc_janelas():
@@ -13,14 +13,14 @@ def test_window_meta_covers_doc_janelas():
 
 
 def test_build_delta_empty_historico():
-    engine = SynthesisEngine(db=FakeSupabase(historico=[]))
+    engine = SynthesisEngine(db=FakePostgres(historico=[]))
     result = engine.build_delta("weekly")
     assert result["count"] == 0
     assert result["delta"] == {}
 
 
 def test_build_delta_computes_variation(historico_mock_rows):
-    engine = SynthesisEngine(db=FakeSupabase(historico=historico_mock_rows))
+    engine = SynthesisEngine(db=FakePostgres(historico=historico_mock_rows))
     result = engine.build_delta("weekly")
     assert result["motor"] == "nivel_2"
     assert result["count"] == 7
@@ -33,7 +33,7 @@ def test_build_delta_computes_variation(historico_mock_rows):
 
 @pytest.mark.asyncio
 async def test_synthesis_run_dry_run(llm_dry_run, historico_mock_rows):
-    engine = SynthesisEngine(db=FakeSupabase(historico=historico_mock_rows))
+    engine = SynthesisEngine(db=FakePostgres(historico=historico_mock_rows))
     result = await engine.run("monthly")
     assert result["motor"] == "nivel_2"
     assert "analise_ia" in result

@@ -8,7 +8,7 @@ from motor.config import get_settings
 from motor.domain.phases import FaseEscatologica
 
 if TYPE_CHECKING:
-    from motor.adapters.supabase import SupabaseClient
+    from motor.adapters.postgres import PostgresClient
 
 
 class PhaseHMM:
@@ -21,12 +21,12 @@ class PhaseHMM:
         self.startprob, self.transmat, self.emissionprob = self._default_matrices()
 
     @classmethod
-    def from_db(cls, db: SupabaseClient | None = None) -> PhaseHMM:
+    def from_db(cls, db: PostgresClient | None = None) -> PhaseHMM:
         hmm = cls()
         if db is None:
-            from motor.adapters.supabase import get_supabase
+            from motor.adapters.postgres import get_postgres
 
-            db = get_supabase()
+            db = get_postgres()
         row = db.get_active_parametros_fase()
         if row:
             hmm._load_parametros(row)

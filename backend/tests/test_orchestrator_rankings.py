@@ -3,11 +3,11 @@
 from datetime import date
 
 from motor.pipeline.orchestrator import DailyOrchestrator
-from tests.conftest import FakeSupabase
+from tests.conftest import FakePostgres
 
 
 def test_build_rankings_top10_mar_terra(ref_date: date):
-    db = FakeSupabase()
+    db = FakePostgres()
     orch = DailyOrchestrator(db=db)
     mar, terra = orch._build_rankings(ref_date)
 
@@ -31,7 +31,7 @@ def test_tendencia_24h_from_yesterday_pap(ref_date: date):
         ],
         ("besta_terra", prior): [],
     }
-    db = FakeSupabase(rankings=rankings)
+    db = FakePostgres(rankings=rankings)
     orch = DailyOrchestrator(db=db)
     mar, _ = orch._build_rankings(ref_date)
 
@@ -40,7 +40,7 @@ def test_tendencia_24h_from_yesterday_pap(ref_date: date):
 
 
 def test_tendencia_zero_without_yesterday(ref_date: date):
-    db = FakeSupabase()
+    db = FakePostgres()
     orch = DailyOrchestrator(db=db)
     mar, _ = orch._build_rankings(ref_date)
     assert all(r["tendencia_24h"] == 0.0 for r in mar)
@@ -52,7 +52,7 @@ def test_load_yesterday_pap_merges_personagens(ref_date: date):
         ("besta_mar", prior): [{"candidato_id": "cand-mar-001", "probabilidade_atual": 70}],
         ("besta_terra", prior): [{"candidato_id": "cand-terra-001", "probabilidade_atual": 65}],
     }
-    db = FakeSupabase(rankings=rankings)
+    db = FakePostgres(rankings=rankings)
     orch = DailyOrchestrator(db=db)
     pap = orch._load_yesterday_pap(ref_date)
     assert pap["cand-mar-001"] == 70

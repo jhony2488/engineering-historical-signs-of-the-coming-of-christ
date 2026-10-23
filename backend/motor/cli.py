@@ -79,12 +79,12 @@ def run_hybrid_analysis(
 @app.command("ingest-only")
 def ingest_only() -> None:
     """Apenas Camada 1 — coleta de documentos."""
-    from motor.adapters.supabase import get_supabase
+    from motor.adapters.postgres import get_postgres
     from motor.pipeline.ingestion.collector import IngestionCollector
 
     collector = IngestionCollector()
     docs = asyncio.run(collector.collect_all())
-    saved = collector.persist(get_supabase(), docs)
+    saved = collector.persist(get_postgres(), docs)
     typer.echo(f"Ingeridos {len(saved)} documentos.")
 
 
@@ -127,9 +127,9 @@ def revert_day(
     motivo: str = typer.Option("revisao_manual", "--motivo"),
 ) -> None:
     """Insere registro corretivo sem apagar histórico."""
-    from motor.adapters.supabase import get_supabase
+    from motor.adapters.postgres import get_postgres
 
-    db = get_supabase()
+    db = get_postgres()
     d = _parse_date(ref_date)
     rows = db.select(
         "resultados_escatologicos", filters={"data_referencia": d.isoformat()}, limit=1
@@ -195,10 +195,10 @@ def export_extraction_dataset(
     """Exporta pares trecho↔extração LLM para destilação do classificador local."""
     from pathlib import Path
 
-    from motor.adapters.supabase import get_supabase
+    from motor.adapters.postgres import get_postgres
     from motor.ml.distill import ExtractionDatasetExporter
 
-    result = ExtractionDatasetExporter(get_supabase()).export(Path(out), min_rows=min_rows or None)
+    result = ExtractionDatasetExporter(get_postgres()).export(Path(out), min_rows=min_rows or None)
     if not result.get("ok"):
         typer.echo(result.get("message"))
         raise typer.Exit(1)
@@ -238,12 +238,12 @@ def train_phase_hmm(
     Com --persist grava versão inativa em `parametros_fase` — a ativação
     (`ativo=true`) é manual após revisão humana.
     """
-    from motor.adapters.supabase import get_supabase
+    from motor.adapters.postgres import get_postgres
     from motor.config import get_settings
     from motor.math.hmm import PhaseHMM, observations_from_resultados
 
     settings = get_settings()
-    db = get_supabase()
+    db = get_postgres()
     rows = db.get_historico(limit=limit)
     observations = observations_from_resultados(rows)
     if len(observations) < settings.hmm_em_min_days:

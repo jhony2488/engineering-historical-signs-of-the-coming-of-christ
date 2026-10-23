@@ -8,7 +8,7 @@ from typing import Any
 import structlog
 
 from motor.adapters.llm_router import LLMRouter
-from motor.adapters.supabase import SupabaseClient
+from motor.adapters.postgres import PostgresClient, get_postgres
 from motor.config import get_settings
 from motor.pipeline.embeddings.service import EmbeddingService
 from motor.pipeline.neutrality_filter import scrub_payload_narratives
@@ -43,11 +43,11 @@ class HybridAnalysisEngine:
 
     def __init__(
         self,
-        db: SupabaseClient | None = None,
+        db: PostgresClient | None = None,
         router: LLMRouter | None = None,
         embeddings: EmbeddingService | None = None,
     ) -> None:
-        self.db = db or SupabaseClient()
+        self.db = db or get_postgres()
         self.router = router or LLMRouter()
         self.embeddings = embeddings or EmbeddingService()
         self.settings = get_settings()

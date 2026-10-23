@@ -75,8 +75,10 @@ def historico_mock_rows() -> list[dict]:
     return rows
 
 
-class FakeSupabase:
-    """Minimal SupabaseClient stub for unit tests."""
+class FakePostgres:
+    """Minimal in-memory database stub for unit tests."""
+
+    is_configured = False
 
     def __init__(
         self,
@@ -219,6 +221,16 @@ class FakeSupabase:
 
     def exists_resultado_for_date(self, _ref: date) -> bool:
         return False
+
+
+@pytest.fixture(autouse=True)
+def isolated_postgres(monkeypatch: pytest.MonkeyPatch):
+    from motor.adapters import postgres
+
+    postgres.get_postgres.cache_clear()
+    monkeypatch.setattr(postgres, "PostgresClient", FakePostgres)
+    yield
+    postgres.get_postgres.cache_clear()
 
 
 @pytest.fixture

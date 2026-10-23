@@ -7,7 +7,7 @@ logger = structlog.get_logger()
 
 class ColdStorageArchiver:
     """
-    Retenção de longo prazo: apenas Postgres (Supabase).
+    Retenção de longo prazo: apenas PostgreSQL.
 
     Não exporta arquivos locais nem S3 — dados históricos permanecem nas tabelas
     `resultados_escatologicos`, `arquivo_profetico`, `snapshots_periodo`, etc.
@@ -27,6 +27,6 @@ class ColdStorageArchiver:
             "policy": "postgres_only",
             "message": (
                 "Cold storage em arquivo/S3 desativado. "
-                "Histórico permanece no Supabase PostgreSQL."
+                "Histórico permanece no PostgreSQL."
             ),
         }

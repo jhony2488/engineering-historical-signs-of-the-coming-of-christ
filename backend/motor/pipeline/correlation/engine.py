@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from typing import Any
 
-from motor.adapters.supabase import get_supabase
+from motor.adapters.postgres import get_postgres
 from motor.config import get_settings
 from motor.domain.apocalyptic_signals import compute_apocalyptic_axis_metrics
 from motor.domain.beasts import compute_beast_scores
@@ -28,7 +28,7 @@ class CorrelationEngine:
     def __init__(self) -> None:
         self.settings = get_settings()
         self.validator = get_validator()
-        self.hmm = PhaseHMM.from_db(get_supabase())
+        self.hmm = PhaseHMM.from_db(get_postgres())
 
     def _aggregate_metrics(self, events: list[dict[str, Any]]) -> dict[str, float]:
         if not events:

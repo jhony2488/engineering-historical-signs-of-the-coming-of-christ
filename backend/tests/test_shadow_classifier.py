@@ -7,7 +7,7 @@ import json
 from motor.ml.event_classifier import EventShadowClassifier
 from motor.pipeline.llm.layers import LLMPipeline
 
-from .conftest import FakeSupabase
+from .conftest import FakePostgres
 
 CHUNK = {
     "id": "t-1",
@@ -46,7 +46,7 @@ def test_shadow_classifier_fields() -> None:
 
 
 async def test_extract_events_logs_shadow_audit() -> None:
-    db = FakeSupabase()
+    db = FakePostgres()
     pipeline = LLMPipeline(router=FakeRouter(), embeddings=None)
     events = await pipeline.extract_events([CHUNK], [], db)
 
@@ -68,7 +68,7 @@ async def test_extract_events_shadow_disabled(monkeypatch) -> None:
     monkeypatch.setenv("EVENT_SHADOW_ENABLED", "false")
     get_settings.cache_clear()
     try:
-        db = FakeSupabase()
+        db = FakePostgres()
         pipeline = LLMPipeline(router=FakeRouter(), embeddings=None)
         await pipeline.extract_events([CHUNK], [], db)
         assert "camada_4_shadow" not in [a["camada"] for a in db.audits]

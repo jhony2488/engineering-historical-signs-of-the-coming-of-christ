@@ -5,15 +5,16 @@ import json
 from fastapi.testclient import TestClient
 
 from api.main import app
+from motor.adapters.postgres import get_postgres
 from motor.pipeline.data_drift import DataDriftEngine
 
-from .conftest import FakeSupabase
+from .conftest import FakePostgres
 
 client = TestClient(app)
 
 
 def test_insert_proposta_sempre_pendente():
-    db = FakeSupabase()
+    db = FakePostgres()
     db.insert_proposta_ajuste(
         tipo="threshold",
         alvo="settings.phase_confidence_min",
@@ -31,7 +32,7 @@ def test_insert_proposta_sempre_pendente():
 
 
 def test_list_e_set_status():
-    db = FakeSupabase(
+    db = FakePostgres(
         tables={
             "propostas_ajuste": [
                 {"id": "p1", "status": "pendente", "created_at": "2026-01-01"},
@@ -53,7 +54,7 @@ def test_list_e_set_status():
 
 
 def test_set_status_inexistente_retorna_vazio():
-    db = FakeSupabase()
+    db = FakePostgres()
     assert db.set_proposta_status("nope", "aprovada") == []
 
 
@@ -75,7 +76,7 @@ async def test_data_drift_gera_propostas_das_recomendacoes():
         async def complete(self, *a, **kw):
             return json.dumps(analise), "fake"
 
-    db = FakeSupabase(
+    db = FakePostgres(
         historico=[
             {
                 "data_referencia": "2026-01-01",
@@ -111,16 +112,20 @@ def test_admin_list_propostas(admin_headers):
 
 
 def test_admin_aprovar_proposta(admin_headers):
-    # Sem Supabase configurado, update retorna o merge — endpoint responde 200
+    db = get_postgres()
+    db.tables["propostas_ajuste"] = [{"id": "qualquer-id", "status": "pendente"}]
     response = client.post(
         "/api/v1/admin/propostas-ajuste/qualquer-id/aprovar",
         headers=admin_headers,
     )
     assert response.status_code == 200
     assert response.json()["status"] == "aprovada"
+    assert db.tables["propostas_ajuste"][0]["status"] == "aprovada"
 
 
 def test_admin_rejeitar_proposta(admin_headers):
+    db = get_postgres()
+    db.tables["propostas_ajuste"] = [{"id": "qualquer-id", "status": "pendente"}]
     response = client.post(
         "/api/v1/admin/propostas-ajuste/qualquer-id/rejeitar",
         params={"motivo": "fora do escopo"},
@@ -128,3 +133,5 @@ def test_admin_rejeitar_proposta(admin_headers):
     )
     assert response.status_code == 200
     assert response.json()["status"] == "rejeitada"
+    assert db.tables["propostas_ajuste"][0]["status"] == "rejeitada"
+    assert db.tables["propostas_ajuste"][0]["revisao_motivo"] == "fora do escopo"

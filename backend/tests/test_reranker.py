@@ -11,7 +11,7 @@ from motor.ml.reranker import BgeReranker
 from motor.pipeline.embeddings.service import EmbeddingService
 from motor.pipeline.fulfillment_tracker import FulfillmentTracker
 
-from .conftest import FakeSupabase
+from .conftest import FakePostgres
 
 
 def test_reranker_unavailable_returns_none(monkeypatch) -> None:
@@ -64,7 +64,7 @@ class _StubReranker:
 
 
 def test_fulfillment_blends_cross_encoder(monkeypatch) -> None:
-    db = FakeSupabase(
+    db = FakePostgres(
         tables={
             "arquivo_profetico": [
                 {
@@ -106,7 +106,7 @@ def test_fulfillment_lexical_only_when_ce_off(monkeypatch) -> None:
     monkeypatch.setenv("RERANKER_ENABLED", "false")
     get_settings.cache_clear()
     try:
-        db = FakeSupabase(tables={"arquivo_profetico": []})
+        db = FakePostgres(tables={"arquivo_profetico": []})
         tracker = FulfillmentTracker(db)
         assert tracker._get_reranker() is None
     finally:
