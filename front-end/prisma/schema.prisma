@@ -1,5 +1,5 @@
 // Prisma schema — leitura do Supabase PostgreSQL (mesmo banco do backend)
-// DDL principal: backend/supabase/migrations/
+// DDL principal: backend/migrations/
 
 generator client {
   provider = "prisma-client-js"
