@@ -36,11 +36,11 @@ Abra [http://localhost:3000](http://localhost:3000).
 ## Testes
 
 ```bash
-npm run test        # Vitest — 34 testes unitários
+npm run test        # Vitest — ~190 testes unitários
 npm run test:watch  # modo watch
 ```
 
-Cobertura: `lib/` (cache, api, phases, mock, seo, db), `middleware`, componentes (`Header`, `RankingTable`, `PhaseTransitionAlert`) e rotas SEO (`sitemap`, `robots`).
+Cobertura: `lib/` (cache, api, phases, mock, seo, db, local-ai), `middleware`, componentes (`Header`, `RankingTable`, `PhaseTransitionAlert`, `local-ai/*`) e rotas SEO (`sitemap`, `robots`).
 
 ## Variáveis de ambiente
 

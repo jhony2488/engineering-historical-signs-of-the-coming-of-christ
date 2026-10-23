@@ -12,9 +12,17 @@ export function ServiceWorkerRegister() {
     if (process.env.NEXT_PUBLIC_SW_DISABLED === "true") return;
     if (!("serviceWorker" in navigator)) return;
 
-    navigator.serviceWorker.register("/sw.js").catch(() => {
-      // best-effort: falha de registro nunca quebra a página
-    });
+    const register = () => {
+      navigator.serviceWorker.register("/sw.js").catch(() => {
+        // best-effort: falha de registro nunca quebra a página
+      });
+    };
+    // registra após o load para não competir com recursos críticos
+    if (document.readyState === "complete") register();
+    else {
+      window.addEventListener("load", register, { once: true });
+      return () => window.removeEventListener("load", register);
+    }
   }, []);
 
   return null;

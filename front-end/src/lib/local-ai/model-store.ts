@@ -95,10 +95,29 @@ export async function getCachedAiOutput(hash: string): Promise<CachedAiOutput | 
   return record ?? null;
 }
 
+const OUTPUTS_CAP = 150;
+
 export async function putCachedAiOutput(
   output: Omit<CachedAiOutput, "createdAt">,
 ): Promise<void> {
   await withStore(OUTPUTS_STORE, "readwrite", (s) =>
     s.put({ ...output, createdAt: Date.now() }),
   );
+  // Evicção best-effort: outputs acumulam por dia/modelo — manter ~150 mais novos
+  try {
+    const all = (await withStore(OUTPUTS_STORE, "readonly", (s) =>
+      s.getAll(),
+    )) as CachedAiOutput[];
+    if (all.length > OUTPUTS_CAP) {
+      const oldest = all
+        .sort((a, b) => (a.createdAt ?? 0) - (b.createdAt ?? 0))
+        .slice(0, all.length - OUTPUTS_CAP);
+      await withStore(OUTPUTS_STORE, "readwrite", (s) => {
+        for (const rec of oldest.slice(0, -1)) s.delete(rec.hash);
+        return s.delete(oldest[oldest.length - 1].hash);
+      });
+    }
+  } catch {
+    // eviction é opcional — falha nunca quebra o fluxo
+  }
 }

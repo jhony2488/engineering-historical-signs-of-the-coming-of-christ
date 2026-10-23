@@ -129,7 +129,8 @@ layout.tsx → components/local-ai/LocalAIHost
         ├─ capabilities.ts         navigator.gpu/ml, deviceMemory, cores,
         │                          connection.saveData/effectiveType, storage.estimate
         ├─ models.ts               tiers a|b|c com cascata de candidatos
-        ├─ local-ai.worker.ts      Web Worker: WebLLM (WebGPU) | Transformers.js (WebNN/WASM)
+        ├─ local-ai.worker.ts      fonte do Worker → esbuild →
+        │                          public/local-ai.worker.js (único, ~6,4 MB)
         └─ model-store.ts          IndexedDB esh-local-ai (manifest + outputs por hash)
 ```
 
@@ -137,31 +138,44 @@ layout.tsx → components/local-ai/LocalAIHost
   (WebGPU, modelos MLC q4f16: Qwen2.5-3B → Llama-3.2-1B → Qwen2.5-0.5B);
   `c` usa `@huggingface/transformers` (WebNN→WASM, SmolLM2 q8).
 - **Resolução de pesos**: cache do engine (IDB/Cache) → `public/models/`
-  self-host → CDN Hugging Face. Falha total ou dispositivo sem suporte →
-  nada é baixado e **nenhum componente de IA renderiza**.
+  self-host (HEAD no config + `.wasm` p/ webllm) → CDN Hugging Face.
+  Falha total ou dispositivo sem suporte → nada é baixado e **nenhum
+  componente de IA renderiza**.
 - **Download**: automático em background; em `saveData`/rede ≤3g exige
-  opt-in (`DownloadStatusChip`).
+  opt-in (`DownloadStatusChip`). Stall de >90 s sem progresso aborta o
+  candidato e desce a cascata (`NEXT_PUBLIC_LOCAL_AI_INIT_STALL_MS`).
 - **Persistência**: `navigator.storage.persist()` no init; outputs gerados
-  cacheados no IDB por `sha256(input + versão de prompt)`.
+  cacheados no IDB por `sha256(input + versão de prompt)` com cap de 150
+  registros (evicção dos mais antigos).
 - **Self-host**: `npm run ai:download-models` espelha os modelos em
   `public/models/` (gitignored; dev/Docker — em deploy CI a pasta não vai e
-  o runtime cai no CDN).
+  o runtime cai no CDN). Para tiers `a`/`b` baixa também o `.wasm` lib
+  resolvido via `prebuiltAppConfig` do pacote `@mlc-ai/web-llm`.
+- **Worker**: o bundle do webpack do Next **não** inclui o worker —
+  `scripts/build-ai-worker.mjs` (esbuild, roda antes de `dev`/`build`)
+  gera `public/local-ai.worker.js` servido como asset estático, mantendo
+  web-llm/transformers fora do bundle do app (~340 kB de First Load JS).
 - **PWA**: `public/sw.js` (shell offline + runtime cache; bypass para CDNs
-  de modelos), `site.webmanifest` com ícones PNG (`scripts/gen-pwa-icons.mjs`),
-  `ServiceWorkerRegister` (só produção) e `InstallPwaButton` no footer.
+  de modelos — o engine cacheia; `/local-ai.worker.js` e `/models/*` em
+  cache-first p/ IA funcionar offline), `site.webmanifest` com ícones PNG
+  (`scripts/gen-pwa-icons.mjs`), `ServiceWorkerRegister` (só produção, no
+  `window.load`) e `InstallPwaButton` no footer.
 - **Copy**: a UI nunca diz que a IA é local/roda no navegador — textos
   neutros ("Resumo do dia", "Explicar") + disclaimer "não é a saída oficial
   do motor".
 
 Flags: `NEXT_PUBLIC_LOCAL_AI=auto|off`, `NEXT_PUBLIC_LOCAL_AI_MODEL_BASE`,
 `NEXT_PUBLIC_LOCAL_AI_FORCE_TIER`, `NEXT_PUBLIC_LOCAL_AI_CACHE_VERSION`,
-`NEXT_PUBLIC_SW_DISABLED`.
+`NEXT_PUBLIC_LOCAL_AI_INIT_STALL_MS`, `NEXT_PUBLIC_SW_DISABLED`.
 
 ## Segurança
 
 - `src/middleware.ts` — headers (CSP, HSTS, X-Frame-Options); mudanças
   exigem justificativa no PR.
-- `isomorphic-dompurify` para sanitização de HTML do relatório.
+- `isomorphic-dompurify` para sanitização de HTML do relatório — fica em
+  `serverExternalPackages` no `next.config.ts` porque o jsdom lê
+  `browser/default-stylesheet.css` por `fs` (bundlar quebrava o prerender
+  SSR de `/newsletter`).
 - Secrets só server-side; `NEXT_PUBLIC_*` é público.
 - Sessão admin em cookie HttpOnly — nunca token em localStorage.
 

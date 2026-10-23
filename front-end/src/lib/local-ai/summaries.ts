@@ -72,6 +72,18 @@ export function resumeEventosPrompt(eventos: EventoEstruturado[]): Msg[] {
 }
 
 export function perguntaPrompt(contexto: ResultadoEscatologico, pergunta: string): Msg[] {
+  const topMar = contexto.ranking_mar
+    .slice(0, 3)
+    .map((c) => `${c.posicao}º ${c.nome} (${c.probabilidade_atual.toFixed(1)}%)`)
+    .join(", ");
+  const topTerra = contexto.ranking_terra
+    .slice(0, 3)
+    .map((c) => `${c.posicao}º ${c.nome} (${c.probabilidade_atual.toFixed(1)}%)`)
+    .join(", ");
+  const eventos = contexto.eventos_analisados
+    .slice(0, 8)
+    .map((e) => `${e.evento.replace(/_/g, " ")} em ${e.regiao}`)
+    .join("; ");
   return [
     {
       role: "system",
@@ -86,8 +98,10 @@ export function perguntaPrompt(contexto: ResultadoEscatologico, pergunta: string
         `${contexto.fase_atual.replace("FASE_", "")}, índice ` +
         `${(contexto.indice_global * 100).toFixed(1)}%, confiança ` +
         `${(contexto.confianca * 100).toFixed(0)}%. ` +
-        `Top mar: ${contexto.ranking_mar[0]?.nome ?? "—"}; top terra: ` +
-        `${contexto.ranking_terra[0]?.nome ?? "—"}.\n\nPergunta: ${pergunta}`,
+        (topMar ? `Ranking mar: ${topMar}. ` : "") +
+        (topTerra ? `Ranking terra: ${topTerra}. ` : "") +
+        (eventos ? `Eventos: ${eventos}. ` : "") +
+        `\nPergunta: ${pergunta.slice(0, 400)}`,
     },
   ];
 }

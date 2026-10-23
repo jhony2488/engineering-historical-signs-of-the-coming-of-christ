@@ -32,7 +32,7 @@ class Settings(BaseSettings):
     batch_hour: int = 4
     max_documents_per_day: int = 50
     embedding_batch_size: int = 8
-    bge_model_name: str = "BAAI/bge-m3"
+    bge_model_name: str = "all-MiniLM-L6-v2"
 
     false_leader_incongruence_threshold: float = 0.7
     phase_confidence_min: float = 0.55

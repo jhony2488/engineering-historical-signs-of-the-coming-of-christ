@@ -3,8 +3,8 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "next dev",
-    "build": "prisma generate && next build",
+    "dev": "node scripts/build-ai-worker.mjs && next dev",
+    "build": "node scripts/build-ai-worker.mjs && prisma generate && next build",
     "start": "next start",
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",
@@ -63,6 +63,7 @@
     "@types/three": "^0.185.4",
     "@vitejs/plugin-react": "^4.3.4",
     "autoprefixer": "^10.4.20",
+    "esbuild": "^0.28.2",
     "eslint": "^9.16.0",
     "eslint-config-next": "^15.1.0",
     "eslint-config-prettier": "^10.1.5",

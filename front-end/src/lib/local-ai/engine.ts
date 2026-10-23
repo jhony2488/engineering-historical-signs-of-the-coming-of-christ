@@ -64,6 +64,12 @@ const FORCE_TIER = process.env.NEXT_PUBLIC_LOCAL_AI_FORCE_TIER?.trim() as
   | LocalModelTierId
   | undefined;
 
+/** Sem mensagem do worker por este tempo durante init/download → aborta. */
+const INIT_STALL_MS = Math.max(
+  30_000,
+  Number(process.env.NEXT_PUBLIC_LOCAL_AI_INIT_STALL_MS ?? 90_000) || 90_000,
+);
+
 export interface GenerateRequest {
   messages: { role: "system" | "user" | "assistant"; content: string }[];
   maxNewTokens?: number;
@@ -89,9 +95,8 @@ function defaultDeps(): EngineDeps {
   return {
     probe: probeDeviceCapabilities,
     createWorker: () =>
-      new Worker(new URL("./local-ai.worker.ts", import.meta.url), {
-        type: "module",
-      }) as unknown as WorkerLike,
+      // worker pré-bundlado por scripts/build-ai-worker.mjs (ver package.json)
+      new Worker("/local-ai.worker.js", { type: "module" }) as unknown as WorkerLike,
     headFetch: async (url) => {
       try {
         const res = await fetch(url, { method: "HEAD", cache: "no-store" });
@@ -138,7 +143,15 @@ export function createLocalAiEngine(deps: EngineDeps = defaultDeps()) {
 
   async function probeLocalPublic(candidate: LocalModelCandidate): Promise<boolean> {
     const base = MODEL_BASE_OVERRIDE || "/models";
-    return deps.headFetch(`${base}/${candidate.slug}/${selfHostProbeFile(candidate)}`);
+    const ok = await deps.headFetch(
+      `${base}/${candidate.slug}/${selfHostProbeFile(candidate)}`,
+    );
+    if (!ok) return false;
+    // webllm self-host sem o .wasm lib quebraria no init — evita cascata inútil
+    if (candidate.engine === "webllm" && candidate.wasmLib) {
+      return deps.headFetch(`${base}/${candidate.slug}/${candidate.wasmLib}`);
+    }
+    return true;
   }
 
   function spawnWorker(
@@ -151,7 +164,27 @@ export function createLocalAiEngine(deps: EngineDeps = defaultDeps()) {
       worker = deps.createWorker();
       let settled = false;
 
+      // Stall detection: rede que morre no meio do download trava o init
+      // silenciosamente — sem mensagem por STALL_MS, aborta e desce na cascata.
+      let stall = setTimeout(() => {
+        if (!settled) {
+          settled = true;
+          reject(new Error("init travado (sem progresso)"));
+        }
+      }, INIT_STALL_MS);
+      const resetStall = () => {
+        if (settled) return;
+        clearTimeout(stall);
+        stall = setTimeout(() => {
+          if (!settled) {
+            settled = true;
+            reject(new Error("init travado (sem progresso)"));
+          }
+        }, INIT_STALL_MS);
+      };
+
       worker.onmessage = (e) => {
+        resetStall();
         const msg = e.data;
         if (msg.type === "progress") {
           set({
@@ -164,6 +197,7 @@ export function createLocalAiEngine(deps: EngineDeps = defaultDeps()) {
         if (msg.type === "ready") {
           if (!settled) {
             settled = true;
+            clearTimeout(stall);
             resolve();
           }
           return;
@@ -186,6 +220,7 @@ export function createLocalAiEngine(deps: EngineDeps = defaultDeps()) {
           }
           if (msg.fatal && !settled) {
             settled = true;
+            clearTimeout(stall);
             reject(new Error(msg.message));
           }
         }
@@ -193,6 +228,7 @@ export function createLocalAiEngine(deps: EngineDeps = defaultDeps()) {
       worker.onerror = (e) => {
         if (!settled) {
           settled = true;
+          clearTimeout(stall);
           reject(new Error(e.message || "worker error"));
         }
       };
@@ -247,7 +283,9 @@ export function createLocalAiEngine(deps: EngineDeps = defaultDeps()) {
         void deps.putManifest(manifest);
         return true;
       } catch {
-        // próximo backend/candidato
+        // libera o worker falho antes do próximo backend/candidato
+        worker?.terminate();
+        worker = null;
       }
     }
     return false;

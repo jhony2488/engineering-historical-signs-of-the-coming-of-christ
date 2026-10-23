@@ -25,7 +25,10 @@ self.addEventListener("install", (event) => {
   event.waitUntil(
     caches
       .open(SHELL_CACHE)
-      .then((cache) => cache.addAll(SHELL_ASSETS))
+      .then((cache) =>
+        // best-effort por asset: um 404 não pode abortar o install inteiro
+        Promise.allSettled(SHELL_ASSETS.map((a) => cache.add(a))),
+      )
       .then(() => self.skipWaiting()),
   );
 });
@@ -42,11 +45,15 @@ self.addEventListener("activate", (event) => {
   );
 });
 
+function putSafe(cache, request, res) {
+  if (res.ok) cache.put(request, res.clone()).catch(() => {});
+}
+
 async function networkFirst(request, fallbackUrl) {
   const cache = await caches.open(RUNTIME_CACHE);
   try {
     const res = await fetch(request);
-    if (res.ok) cache.put(request, res.clone());
+    putSafe(cache, request, res);
     return res;
   } catch (err) {
     const cached = await cache.match(request);
@@ -64,7 +71,7 @@ async function cacheFirst(request, cacheName) {
   const cached = await cache.match(request);
   if (cached) return cached;
   const res = await fetch(request);
-  if (res.ok) cache.put(request, res.clone());
+  putSafe(cache, request, res);
   return res;
 }
 
@@ -73,11 +80,14 @@ async function staleWhileRevalidate(request) {
   const cached = await cache.match(request);
   const network = fetch(request)
     .then((res) => {
-      if (res.ok) cache.put(request, res.clone());
+      putSafe(cache, request, res);
       return res;
     })
     .catch(() => null);
-  return cached || network.then((r) => r || cached);
+  if (cached) return cached;
+  const res = await network;
+  if (res) return res;
+  throw new TypeError("Failed to fetch (sem cache e sem rede)");
 }
 
 self.addEventListener("fetch", (event) => {
@@ -105,7 +115,7 @@ self.addEventListener("fetch", (event) => {
     return;
   }
 
-  if (url.pathname.startsWith("/models/")) {
+  if (url.pathname.startsWith("/models/") || url.pathname === "/local-ai.worker.js") {
     event.respondWith(cacheFirst(request, MODELS_CACHE));
     return;
   }

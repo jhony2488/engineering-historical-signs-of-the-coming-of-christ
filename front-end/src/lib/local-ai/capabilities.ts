@@ -84,7 +84,7 @@ export async function probeDeviceCapabilities(): Promise<DeviceProfile> {
   if (gpu.ok) {
     const mem = deviceMemoryGb ?? 4; // FF/Safari não expõem deviceMemory — assume mid
     const strongGpu = mem >= 8 && cores >= 6 && (gpu.maxBufferMb === null || gpu.maxBufferMb >= 2048);
-    const tier: LocalModelTierId =
+    const tier: LocalModelTierId | null =
       strongGpu && (quotaBytes === null || quotaBytes >= 4 * GIB)
         ? "a"
         : quotaBytes === null || quotaBytes >= 2 * GIB
