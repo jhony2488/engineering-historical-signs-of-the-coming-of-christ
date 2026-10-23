@@ -89,7 +89,7 @@ Detalhes em [backend/docs/arquitetura.md](backend/docs/arquitetura.md) e
 |-------|-----------|
 | [`backend/`](backend/) | Motor de IA Python, FastAPI, migrations Supabase, testes |
 | [`front-end/`](front-end/) | Dashboard Next.js — painel escatológico, rankings, histórico, globo 3D, grafo |
-| [`.github/workflows/`](.github/workflows/) | 10 workflows agendados (batch diário, sínteses, drift, híbridos) |
+| [`.github/workflows/`](.github/workflows/) | CI de PR para testes e assinaturas SSH + 10 workflows agendados (batch diário, sínteses, drift, híbridos) |
 
 ## Stack
 

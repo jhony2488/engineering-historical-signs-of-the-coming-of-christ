@@ -53,7 +53,7 @@ com profecias e publicação de rankings/fases em um dashboard.
 | `front-end/src/lib/` | `api.ts`, `cache.ts`, `types.ts`, `db/`, `seo/`, `auth/`, `mock*.ts` |
 | `front-end/prisma/` | Schema Prisma (espelha Supabase — não crie DDL aqui) + seed |
 | `front-end/docs/` | Documentação do dashboard |
-| `.github/workflows/` | 10 workflows agendados (batch diário, sínteses, drift, híbridos) |
+| `.github/workflows/` | CI de PR para testes e assinaturas SSH + 10 workflows agendados (batch diário, sínteses, drift, híbridos) |
 | `.husky/` + `package.json` raiz | Hooks: `pre-commit` → lint, `pre-push` → test (ambas as stacks) |
 
 ## Índice de documentação
@@ -164,8 +164,9 @@ npm run test   # Vitest + pytest — usado pelo pre-push
 
 ### Gaps conhecidos (não bloqueiam dev local)
 
-- **Sem CI de PR** — os 10 workflows são cron/`workflow_dispatch` (batch);
-  lint/testes/build são garantidos só pelos hooks Husky locais.
+- **CI de PR** — `.github/workflows/ci-tests.yml` verifica assinaturas SSH e
+  executa testes Vitest e pytest; lint e build continuam sendo verificados
+  localmente pelos hooks e comandos documentados.
 - **`package-lock.json` não versionado** — está no `.gitignore`; `npm ci` não
   funciona e builds não são reproduzíveis.
 - **`doc.txt`** (especificação original do projeto, ~56KB) existe localmente

@@ -1,5 +1,7 @@
 # Como contribuir com o Engenharia de Sinais Históricos da vinda de Cristo
 
+[Read this guide in English](CONTRIBUTING.en.md).
+
 Obrigado por querer ajudar a construir o projeto. Antes de abrir uma issue ou pull request, leia as regras abaixo.
 
 ## Antes de começar
@@ -26,8 +28,11 @@ Obrigado por querer ajudar a construir o projeto. Antes de abrir uma issue ou pu
   - `bug:` — correção de bug — `bug: fix false leader threshold when macro is zero`
   - `doc:` — documentação — `doc: update API contract guide`
   - `chore:` — manutenção e configuração — `chore: update dependencies`
-- **Todos os commits devem ser assinados com SSH**. Veja o
+- **Todos os commits devem ser assinados com SSH**. O CI verifica as
+  assinaturas de cada commit enviado em pull requests. Veja o
   [guia oficial do GitHub](https://docs.github.com/pt/authentication/managing-commit-signature-verification/signing-commits).
+  Para impedir merges quando a verificação falhar, configure como obrigatória
+  a checagem `Verify SSH commit signatures` nas regras de proteção da branch.
 
 ## Padrão de código
 
@@ -98,8 +103,10 @@ configurações server-side e nunca devem ser expostas como `NEXT_PUBLIC_*`.
 1. Sua branch deve estar atualizada com a `master`.
 2. O PR deve descrever o que foi alterado e por quê.
 3. Marque pelo menos um revisor.
-4. Lint, testes e build devem passar localmente — não há CI de PR; os hooks
-   Husky são o gate de qualidade.
+4. Lint, testes e build devem passar localmente. O CI de PR
+   (`.github/workflows/ci-tests.yml`) verifica as assinaturas SSH e executa os
+   testes de front-end e back-end; os hooks Husky também verificam os testes
+   localmente.
 5. **Cada PR deve alterar no máximo 20 arquivos.** PRs acima desse limite só
    são aceitos com uma justificativa muito válida descrita no corpo do PR;
    quando possível, divida em entregas menores.

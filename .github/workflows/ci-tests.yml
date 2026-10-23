@@ -1,0 +1,114 @@
+name: CI — Tests and SSH Commit Signatures
+
+on:
+  pull_request:
+  push:
+    branches:
+      - master
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pull-requests: read
+
+jobs:
+  commit-signatures:
+    name: Verify SSH commit signatures
+    if: github.event_name == 'pull_request'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Verify every commit has a valid SSH signature
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const shas = (await github.paginate(github.rest.pulls.listCommits, {
+              ...context.repo,
+              pull_number: context.issue.number,
+            })).map((commit) => commit.sha);
+
+            if (shas.length === 0) {
+              core.setFailed("No commits were found to verify.");
+              return;
+            }
+
+            const invalid = [];
+            for (const sha of shas) {
+              const { data: commit } = await github.rest.repos.getCommit({
+                ...context.repo,
+                ref: sha,
+              });
+              const verification = commit.commit.verification;
+              const isVerifiedSshSignature =
+                verification?.verified === true &&
+                verification.signature?.includes("-----BEGIN SSH SIGNATURE-----");
+
+              if (!isVerifiedSshSignature) {
+                invalid.push(`${sha} (${verification?.reason ?? "signature missing or not SSH"})`);
+              }
+            }
+
+            if (invalid.length > 0) {
+              core.setFailed(
+                `Every commit must have a valid SSH signature recognized by GitHub:\n${invalid.join("\n")}`,
+              );
+            } else {
+              core.info(`Verified SSH signatures for all ${shas.length} commit(s).`);
+            }
+
+  frontend-tests:
+    name: Front-end tests
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    defaults:
+      run:
+        working-directory: front-end
+    env:
+      DATABASE_URL: postgresql://ci:ci@localhost:5432/ci
+      DIRECT_URL: postgresql://ci:ci@localhost:5432/ci
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Install dependencies
+        run: npm install --ignore-scripts --no-audit --no-fund --package-lock=false
+
+      - name: Generate Prisma Client
+        run: npm run db:generate
+
+      - name: Run front-end tests
+        run: npm test
+
+  backend-tests:
+    name: Back-end tests
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    defaults:
+      run:
+        working-directory: backend
+    env:
+      LLM_DRY_RUN: "true"
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: pip
+          cache-dependency-path: backend/pyproject.toml
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install -e ".[dev]"
+
+      - name: Run back-end tests
+        run: python -m pytest -q
