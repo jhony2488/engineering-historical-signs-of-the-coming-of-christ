@@ -20,6 +20,5 @@ jobs:
       - run: python -m motor.cli run-data-drift
         env:
           LLM_DRY_RUN: ${{ vars.LLM_DRY_RUN || 'true' }}
-          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
-          SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
           GROQ_API_KEY: ${{ secrets.GROQ_API_KEY }}

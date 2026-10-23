@@ -10,7 +10,14 @@ services:
       - "5432:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
-      - ../backend/supabase/migrations/20260604000001_init_schema.sql:/docker-entrypoint-initdb.d/01-init.sql:ro
+      - ../backend/migrations/20260604000001_init_schema.sql:/docker-entrypoint-initdb.d/01-init.sql:ro
+      - ../backend/migrations/20260604000002_match_documents_hmm_seed.sql:/docker-entrypoint-initdb.d/02-seed.sql:ro
+      - ../backend/migrations/20260605000001_baseline_escatologico.sql:/docker-entrypoint-initdb.d/03-baseline.sql:ro
+      - ../backend/migrations/20260605100001_baseline_atualizacoes.sql:/docker-entrypoint-initdb.d/04-baseline-updates.sql:ro
+      - ../backend/migrations/20260605120001_newsletter_subscribers.sql:/docker-entrypoint-initdb.d/05-newsletter.sql:ro
+      - ../backend/migrations/20260805000001_layers_10_15.sql:/docker-entrypoint-initdb.d/06-layers.sql:ro
+      - ../backend/migrations/20260806000001_joshua_project.sql:/docker-entrypoint-initdb.d/07-joshua.sql:ro
+      - ../backend/migrations/20261002000001_propostas_ajuste.sql:/docker-entrypoint-initdb.d/08-propostas.sql:ro
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U sinais -d sinais"]
       interval: 5s

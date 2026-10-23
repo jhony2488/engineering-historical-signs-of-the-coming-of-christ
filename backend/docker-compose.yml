@@ -10,7 +10,14 @@ services:
       - "5433:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
-      - ./supabase/migrations/20260604000001_init_schema.sql:/docker-entrypoint-initdb.d/01-init.sql:ro
+      - ./migrations/20260604000001_init_schema.sql:/docker-entrypoint-initdb.d/01-init.sql:ro
+      - ./migrations/20260604000002_match_documents_hmm_seed.sql:/docker-entrypoint-initdb.d/02-seed.sql:ro
+      - ./migrations/20260605000001_baseline_escatologico.sql:/docker-entrypoint-initdb.d/03-baseline.sql:ro
+      - ./migrations/20260605100001_baseline_atualizacoes.sql:/docker-entrypoint-initdb.d/04-baseline-updates.sql:ro
+      - ./migrations/20260605120001_newsletter_subscribers.sql:/docker-entrypoint-initdb.d/05-newsletter.sql:ro
+      - ./migrations/20260805000001_layers_10_15.sql:/docker-entrypoint-initdb.d/06-layers.sql:ro
+      - ./migrations/20260806000001_joshua_project.sql:/docker-entrypoint-initdb.d/07-joshua.sql:ro
+      - ./migrations/20261002000001_propostas_ajuste.sql:/docker-entrypoint-initdb.d/08-propostas.sql:ro
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U sinais -d sinais"]
       interval: 5s
@@ -44,17 +51,14 @@ services:
       ADMIN_API_KEY: change-me
       API_RATE_LIMIT: 120/minute
       REDIS_URL: redis://redis:6379/0
-      # Sem Supabase: motor opera em modo mock (inserts locais, reads vazios)
-      SUPABASE_URL: ""
-      SUPABASE_SERVICE_ROLE_KEY: ""
-      SUPABASE_ANON_KEY: ""
+      DATABASE_URL: postgresql://sinais:sinais@postgres:5432/sinais
     depends_on:
       redis:
         condition: service_healthy
       postgres:
         condition: service_healthy
 
-  # Batch diário em dry-run (sem chaves LLM/Supabase)
+  # Batch diário em dry-run (sem chaves LLM)
   # Uso: docker compose --profile batch run --rm batch
   batch:
     build:
@@ -65,10 +69,13 @@ services:
     environment:
       LLM_DRY_RUN: "true"
       REDIS_URL: redis://redis:6379/0
+      DATABASE_URL: postgresql://sinais:sinais@postgres:5432/sinais
       ADMIN_API_KEY: change-me
     command: python -m motor.cli run-daily --dry-run --force
     depends_on:
       redis:
+        condition: service_healthy
+      postgres:
         condition: service_healthy
 
 volumes:

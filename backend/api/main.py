@@ -19,7 +19,7 @@ from slowapi.errors import RateLimitExceeded
 from slowapi.util import get_remote_address
 
 from motor.adapters.job_queue import RedisJobQueue
-from motor.adapters.supabase import get_supabase
+from motor.adapters.postgres import get_postgres
 from motor.config import get_settings
 from motor.logging_setup import setup_logging
 from motor.pipeline.fulfillment_tracker import FulfillmentTracker
@@ -77,7 +77,7 @@ async def baseline_arquivo(
     status: str | None = Query(None, description="cumprida|parcial|pendente"),
     limit: int = Query(100, ge=1, le=500),
 ) -> list[dict]:
-    db = get_supabase()
+    db = get_postgres()
     filters = {"status": status} if status else None
     return db.select("arquivo_profetico", filters=filters, limit=limit)
 
@@ -95,7 +95,7 @@ async def baseline_atualizacoes(
 @app.get("/api/v1/resultado/atual")
 @limiter.limit(settings.api_rate_limit)
 async def resultado_atual(request: Request) -> dict:
-    db = get_supabase()
+    db = get_postgres()
     row = db.get_latest_resultado()
     if not row:
         raise HTTPException(status_code=404, detail="Nenhum resultado disponível")
@@ -109,7 +109,7 @@ async def resultado_historico(
     desde: str | None = Query(None, description="YYYY-MM-DD"),
     limit: int = Query(90, ge=1, le=365),
 ) -> list[dict]:
-    db = get_supabase()
+    db = get_postgres()
     desde_date = datetime.strptime(desde, "%Y-%m-%d").date() if desde else None
     rows = db.get_historico(desde=desde_date, limit=limit)
     return [r.get("json_analise_ia", r) for r in rows]
@@ -125,7 +125,7 @@ async def ranking(
     if personagem not in ("besta_mar", "besta_terra", "mar", "terra"):
         raise HTTPException(status_code=400, detail="personagem deve ser besta_mar ou besta_terra")
     key = "besta_mar" if personagem in ("besta_mar", "mar") else "besta_terra"
-    db = get_supabase()
+    db = get_postgres()
     ref = datetime.strptime(data, "%Y-%m-%d").date() if data else None
     rows = db.get_ranking(key, ref)
     if rows:
@@ -140,7 +140,7 @@ async def ranking(
 @app.get("/api/v1/snapshot/{janela}")
 @limiter.limit(settings.api_rate_limit)
 async def snapshot_atual(request: Request, janela: str) -> dict:
-    db = get_supabase()
+    db = get_postgres()
     row = db.get_latest_snapshot(janela)
     if not row:
         raise HTTPException(status_code=404, detail=f"Nenhum snapshot para janela {janela}")
@@ -154,7 +154,7 @@ async def snapshot_historico(
     janela: str,
     limit: int = Query(12, ge=1, le=52),
 ) -> list[dict]:
-    db = get_supabase()
+    db = get_postgres()
     rows = db.get_snapshots(janela, limit=limit)
     return [r.get("dados", r) for r in rows]
 
@@ -254,7 +254,7 @@ async def ameacas_paises(
     request: Request,
     data: str | None = Query(None, description="YYYY-MM-DD"),
 ) -> list[dict]:
-    db = get_supabase()
+    db = get_postgres()
     ref = datetime.strptime(data, "%Y-%m-%d").date() if data else None
     if ref:
         rows = db.select(
@@ -277,7 +277,7 @@ async def ameacas_paises(
 async def missiological_analyze(request: Request) -> dict:
     from motor.pipeline.joshua_analysis import JoshuaAnalysisService
 
-    db = get_supabase()
+    db = get_postgres()
     rows = db.select("joshua_project_data", limit=300)
     svc = JoshuaAnalysisService()
     analyses = svc.analyze_many(rows)
@@ -296,7 +296,7 @@ async def missiological_results(
     country: str | None = Query(None),
     limit: int = Query(50, ge=1, le=200),
 ) -> list[dict]:
-    db = get_supabase()
+    db = get_postgres()
     filters = {"country_code": country.upper()} if country else None
     rows = db.select(
         "missiological_analysis",
@@ -325,7 +325,7 @@ async def ameacas_pais_detail(
     data: str | None = Query(None, description="YYYY-MM-DD"),
 ) -> dict:
     code = code.upper()
-    db = get_supabase()
+    db = get_postgres()
     filters: dict = {"country_code": code}
     if data:
         filters["data_referencia"] = data
@@ -381,7 +381,7 @@ async def ameacas_pais_detail(
 async def provenance_day(request: Request, day: str) -> dict:
     from motor.pipeline.provenance import ProvenanceService
 
-    db = get_supabase()
+    db = get_postgres()
     try:
         datetime.strptime(day, "%Y-%m-%d")
     except ValueError as exc:
@@ -409,7 +409,7 @@ async def provenance_day(request: Request, day: str) -> dict:
 @app.get("/api/v1/relatorio/pdf")
 @limiter.limit(settings.api_rate_limit)
 async def relatorio_pdf(request: Request) -> Response:
-    db = get_supabase()
+    db = get_postgres()
     row = db.get_latest_resultado()
     if not row:
         raise HTTPException(status_code=404, detail="Nenhum resultado disponível")
@@ -441,7 +441,7 @@ async def approve_review(
     _: None = Depends(verify_admin),
     data_referencia: str = Query(..., description="YYYY-MM-DD"),
 ) -> dict:
-    db = get_supabase()
+    db = get_postgres()
     rows = db.select(
         "resultados_escatologicos",
         filters={"data_referencia": data_referencia},
@@ -454,10 +454,7 @@ async def approve_review(
     payload["revisao_humana"] = True
     payload["status"] = "complete"
     payload["revisao_aprovada_em"] = datetime.now().isoformat()
-    if db.is_configured:
-        db._client.table("resultados_escatologicos").update({"json_analise_ia": payload}).eq(
-            "id", row["id"]
-        ).execute()
+    db.update("resultados_escatologicos", {"id": row["id"]}, {"json_analise_ia": payload})
     return {"status": "approved", "data_referencia": data_referencia}
 
 
@@ -469,7 +466,7 @@ async def reject_review(
     data_referencia: str = Query(..., description="YYYY-MM-DD"),
 ) -> dict:
     """Rejeita transição de fase — mantém registro append-only com status rejected."""
-    db = get_supabase()
+    db = get_postgres()
     rows = db.select(
         "resultados_escatologicos",
         filters={"data_referencia": data_referencia},
@@ -483,10 +480,7 @@ async def reject_review(
     payload["status"] = "rejected"
     payload["revisao_rejeitada_em"] = datetime.now().isoformat()
     payload["revisao_motivo"] = "Rejeitado na revisão humana — transição não publicada."
-    if db.is_configured:
-        db._client.table("resultados_escatologicos").update({"json_analise_ia": payload}).eq(
-            "id", row["id"]
-        ).execute()
+    db.update("resultados_escatologicos", {"id": row["id"]}, {"json_analise_ia": payload})
     return {"status": "rejected", "data_referencia": data_referencia}
 
 
@@ -499,7 +493,7 @@ async def list_propostas(
     limit: int = Query(50, ge=1, le=200),
 ) -> dict:
     """Lista propostas de ajuste geradas por LLM aguardando revisão."""
-    propostas = get_supabase().list_propostas_ajuste(status=status, limit=limit)
+    propostas = get_postgres().list_propostas_ajuste(status=status, limit=limit)
     return {"propostas": propostas, "count": len(propostas)}
 
 
@@ -514,7 +508,7 @@ async def aprovar_proposta(
     ),
 ) -> dict:
     """Aprova proposta — a aplicação no alvo (JSON/config/tabela) é manual."""
-    db = get_supabase()
+    db = get_postgres()
     status = "aplicada" if marcar_aplicada else "aprovada"
     updated = db.set_proposta_status(proposta_id, status)
     if not updated:
@@ -531,7 +525,7 @@ async def rejeitar_proposta(
     motivo: str = Query("", description="Motivo da rejeição"),
 ) -> dict:
     """Rejeita proposta — o registro permanece append-only com motivo."""
-    db = get_supabase()
+    db = get_postgres()
     updated = db.set_proposta_status(proposta_id, "rejeitada", motivo=motivo or None)
     if not updated:
         raise HTTPException(status_code=404, detail="Proposta não encontrada")
