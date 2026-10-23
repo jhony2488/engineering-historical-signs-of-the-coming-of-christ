@@ -12,7 +12,6 @@ const fetchRankingSWR = vi.fn();
 const fetchRanking = vi.fn();
 const fetchBaselineHistoricoSWR = vi.fn();
 const fetchBaselineAtualizacoesSWR = vi.fn();
-const getDataSource = vi.fn(() => "db" as const);
 
 vi.mock("@/components/charts/ConvictionChart", () => ({
   ConvictionChart: () => <div data-testid="conviction-chart" />,
@@ -26,7 +25,6 @@ vi.mock("@/lib/api", () => ({
   fetchRanking: (...args: unknown[]) => fetchRanking(...args),
   fetchBaselineHistoricoSWR: (...args: unknown[]) => fetchBaselineHistoricoSWR(...args),
   fetchBaselineAtualizacoesSWR: (...args: unknown[]) => fetchBaselineAtualizacoesSWR(...args),
-  getDataSource: () => getDataSource(),
 }));
 
 describe("DashboardClient", () => {

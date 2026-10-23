@@ -24,7 +24,6 @@ import {
   fetchRankingSWR,
   fetchResultadoAtual,
   fetchResultadoAtualSWR,
-  getDataSource,
 } from "@/lib/api";
 import type {
   BaselineAtualizacao,
@@ -40,7 +39,6 @@ export function DashboardClient() {
   const [revalidating, setRevalidating] = useState(false);
   const [fromCache, setFromCache] = useState(false);
   const [isMock, setIsMock] = useState(false);
-  const [dataSource, setDataSource] = useState<"db" | "fastapi">(getDataSource());
   const [rankingMar, setRankingMar] = useState<RankingCandidato[]>([]);
   const [rankingTerra, setRankingTerra] = useState<RankingCandidato[]>([]);
   const [baseline, setBaseline] = useState<BaselineHistorico | null>(null);
@@ -61,7 +59,6 @@ export function DashboardClient() {
       setHistorico(hist.data);
       setFromCache(atual.fromCache && !skipCache);
       setIsMock(atual.isMock || hist.isMock);
-      setDataSource(atual.source);
     } finally {
       setLoading(false);
       setRevalidating(false);
@@ -76,7 +73,6 @@ export function DashboardClient() {
       setResultado(atual.data);
       setFromCache(atual.fromCache);
       setIsMock(atual.isMock);
-      setDataSource(atual.source);
       setLoading(false);
 
       if (atual.revalidating) {
@@ -182,7 +178,6 @@ export function DashboardClient() {
         dataReferencia={resultado.data_referencia}
         fromCache={fromCache}
         isMock={isMock}
-        dataSource={dataSource}
       />
       <main id="main-content" className="page-main" aria-labelledby="dashboard-title">
         <header className="page-hero flex flex-wrap items-center justify-between gap-4">

@@ -65,9 +65,9 @@ describe("Header", () => {
 
 
 
-  it("shows reference date and source metadata", () => {
+  it("shows reference date and cache/demo metadata without source selection", () => {
 
-    render(<Header dataReferencia="2026-06-04" fromCache isMock dataSource="db" />);
+    render(<Header dataReferencia="2026-06-04" fromCache isMock />);
 
     expect(screen.getByText(/Ref: 2026-06-04/)).toBeInTheDocument();
 
@@ -75,9 +75,6 @@ describe("Header", () => {
 
     expect(screen.getByText(/demo/)).toBeInTheDocument();
 
-    expect(screen.getByText(/db/)).toBeInTheDocument();
-
   });
 
 });
-

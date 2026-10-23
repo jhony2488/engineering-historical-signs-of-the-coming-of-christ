@@ -29,31 +29,22 @@ import type {
   SnapshotPeriodo,
 } from "./types";
 
-type DataSource = "db" | "fastapi";
-
 export type FetchMeta = {
   fromCache: boolean;
   isMock: boolean;
-  source: DataSource;
+  source: "db";
   revalidating?: boolean;
 };
 
-const DATA_SOURCE = (process.env.NEXT_PUBLIC_DATA_SOURCE || "db") as DataSource;
+const DATA_SOURCE = "db";
 const USE_MOCK = process.env.NEXT_PUBLIC_USE_MOCK === "true";
 
 function resolveUrl(path: string): string {
-  if (DATA_SOURCE === "db") {
-    const origin =
-      typeof window !== "undefined"
-        ? ""
-        : process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000";
-    return `${origin}/api/db${path}`;
-  }
-  const api =
+  const origin =
     typeof window !== "undefined"
-      ? "/api/backend"
-      : process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
-  return `${api}${path}`;
+      ? ""
+      : process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000";
+  return `${origin}/api/db${path}`;
 }
 
 async function fetchJson<T>(path: string, init?: RequestInit): Promise<T> {
@@ -64,33 +55,24 @@ async function fetchJson<T>(path: string, init?: RequestInit): Promise<T> {
 }
 
 const PATHS = {
-  atual: DATA_SOURCE === "db" ? "/resultado/atual" : "/api/v1/resultado/atual",
-  historico: (params: string) =>
-    DATA_SOURCE === "db" ? `/resultado/historico?${params}` : `/api/v1/resultado/historico?${params}`,
-  snapshot: (janela: string) =>
-    DATA_SOURCE === "db" ? `/snapshot/${janela}` : `/api/v1/snapshot/${janela}`,
+  atual: "/resultado/atual",
+  historico: (params: string) => `/resultado/historico?${params}`,
+  snapshot: (janela: string) => `/snapshot/${janela}`,
   snapshotHistorico: (janela: string, limit: number) =>
-    DATA_SOURCE === "db"
-      ? `/snapshot/${janela}/historico?limit=${limit}`
-      : `/api/v1/snapshot/${janela}/historico?limit=${limit}`,
-  ranking: (personagem: string) =>
-    DATA_SOURCE === "db" ? `/ranking/${personagem}` : `/api/v1/ranking/${personagem}`,
-  baselineHistorico: DATA_SOURCE === "db" ? "/baseline/historico" : "/api/v1/baseline/historico",
+    `/snapshot/${janela}/historico?limit=${limit}`,
+  ranking: (personagem: string) => `/ranking/${personagem}`,
+  baselineHistorico: "/baseline/historico",
   baselineArquivo: (status?: string) => {
     const q = status ? `?status=${status}` : "";
-    return DATA_SOURCE === "db" ? `/baseline/arquivo${q}` : `/api/v1/baseline/arquivo${q}`;
+    return `/baseline/arquivo${q}`;
   },
   baselineAtualizacoes: (limit = 20) => {
     const q = `?limit=${limit}`;
-    return DATA_SOURCE === "db" ? `/baseline/atualizacoes${q}` : `/api/v1/baseline/atualizacoes${q}`;
+    return `/baseline/atualizacoes${q}`;
   },
-  ameacas: DATA_SOURCE === "db" ? "/ameacas" : "/api/v1/ameacas/paises",
-  ameacaDetail: (code: string) =>
-    DATA_SOURCE === "db" ? `/ameacas/${code}` : `/api/v1/ameacas/paises/${code}`,
-  provenance: (day: string) =>
-    DATA_SOURCE === "db"
-      ? `/provenance/verify/${day}`
-      : `/api/v1/provenance/day/${day}`,
+  ameacas: "/ameacas",
+  ameacaDetail: (code: string) => `/ameacas/${code}`,
+  provenance: (day: string) => `/provenance/verify/${day}`,
 };
 
 export async function fetchResultadoAtual(
@@ -379,10 +361,6 @@ export async function fetchRankingSWR(
 
 export function isCacheStale(): boolean {
   return isCacheExpired(cacheKeys.resultado.ts);
-}
-
-export function getDataSource(): DataSource {
-  return DATA_SOURCE;
 }
 
 export async function fetchBaselineHistorico(

@@ -5,7 +5,6 @@ import { MOCK_RESULTADO } from "@/lib/mock";
 
 vi.hoisted(() => {
   vi.stubEnv("NEXT_PUBLIC_USE_MOCK", "true");
-  vi.stubEnv("NEXT_PUBLIC_DATA_SOURCE", "db");
 });
 
 import {
@@ -54,7 +53,6 @@ describe("api", () => {
     afterEach(() => {
       vi.unstubAllGlobals();
       vi.stubEnv("NEXT_PUBLIC_USE_MOCK", "true");
-      vi.stubEnv("NEXT_PUBLIC_DATA_SOURCE", "db");
       vi.resetModules();
     });
 
@@ -69,6 +67,25 @@ describe("api", () => {
       const { fetchResultadoAtual: fetchAtual } = await import("@/lib/api");
       const r = await fetchAtual({ skipCache: true });
       expect(r.isMock).toBe(true);
+    });
+
+    it("always uses the Next.js database route even if the legacy source variable is set", async () => {
+      vi.stubEnv("NEXT_PUBLIC_USE_MOCK", "false");
+      vi.stubEnv("NEXT_PUBLIC_DATA_SOURCE", "fastapi");
+      vi.resetModules();
+      const fetchMock = vi.fn().mockResolvedValue({
+        ok: true,
+        json: () => Promise.resolve(MOCK_RESULTADO),
+      });
+      vi.stubGlobal("fetch", fetchMock);
+
+      const { fetchResultadoAtual: fetchAtual } = await import("@/lib/api");
+      await fetchAtual({ skipCache: true });
+
+      expect(fetchMock).toHaveBeenCalledWith(
+        "/api/db/resultado/atual",
+        expect.objectContaining({ next: { revalidate: 3600 } }),
+      );
     });
   });
 });

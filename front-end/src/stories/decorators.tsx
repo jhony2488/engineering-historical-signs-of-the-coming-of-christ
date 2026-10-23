@@ -5,7 +5,7 @@ import { Header } from "@/components/ui/Header";
 /** Layout admin com Header — para stories de páginas internas. */
 export const withAdminLayout: Decorator = (Story) => (
   <>
-    <Header variant="admin" dataReferencia="2026-06-04" dataSource="db" />
+    <Header variant="admin" dataReferencia="2026-06-04" />
     <div className="mx-auto max-w-7xl px-4 py-6 sm:px-6">
       <Story />
     </div>

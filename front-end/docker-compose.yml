@@ -24,7 +24,6 @@ services:
       dockerfile: Dockerfile
       args:
         NEXT_PUBLIC_SITE_URL: http://localhost:3000
-        NEXT_PUBLIC_DATA_SOURCE: db
         NEXT_PUBLIC_USE_MOCK: "false"
     restart: unless-stopped
     ports:
@@ -34,8 +33,6 @@ services:
       DATABASE_URL: postgresql://sinais:sinais@postgres:5432/sinais
       DIRECT_URL: postgresql://sinais:sinais@postgres:5432/sinais
       NEXT_PUBLIC_SITE_URL: http://localhost:3000
-      NEXT_PUBLIC_DATA_SOURCE: db
-      NEXT_PUBLIC_API_URL: http://host.docker.internal:8000
       NEXT_PUBLIC_USE_MOCK: "false"
     depends_on:
       postgres:
@@ -73,8 +70,6 @@ services:
       DATABASE_URL: postgresql://sinais:sinais@postgres:5432/sinais
       DIRECT_URL: postgresql://sinais:sinais@postgres:5432/sinais
       NEXT_PUBLIC_SITE_URL: http://localhost:3000
-      NEXT_PUBLIC_DATA_SOURCE: db
-      NEXT_PUBLIC_API_URL: http://localhost:8000
       NEXT_PUBLIC_USE_MOCK: "false"
     command: sh -c "apk add --no-cache libc6-compat openssl && npm ci && npx prisma generate && npm run dev"
     depends_on:

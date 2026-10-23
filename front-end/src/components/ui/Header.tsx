@@ -5,7 +5,6 @@ interface HeaderProps {
   dataReferencia?: string;
   fromCache?: boolean;
   isMock?: boolean;
-  dataSource?: "db" | "fastapi";
   /** public: visitante (só leitura). admin: área restrita autenticada. */
   variant?: "public" | "admin";
 }
@@ -31,7 +30,6 @@ export function Header({
   dataReferencia,
   fromCache,
   isMock,
-  dataSource,
   variant = "public",
 }: HeaderProps) {
   const links = variant === "admin" ? [...PUBLIC_LINKS, ...ADMIN_LINKS] : PUBLIC_LINKS;
@@ -59,12 +57,11 @@ export function Header({
             {dataReferencia && (
               <span
                 className="header-meta text-xs text-slate-500 border-l border-ink-700 pl-4 transition-colors hover:text-slate-300"
-                aria-label={`Data de referência ${dataReferencia}${fromCache ? ", dados em cache" : ""}${isMock ? ", modo demonstração" : ""}${dataSource ? `, fonte ${dataSource}` : ""}`}
+                aria-label={`Data de referência ${dataReferencia}${fromCache ? ", dados em cache" : ""}${isMock ? ", modo demonstração" : ""}`}
               >
                 Ref: {dataReferencia}
                 {fromCache && " · cache"}
                 {isMock && " · demo"}
-                {dataSource && ` · ${dataSource}`}
               </span>
             )}
           </nav>

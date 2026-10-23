@@ -21,7 +21,6 @@ export const Admin: Story = {
     variant: "admin",
     dataReferencia: "2026-06-04",
     fromCache: true,
-    dataSource: "db",
   },
 };
 
@@ -31,6 +30,5 @@ export const ComDemo: Story = {
     dataReferencia: "2026-06-04",
     isMock: true,
     fromCache: false,
-    dataSource: "fastapi",
   },
 };
