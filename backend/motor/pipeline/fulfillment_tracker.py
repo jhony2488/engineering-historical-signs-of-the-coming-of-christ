@@ -7,7 +7,7 @@ from typing import Any
 
 import structlog
 
-from motor.adapters.supabase import SupabaseClient, get_supabase
+from motor.adapters.postgres import PostgresClient, get_postgres
 from motor.config import get_settings
 from motor.domain.apocalyptic_signals import PROPHECY_SIGNAL_KEYWORDS
 from motor.pipeline.historical_baseline import (
@@ -67,8 +67,8 @@ def _build_corpus(
 class FulfillmentTracker:
     """Detecta profecias pendentes que avançam para cumprida/parcial no run diário."""
 
-    def __init__(self, db: SupabaseClient | None = None) -> None:
-        self.db = db or get_supabase()
+    def __init__(self, db: PostgresClient | None = None) -> None:
+        self.db = db or get_postgres()
         self.settings = get_settings()
         self.baseline_svc = HistoricalBaselineService(self.db)
         self._reranker = None

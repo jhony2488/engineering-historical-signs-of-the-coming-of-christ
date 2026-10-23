@@ -7,7 +7,7 @@ from typing import Any
 
 import structlog
 
-from motor.adapters.supabase import SupabaseClient, get_supabase
+from motor.adapters.postgres import PostgresClient, get_postgres
 from motor.config import CONFIG_DIR, get_settings
 from motor.math.mcda import rank_candidates
 from motor.ml.graph import PropheticGraph
@@ -36,8 +36,8 @@ logger = structlog.get_logger()
 
 
 class DailyOrchestrator:
-    def __init__(self, db: SupabaseClient | None = None) -> None:
-        self.db = db or get_supabase()
+    def __init__(self, db: PostgresClient | None = None) -> None:
+        self.db = db or get_postgres()
         self.settings = get_settings()
         self.collector = IngestionCollector()
         self.preprocessor = Preprocessor()

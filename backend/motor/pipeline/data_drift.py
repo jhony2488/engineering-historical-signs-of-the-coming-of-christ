@@ -7,7 +7,7 @@ from typing import Any
 import structlog
 
 from motor.adapters.llm_router import LLMRouter
-from motor.adapters.supabase import SupabaseClient, get_supabase
+from motor.adapters.postgres import PostgresClient, get_postgres
 from motor.config import get_settings
 from motor.domain.phases import FaseEscatologica
 
@@ -24,8 +24,8 @@ PHASE_CRITERIA = {
 class DataDriftEngine:
     """Refinamento mensal dos critérios de fase (doc: Mistral Nemo / timeline model)."""
 
-    def __init__(self, db: SupabaseClient | None = None, router: LLMRouter | None = None) -> None:
-        self.db = db or get_supabase()
+    def __init__(self, db: PostgresClient | None = None, router: LLMRouter | None = None) -> None:
+        self.db = db or get_postgres()
         self.router = router or LLMRouter()
         self.settings = get_settings()
 

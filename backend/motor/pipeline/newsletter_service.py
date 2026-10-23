@@ -6,7 +6,7 @@ from typing import Any
 import structlog
 
 from motor.adapters.email_sender import EmailSender
-from motor.adapters.supabase import SupabaseClient, get_supabase
+from motor.adapters.postgres import PostgresClient, get_postgres
 from motor.config import get_settings
 
 logger = structlog.get_logger()
@@ -24,8 +24,8 @@ def build_email_footer_unsubscribe(token: str, site_url: str) -> str:
 class NewsletterDigestService:
     """Lê inscritos do DB compartilhado e envia digest diário ao final do pipeline."""
 
-    def __init__(self, db: SupabaseClient | None = None) -> None:
-        self.db = db or get_supabase()
+    def __init__(self, db: PostgresClient | None = None) -> None:
+        self.db = db or get_postgres()
         self.settings = get_settings()
         self.sender = EmailSender(self.settings)
         self.site_url = (self.settings.site_url or "http://localhost:3000").rstrip("/")

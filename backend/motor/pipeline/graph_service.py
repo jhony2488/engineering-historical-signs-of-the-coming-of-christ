@@ -2,14 +2,14 @@ from __future__ import annotations
 
 from typing import Any
 
-from motor.adapters.supabase import SupabaseClient, get_supabase
+from motor.adapters.postgres import PostgresClient, get_postgres
 from motor.ml.gnn import PropheticGNN
 from motor.ml.graph import PropheticGraph
 
 
 class GraphService:
-    def __init__(self, db: SupabaseClient | None = None) -> None:
-        self.db = db or get_supabase()
+    def __init__(self, db: PostgresClient | None = None) -> None:
+        self.db = db or get_postgres()
 
     def load_graph(self) -> PropheticGraph:
         pg = PropheticGraph()

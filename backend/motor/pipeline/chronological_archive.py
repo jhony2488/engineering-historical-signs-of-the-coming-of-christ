@@ -6,7 +6,7 @@ from typing import Any
 
 import structlog
 
-from motor.adapters.supabase import SupabaseClient, get_supabase
+from motor.adapters.postgres import PostgresClient, get_postgres
 
 logger = structlog.get_logger()
 
@@ -14,8 +14,8 @@ logger = structlog.get_logger()
 class ChronologicalArchiveService:
     """Inventário vivo no Postgres (arquivo_profetico) — sem arquivos locais/S3."""
 
-    def __init__(self, db: SupabaseClient | None = None) -> None:
-        self.db = db or get_supabase()
+    def __init__(self, db: PostgresClient | None = None) -> None:
+        self.db = db or get_postgres()
 
     def catalog_daily_events(
         self,

@@ -7,7 +7,7 @@ from typing import Any
 import structlog
 
 from motor.adapters.llm_router import LLMRouter
-from motor.adapters.supabase import SupabaseClient
+from motor.adapters.postgres import PostgresClient, get_postgres
 from motor.config import get_settings
 
 logger = structlog.get_logger()
@@ -25,8 +25,8 @@ WINDOW_META: dict[str, dict[str, str | int]] = {
 class SynthesisEngine:
     """Motor Nível 2 — análise de deltas periódicos (semanal → anual)."""
 
-    def __init__(self, db: SupabaseClient | None = None, router: LLMRouter | None = None) -> None:
-        self.db = db or SupabaseClient()
+    def __init__(self, db: PostgresClient | None = None, router: LLMRouter | None = None) -> None:
+        self.db = db or get_postgres()
         self.router = router or LLMRouter()
         self.settings = get_settings()
 

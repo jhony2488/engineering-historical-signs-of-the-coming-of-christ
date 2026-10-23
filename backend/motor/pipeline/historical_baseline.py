@@ -6,7 +6,7 @@ from typing import Any
 
 import structlog
 
-from motor.adapters.supabase import SupabaseClient, get_supabase
+from motor.adapters.postgres import PostgresClient, get_postgres
 from motor.config import CONFIG_DIR
 from motor.ml.graph import PropheticGraph
 
@@ -24,8 +24,8 @@ def clear_baseline_cache() -> None:
 class HistoricalBaselineService:
     """Camada 0 — overview de profecias cumpridas antes do monitoramento diário."""
 
-    def __init__(self, db: SupabaseClient | None = None) -> None:
-        self.db = db or get_supabase()
+    def __init__(self, db: PostgresClient | None = None) -> None:
+        self.db = db or get_postgres()
 
     def _load_seed(self) -> dict[str, Any]:
         path = CONFIG_DIR / "profecias_baseline_seed.json"
