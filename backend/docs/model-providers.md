@@ -1,4 +1,4 @@
-# Provedores de modelos (Local GGUF → Ollama → Groq → OpenRouter)
+# Provedores de modelos (Local GGUF → Ollama → Gemini → Groq → DeepSeek → OpenRouter)
 
 O `doc.txt` original previa **Ollama** local (Llama, Mistral Nemo, DeepSeek-R1, Gemma 2).
 Na fase zero-custo, o motor usa **Groq Cloud** (tier gratuito) com **fallback OpenRouter**.
@@ -6,16 +6,28 @@ Antes deles, dois tiers locais podem responder primeiro (ambos opcionais):
 **SLM GGUF in-process** (`LocalLlamaClient`, extra `[local]`) e **Ollama**
 (quando `OLLAMA_ENABLED=true`).
 
-| Camada doc | Modelo doc | Alias config | Groq (mapa) | OpenRouter | Ollama |
-|------------|------------|--------------|-------------|------------|--------|
-| Extração (4) | Llama 3.1/3.2 | `llama-3.1-8b-instant` | llama-3.1-8b-instant | meta-llama/... | llama3.1:8b |
-| Timeline (5) | Mistral Nemo 12B | `mistral-nemo` | llama-3.3-70b-versatile* | mistralai/mistral-nemo | mistral-nemo:12b |
-| Raciocínio (6) | DeepSeek-R1 | `deepseek-r1-distill` | deepseek-r1-distill-llama-70b | deepseek/... | deepseek-r1:8b |
-| Hermenêutica (7) | Gemma 2 | `gemma2-9b-it` | gemma2-9b-it | google/gemma-2-9b-it | gemma2:9b |
+**Novos provedores gratuitos (2025):**
+- **Google AI Studio (Gemini):** 1.500 req/dia, usado para camadas 4, 5, 7
+- **DeepSeek API:** 500K tokens/dia, especializado em raciocínio (camada 6)
+
+| Camada doc | Modelo doc | Alias config | Gemini | DeepSeek | Groq (mapa) | OpenRouter | Ollama |
+|------------|------------|--------------|--------|----------|-------------|------------|--------|
+| Extração (4) | Llama 3.1/3.2 | `llama-3.1-8b-instant` | gemini-2.5-flash-lite | deepseek-chat | llama-3.1-8b-instant | meta-llama/... | llama3.1:8b |
+| Timeline (5) | Mistral Nemo 12B | `mistral-nemo` | gemini-3-flash | deepseek-chat | llama-3.3-70b-versatile* | mistralai/mistral-nemo | mistral-nemo:12b |
+| Raciocínio (6) | DeepSeek-R1 | `deepseek-r1-distill` | gemini-3-flash | deepseek-reasoner | deepseek-r1-distill-llama-70b | deepseek/... | deepseek-r1:8b |
+| Hermenêutica (7) | Gemma 2 | `gemma2-9b-it` | gemini-3-flash | deepseek-chat | gemma2-9b-it | google/gemma-2-9b-it | gemma2:9b |
 
 \* Groq free tier não oferece Mistral Nemo; usa Llama 70B como proxy até OpenRouter/Ollama.
 
-Ordem do `LLMRouter`: **Local GGUF (se habilitado) → Ollama → Groq → OpenRouter → dry-run**.
+Ordem do `LLMRouter`: **Local GGUF (se habilitado) → Ollama → Gemini → Groq → DeepSeek → OpenRouter → dry-run**.
+
+## Estratégia híbrida (custo zero)
+
+Por padrão, o motor usa provedores otimizados por camada:
+- Camadas 4, 5, 7: Gemini Flash (mais rápido, 1.500 req/dia)
+- Camada 6: DeepSeek Reasoner (especializado em raciocínio, 500K tokens/dia)
+
+Sem API keys configuradas, o sistema degrada para Groq → OpenRouter → dry-run.
 
 ## SLM local in-process (llama.cpp / GGUF)
 

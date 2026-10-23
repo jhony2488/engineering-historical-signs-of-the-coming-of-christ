@@ -13,21 +13,41 @@ Referência completa de [`backend/.env.example`](../.env.example). Copie para
 
 ## LLMs
 
-Ordem do `LLMRouter`: **Local GGUF → Ollama → Groq → OpenRouter → dry-run**
+Ordem do `LLMRouter`: **Local GGUF → Ollama → Gemini → Groq → DeepSeek → OpenRouter → dry-run**
 (locais habilitáveis; dry-run sempre cobre). Detalhes:
 [model-providers.md](model-providers.md).
 
 | Variável | Default | Descrição |
 |----------|---------|-----------|
-| `GROQ_API_KEY` | — | Provedor primário (fallback final) |
-| `OPENROUTER_API_KEY` | — | Fallback |
+| `GROQ_API_KEY` | — | Provedor (fallback após Gemini) |
+| `OPENROUTER_API_KEY` | — | Fallback final |
 | `LLM_DRY_RUN` | `false` | `true` simula LLMs sem chaves (CI/dev) |
-| `GROQ_MODEL_EXTRACTION` | `llama-3.1-8b-instant` | Camada 4 |
-| `GROQ_MODEL_TIMELINE` | `mistral-nemo` | Camada 5 |
-| `GROQ_MODEL_REASONING` | `deepseek-r1-distill` | Camada 6 |
-| `GROQ_MODEL_HERMENEUTICS` | `gemma2-9b-it` | Camada 7 |
+| `GROQ_MODEL_EXTRACTION` | `llama-3.1-8b-instant` | Camada 4 (sem Gemini) |
+| `GROQ_MODEL_TIMELINE` | `mistral-nemo` | Camada 5 (sem Gemini) |
+| `GROQ_MODEL_REASONING` | `deepseek-r1-distill` | Camada 6 (sem DeepSeek) |
+| `GROQ_MODEL_HERMENEUTICS` | `gemma2-9b-it` | Camada 7 (sem Gemini) |
 | `OLLAMA_ENABLED` | `false` | Habilita Ollama local/RunPod |
 | `OLLAMA_BASE_URL` | `http://localhost:11434` | Endpoint Ollama |
+
+### Google AI Studio (Gemini)
+
+Provedor primário gratuito (1.500 req/dia) para camadas 4, 5, 7.
+
+| Variável | Default | Descrição |
+|----------|---------|-----------|
+| `GEMINI_API_KEY` | — | Chave API (AI Studio) |
+| `GEMINI_MODEL_EXTRACTION` | `gemini-2.5-flash-lite` | Camada 4 |
+| `GEMINI_MODEL_TIMELINE` | `gemini-3-flash` | Camada 5 |
+| `GEMINI_MODEL_HERMENEUTICS` | `gemini-3-flash` | Camada 7 |
+
+### DeepSeek API
+
+Provedor especializado em raciocínio (500K tokens/dia) para camada 6.
+
+| Variável | Default | Descrição |
+|----------|---------|-----------|
+| `DEEPSEEK_API_KEY` | — | Chave API |
+| `DEEPSEEK_MODEL_REASONING` | `deepseek-reasoner` | Camada 6 |
 
 ## SLM local in-process (llama.cpp)
 
