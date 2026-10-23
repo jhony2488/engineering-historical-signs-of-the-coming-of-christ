@@ -86,6 +86,222 @@ async def test_groq_adapter_builds_json_schema_response_format(monkeypatch):
     assert rf["json_schema"]["strict"] is True
 
 
+@pytest.mark.asyncio
+async def test_gemini_adapter_basic(monkeypatch):
+    """Testa adapter Gemini com mock do SDK."""
+    import sys
+
+    # Mock do SDK Gemini antes de importar
+    class _MockModel:
+        async def generate_content_async(self, contents, generation_config):
+            return type("R", (), {"text": '{"test": "value"}'})()
+
+    class _MockGenAI:
+        def configure(self, api_key):
+            pass
+
+        def GenerativeModel(self, **kwargs):
+            return _MockModel()
+
+    sys.modules["google"] = type(sys)("google")
+    sys.modules["google.generativeai"] = _MockGenAI()
+
+    from motor.adapters.gemini import GeminiClient
+    from motor.config import get_settings
+
+    monkeypatch.setenv("GEMINI_API_KEY", "test-key")
+    get_settings.cache_clear()
+
+    client = GeminiClient()
+
+    content = await client.complete(
+        "gemini-2.5-flash-lite",
+        [{"role": "user", "content": "Test"}],
+        json_mode=True,
+    )
+    assert content == '{"test": "value"}'
+
+    # Limpar mock
+    del sys.modules["google"]
+    del sys.modules["google.generativeai"]
+
+
+@pytest.mark.asyncio
+async def test_gemini_adapter_json_schema_not_supported(monkeypatch):
+    """Gemini não suporta json_schema strict, usa json_object."""
+    import sys
+
+    # Mock do SDK Gemini antes de importar
+    captured: dict = {}
+
+    class _MockModel:
+        async def generate_content_async(self, contents, generation_config):
+            captured["generation_config"] = generation_config
+            return type("R", (), {"text": "{}"})()
+
+    class _MockGenAI:
+        def configure(self, api_key):
+            pass
+
+        def GenerativeModel(self, **kwargs):
+            return _MockModel()
+
+    sys.modules["google"] = type(sys)("google")
+    sys.modules["google.generativeai"] = _MockGenAI()
+
+    from motor.adapters.gemini import GeminiClient
+    from motor.config import get_settings
+
+    monkeypatch.setenv("GEMINI_API_KEY", "test-key")
+    get_settings.cache_clear()
+
+    client = GeminiClient()
+
+    schema = {"type": "object"}
+    await client.complete(
+        "gemini-2.5-flash-lite",
+        [{"role": "user", "content": "Test"}],
+        json_mode=True,
+        json_schema=schema,
+    )
+    # Gemini deve usar json_object mesmo com json_schema
+    assert captured["generation_config"]["response_mime_type"] == "application/json"
+
+    # Limpar mock
+    del sys.modules["google"]
+    del sys.modules["google.generativeai"]
+
+
+@pytest.mark.asyncio
+async def test_deepseek_adapter_basic(monkeypatch):
+    """Testa adapter DeepSeek com mock httpx."""
+    from motor.adapters.deepseek import DeepSeekClient
+    from motor.config import get_settings
+
+    monkeypatch.setenv("DEEPSEEK_API_KEY", "test-key")
+    get_settings.cache_clear()
+
+    client = DeepSeekClient()
+    captured: dict = {}
+
+    class _MockResponse:
+        def raise_for_status(self):
+            pass
+
+        def json(self):
+            return {"choices": [{"message": {"content": '{"test": "value"}'}}]}
+
+    class _MockClient:
+        async def __aenter__(self):
+            return self
+
+        async def __aexit__(self, *args):
+            pass
+
+        async def post(self, url, headers, json):
+            captured["url"] = url
+            captured["headers"] = headers
+            captured["json"] = json
+            return _MockResponse()
+
+    # Mock do httpx.AsyncClient
+    monkeypatch.setattr("motor.adapters.deepseek.httpx.AsyncClient", lambda timeout: _MockClient())
+
+    content = await client.complete(
+        "deepseek-chat",
+        [{"role": "user", "content": "Test"}],
+        json_mode=True,
+    )
+    assert content == '{"test": "value"}'
+    assert captured["headers"]["Authorization"] == "Bearer test-key"
+
+
+@pytest.mark.asyncio
+async def test_deepseek_adapter_json_schema(monkeypatch):
+    """DeepSeek suporta json_schema strict (OpenAI-compatible)."""
+    from motor.adapters.deepseek import DeepSeekClient
+    from motor.config import get_settings
+
+    monkeypatch.setenv("DEEPSEEK_API_KEY", "test-key")
+    get_settings.cache_clear()
+
+    client = DeepSeekClient()
+    captured: dict = {}
+
+    class _MockResponse:
+        def raise_for_status(self):
+            pass
+
+        def json(self):
+            return {"choices": [{"message": {"content": "{}"}}]}
+
+    class _MockClient:
+        async def __aenter__(self):
+            return self
+
+        async def __aexit__(self, *args):
+            pass
+
+        async def post(self, url, headers, json):
+            captured["json"] = json
+            return _MockResponse()
+
+    # Mock do httpx.AsyncClient
+    monkeypatch.setattr("motor.adapters.deepseek.httpx.AsyncClient", lambda timeout: _MockClient())
+
+    schema = {"type": "object", "properties": {"test": {"type": "string"}}}
+    await client.complete(
+        "deepseek-chat",
+        [{"role": "user", "content": "Test"}],
+        json_mode=True,
+        json_schema=schema,
+        schema_name="test_schema",
+    )
+    assert captured["json"]["response_format"]["type"] == "json_schema"
+    assert captured["json"]["response_format"]["json_schema"]["name"] == "test_schema"
+    assert captured["json"]["response_format"]["json_schema"]["schema"] == schema
+
+
+@pytest.mark.asyncio
+async def test_router_includes_gemini_deepseek(monkeypatch):
+    """Verifica ordem do router: Gemini → Groq → DeepSeek → OpenRouter."""
+    from motor.config import get_settings
+
+    monkeypatch.setenv("GEMINI_API_KEY", "test-key")
+    monkeypatch.setenv("DEEPSEEK_API_KEY", "test-key")
+    get_settings.cache_clear()
+
+    seen_providers = []
+
+    class _Probe:
+        is_configured = True
+
+        def __init__(self, name):
+            self.name = name
+
+        async def complete(self, _m, _msgs, json_mode=False, temperature=0.2, **kw):
+            seen_providers.append(self.name)
+            if self.name == "gemini":
+                raise RuntimeError("Gemini falha")
+            if self.name == "groq":
+                raise RuntimeError("Groq falha")
+            return "{}"
+
+    router = LLMRouter()
+    router._gemini = _Probe("gemini")
+    router._groq = _Probe("groq")
+    router._deepseek = _Probe("deepseek")
+    router._openrouter = _Probe("openrouter")
+
+    await router.complete(
+        "llama-3.1-8b-instant",
+        [{"role": "user", "content": "Test"}],
+        json_mode=True,
+    )
+
+    assert seen_providers == ["gemini", "groq", "deepseek"]
+
+
 def test_validator_get_schema_returns_raw_dict():
     from motor.schemas.validator import get_validator
 

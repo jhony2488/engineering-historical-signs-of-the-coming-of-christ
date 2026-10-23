@@ -21,6 +21,8 @@ class Settings(BaseSettings):
 
     groq_api_key: str = ""
     openrouter_api_key: str = ""
+    gemini_api_key: str = ""
+    deepseek_api_key: str = ""
     llm_dry_run: bool = False
 
     redis_url: str = "redis://localhost:6379/0"
@@ -62,6 +64,14 @@ class Settings(BaseSettings):
     groq_model_timeline: str = "mistral-nemo"
     groq_model_reasoning: str = "deepseek-r1-distill"
     groq_model_hermeneutics: str = "gemma2-9b-it"
+
+    # Gemini models (camadas 4, 5, 7 - estratégia híbrida)
+    gemini_model_extraction: str = "gemini-2.5-flash-lite"
+    gemini_model_timeline: str = "gemini-3-flash"
+    gemini_model_hermeneutics: str = "gemini-3-flash"
+
+    # DeepSeek models (camada 6 - raciocínio)
+    deepseek_model_reasoning: str = "deepseek-reasoner"
 
     ollama_enabled: bool = False
     ollama_base_url: str = "http://localhost:11434"

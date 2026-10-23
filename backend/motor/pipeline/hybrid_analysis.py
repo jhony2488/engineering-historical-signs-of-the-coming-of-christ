@@ -139,8 +139,13 @@ class HybridAnalysisEngine:
             f"Dados híbridos:\n{json.dumps(payload, ensure_ascii=False, default=str)}"
         )
 
+        reasoning_model = (
+            self.settings.deepseek_model_reasoning
+            if self.settings.deepseek_api_key
+            else self.settings.groq_model_reasoning
+        )
         reasoning_content, reasoning_provider = await self.router.complete(
-            self.settings.groq_model_reasoning,
+            reasoning_model,
             [
                 {
                     "role": "system",
@@ -159,8 +164,13 @@ class HybridAnalysisEngine:
             layer="hybrid_reasoning",
         )
 
+        hermeneutics_model = (
+            self.settings.gemini_model_hermeneutics
+            if self.settings.gemini_api_key
+            else self.settings.groq_model_hermeneutics
+        )
         hermeneutics_content, herm_provider = await self.router.complete(
-            self.settings.groq_model_hermeneutics,
+            hermeneutics_model,
             [
                 {
                     "role": "system",
@@ -210,7 +220,7 @@ class HybridAnalysisEngine:
         self.db.cache_snapshot(payload["janela_out"], inserted if inserted.get("id") else row)
         self.db.log_audit(
             camada="nivel_3_hybrid",
-            modelo=f"{self.settings.groq_model_reasoning}+{self.settings.groq_model_hermeneutics}",
+            modelo=f"{reasoning_model}+{hermeneutics_model}",
             prompt_version=PROMPT_VERSION,
             input_hash=str(hash(json.dumps(payload, default=str))),
             decisao=payload["janela_out"],

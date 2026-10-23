@@ -156,8 +156,13 @@ class AbmSimulationService:
             payload = {k: v for k, v in result.items() if k != "synthesis"}
             template = compose_prompt("abm_synthesis.txt")
             prompt = template.replace("{{abm}}", json.dumps(payload, ensure_ascii=False)[:6000])
+            model_name = (
+                self.settings.gemini_model_timeline
+                if self.settings.gemini_api_key
+                else self.settings.groq_model_timeline
+            )
             content, _provider = await router.complete(
-                self.settings.groq_model_timeline,
+                model_name,
                 [
                     {
                         "role": "system",

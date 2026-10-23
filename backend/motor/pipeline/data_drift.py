@@ -62,8 +62,13 @@ class DataDriftEngine:
                 "Responda JSON: criterios_revisados, drift_detectado, recomendacoes, resumo.\n\n"
                 f"{json.dumps(context, ensure_ascii=False)}"
             )
+        model_name = (
+            self.settings.gemini_model_timeline
+            if self.settings.gemini_api_key
+            else self.settings.groq_model_timeline
+        )
         content, provider = await self.router.complete(
-            self.settings.groq_model_timeline,
+            model_name,
             [{"role": "user", "content": prompt}],
             json_mode=True,
         )
@@ -86,14 +91,14 @@ class DataDriftEngine:
             "audit_log",
             {
                 "camada": "data_drift_monthly",
-                "modelo": self.settings.groq_model_timeline,
+                "modelo": model_name,
                 "prompt_version": "v1/data_drift",
                 "input_hash": str(hash(json.dumps(context, default=str))),
                 "decisao": "drift" if analise.get("drift_detectado") else "stable",
                 "detalhes": result,
             },
         )
-        propostas = self._persist_propostas(analise, provider)
+        propostas = self._persist_propostas(analise, provider, model_name)
         result["propostas_geradas"] = propostas
         logger.info(
             "data_drift_complete",
@@ -102,7 +107,7 @@ class DataDriftEngine:
         )
         return result
 
-    def _persist_propostas(self, analise: dict[str, Any], provider: str) -> int:
+    def _persist_propostas(self, analise: dict[str, Any], provider: str, model_name: str) -> int:
         """Recomendações da LLM viram `propostas_ajuste` pendentes — a
         aplicação exige revisão humana via endpoints admin."""
         recs = analise.get("recomendacoes") or []
@@ -129,7 +134,7 @@ class DataDriftEngine:
             try:
                 self.db.insert_proposta_ajuste(
                     **proposta,
-                    modelo=f"{self.settings.groq_model_timeline}@{provider}",
+                    modelo=f"{model_name}@{provider}",
                     origem="data_drift_monthly",
                 )
                 count += 1

@@ -3,6 +3,8 @@ from __future__ import annotations
 import structlog
 from tenacity import retry, stop_after_attempt, wait_exponential
 
+from motor.adapters.deepseek import DeepSeekClient
+from motor.adapters.gemini import GeminiClient
 from motor.adapters.groq import GroqClient
 from motor.adapters.local_llm import LocalLlamaClient
 from motor.adapters.ollama import OllamaClient
@@ -13,12 +15,14 @@ logger = structlog.get_logger()
 
 
 class LLMRouter:
-    """Ordem: Local GGUF (se habilitado) → Ollama → Groq → OpenRouter → dry-run via GroqClient."""
+    """Ordem: Local GGUF (se habilitado) → Ollama → Gemini → Groq → DeepSeek → OpenRouter → dry-run via GroqClient."""
 
     def __init__(self) -> None:
         self._local = LocalLlamaClient()
         self._ollama = OllamaClient()
+        self._gemini = GeminiClient()
         self._groq = GroqClient()
+        self._deepseek = DeepSeekClient()
         self._openrouter = OpenRouterClient()
         self._force_fallback = False
 
@@ -60,12 +64,26 @@ class LLMRouter:
             except Exception as exc:
                 logger.warning("ollama_failed_fallback", error=str(exc), model=model)
 
+        if not self._force_fallback and self._gemini.is_configured:
+            try:
+                content = await self._gemini.complete(model, messages, json_mode, temperature, **kw)
+                return content, "gemini"
+            except Exception as exc:
+                logger.warning("gemini_failed_fallback", error=str(exc), model=model)
+
         if not self._force_fallback and self._groq.is_configured:
             try:
                 content = await self._groq.complete(model, messages, json_mode, temperature, **kw)
                 return content, "groq"
             except Exception as exc:
                 logger.warning("groq_failed_fallback", error=str(exc), model=model)
+
+        if self._deepseek.is_configured:
+            try:
+                content = await self._deepseek.complete(model, messages, json_mode, temperature, **kw)
+                return content, "deepseek"
+            except Exception as exc:
+                logger.warning("deepseek_failed_fallback", error=str(exc), model=model)
 
         if self._openrouter.is_configured:
             content = await self._openrouter.complete(model, messages, json_mode, temperature, **kw)

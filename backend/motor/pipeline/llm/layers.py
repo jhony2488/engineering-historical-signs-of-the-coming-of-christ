@@ -192,7 +192,11 @@ class LLMPipeline:
                 return shadow
 
             if parsed is None:
-                model_name = self.settings.groq_model_extraction
+                model_name = (
+                    self.settings.gemini_model_extraction
+                    if self.settings.gemini_api_key
+                    else self.settings.groq_model_extraction
+                )
                 last_err: str | None = None
                 for _ in range(2):
                     try:
@@ -209,7 +213,7 @@ class LLMPipeline:
                                 },
                             ]
                         content, provider = await self.router.complete(
-                            self.settings.groq_model_extraction,
+                            model_name,
                             msgs,
                             json_mode=True,
                             json_schema=self.validator.get_schema("evento_estruturado"),
@@ -277,14 +281,17 @@ class LLMPipeline:
             },
             {"role": "user", "content": prompt},
         ]
-        content, provider = await self.router.complete(
-            self.settings.groq_model_timeline, messages, json_mode=True
+        model_name = (
+            self.settings.gemini_model_timeline
+            if self.settings.gemini_api_key
+            else self.settings.groq_model_timeline
         )
+        content, provider = await self.router.complete(model_name, messages, json_mode=True)
         parsed = self._translate_narratives(self._parse_json(content), "timeline")
         row = db.insert("linhas_temporais", {"dados": parsed})
         db.log_audit(
             "camada_5",
-            self.settings.groq_model_timeline,
+            model_name,
             self.PROMPT_VERSION,
             self._hash_input(json.dumps(events)),
             "ok",
@@ -306,9 +313,12 @@ class LLMPipeline:
             },
             {"role": "user", "content": prompt},
         ]
-        content, provider = await self.router.complete(
-            self.settings.groq_model_reasoning, messages, json_mode=True
+        model_name = (
+            self.settings.deepseek_model_reasoning
+            if self.settings.deepseek_api_key
+            else self.settings.groq_model_reasoning
         )
+        content, provider = await self.router.complete(model_name, messages, json_mode=True)
         parsed = self._translate_narratives(
             scrub_payload_narratives(
                 self._parse_json(content),
@@ -320,7 +330,7 @@ class LLMPipeline:
         row = db.insert("inferencias_raciocinio", {"dados": parsed})
         db.log_audit(
             "camada_6",
-            self.settings.groq_model_reasoning,
+            model_name,
             self.PROMPT_VERSION,
             self._hash_input(json.dumps(context)),
             "ok",
@@ -346,9 +356,12 @@ class LLMPipeline:
             },
             {"role": "user", "content": prompt},
         ]
-        content, provider = await self.router.complete(
-            self.settings.groq_model_hermeneutics, messages, json_mode=True
+        model_name = (
+            self.settings.gemini_model_hermeneutics
+            if self.settings.gemini_api_key
+            else self.settings.groq_model_hermeneutics
         )
+        content, provider = await self.router.complete(model_name, messages, json_mode=True)
         parsed = self._translate_narratives(
             scrub_payload_narratives(
                 self._parse_json(content),
@@ -361,7 +374,7 @@ class LLMPipeline:
         row = db.insert("interpretacoes_hermeneuticas", {"dados": parsed})
         db.log_audit(
             "camada_7",
-            self.settings.groq_model_hermeneutics,
+            model_name,
             self.PROMPT_VERSION,
             self._hash_input(json.dumps(events)),
             "ok",
