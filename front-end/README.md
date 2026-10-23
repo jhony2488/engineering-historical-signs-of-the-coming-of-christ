@@ -47,20 +47,14 @@ Cobertura: `lib/` (cache, api, phases, mock, seo, db, local-ai), `middleware`, c
 | Variável | Descrição |
 |----------|-----------|
 | `NEXT_PUBLIC_SITE_URL` | URL pública do site (SEO/canonical) |
-| `NEXT_PUBLIC_DATA_SOURCE` | `db` (Prisma) ou `fastapi` (motor Python) |
 | `DATABASE_URL` | PostgreSQL Supabase (Prisma) |
 | `DIRECT_URL` | Conexão direta Supabase (migrations) |
-| `NEXT_PUBLIC_API_URL` | FastAPI quando `DATA_SOURCE=fastapi` |
 | `NEXT_PUBLIC_USE_MOCK` | `true` força dados de demonstração |
 | `NEXT_PUBLIC_LOCAL_AI` | `auto` (default) ou `off` — IA on-device |
 
-O `next.config.ts` faz rewrite de `/api/backend/*` → FastAPI.
-
 ## Fontes de dados
 
-**Modo `db` (padrão):** Next.js → Prisma → Supabase (`/api/db/*`)
-
-**Modo `fastapi`:** Next.js → rewrite → motor Python (`/api/backend/*`)
+**Banco:** Browser → rotas `/api/db/*` do Next.js → Prisma → Supabase
 
 1. Migration: `backend/supabase/migrations/...sql`
 2. Batch: `python -m motor.cli run-daily --dry-run`
@@ -77,7 +71,7 @@ O `next.config.ts` faz rewrite de `/api/backend/*` → FastAPI.
 
 - Build: `npm run build`
 - Publish: `.next` (ou use adapter Netlify para Next.js)
-- Env: `NEXT_PUBLIC_API_URL` apontando para API em produção
+- Env: `DATABASE_URL` e `DIRECT_URL` apontando para o Supabase
 
 ## Estrutura
 

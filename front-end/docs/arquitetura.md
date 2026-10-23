@@ -9,12 +9,10 @@ ver [IA on-device](#ia-on-device-pwa).)
 
 ```text
 Browser → lib/api.ts (cache localStorage + fallback mock)
-        ├── DATA_SOURCE=db     → /api/db/*      → route handlers → Prisma → Supabase
-        └── DATA_SOURCE=fastapi → /api/backend/* → rewrite (next.config.ts) → FastAPI :8000
+        └── /api/db/* → route handlers do Next.js → Prisma → Supabase
 ```
 
-- `lib/api.ts` resolve a URL conforme `NEXT_PUBLIC_DATA_SOURCE`
-  (`resolveUrl` + `PATHS`).
+- `lib/api.ts` chama exclusivamente os route handlers `/api/db/*` do Next.js.
 - `NEXT_PUBLIC_USE_MOCK=true` ou qualquer falha de fetch → mocks de
   `lib/mock*.ts` (a UI nunca quebra).
 - Funções `*SWR` entregam cache stale imediatamente e revalidam em
@@ -182,7 +180,6 @@ Flags: `NEXT_PUBLIC_LOCAL_AI=auto|off`, `NEXT_PUBLIC_LOCAL_AI_MODEL_BASE`,
 ## Variáveis de ambiente
 
 Ver `.env.example`. Principais: `NEXT_PUBLIC_SITE_URL`,
-`NEXT_PUBLIC_DATA_SOURCE` (`db`|`fastapi`), `NEXT_PUBLIC_USE_MOCK`,
-`DATABASE_URL`/`DIRECT_URL` (Prisma/Supabase), `NEXT_PUBLIC_API_URL` ou
-`BACKEND_URL` (alvo do rewrite `/api/backend/*`), `JOSHUA_API_KEY` +
-`JOSHUA_SYNC_TOKEN`, `RESEND_API_KEY`/`SMTP_*`, `NEXT_PUBLIC_GA_*`.
+`NEXT_PUBLIC_USE_MOCK`, `DATABASE_URL`/`DIRECT_URL` (Prisma/Supabase),
+`JOSHUA_API_KEY` + `JOSHUA_SYNC_TOKEN`, `RESEND_API_KEY`/`SMTP_*`,
+`NEXT_PUBLIC_GA_*`.

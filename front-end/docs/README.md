@@ -13,4 +13,3 @@
 
 1. [REQUISITOS_CONTRIBUICAO.md](REQUISITOS_CONTRIBUICAO.md) — antes de abrir um PR
 2. [arquitetura.md](arquitetura.md) — para entender páginas, rotas e fontes de dados
-3. [../../backend/docs/api-contrato.md](../../backend/docs/api-contrato.md) — contrato do motor quando `DATA_SOURCE=fastapi`

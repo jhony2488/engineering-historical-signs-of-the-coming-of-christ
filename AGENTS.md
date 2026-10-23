@@ -25,6 +25,9 @@ com profecias e publicação de rankings/fases em um dashboard.
   Supabase free; evite infra 24/7.
 - **Front-end só lê** — o dashboard nunca executa pipeline de IA, nunca chama
   LLMs **de API** e nunca grava em `resultados_escatologicos`.
+  Para dados, o navegador chama somente rotas do Next.js (`/api/db/*`), que
+  consultam o Supabase via Prisma no servidor; o front-end não usa FastAPI como
+  fonte de dados alternativa nem acessa o banco diretamente do navegador.
   Exceção: inferência **on-device** (`front-end/src/lib/local-ai/` —
   WebLLM/Transformers.js no navegador do usuário) é permitida porque não usa
   rede, custo ou credenciais; ela só lê dados já exibidos e nunca é
@@ -45,7 +48,7 @@ com profecias e publicação de rankings/fases em um dashboard.
 | `backend/supabase/migrations/` | DDL do Postgres (fonte única de schema) |
 | `backend/tests/` | Testes pytest |
 | `backend/docs/` | Documentação técnica do motor |
-| `front-end/src/app/` | App Router — páginas (`(painel)`, `historico`, `rankings`, `globo`, `grafo`, `profecias`, `simulador`, `revisao`, `joshua`, …) e route handlers `api/db/`, `api/admin/`, `api/auth/`, `api/joshua/` |
+| `front-end/src/app/` | App Router — páginas (`(painel)`, `historico`, `rankings`, `globo`, `grafo`, `profecias`, `simulador`, `revisao`, `joshua`, …) e route handlers `api/db/` (Prisma/Supabase), `api/admin/`, `api/auth/`, `api/joshua/` |
 | `front-end/src/components/` | Componentes React (dashboard, charts, globo, grafo, ui) |
 | `front-end/src/lib/` | `api.ts`, `cache.ts`, `types.ts`, `db/`, `seo/`, `auth/`, `mock*.ts` |
 | `front-end/prisma/` | Schema Prisma (espelha Supabase — não crie DDL aqui) + seed |
@@ -156,7 +159,7 @@ npm run test   # Vitest + pytest — usado pelo pre-push
 |------------|---------|
 | Motor (batch real) | `SUPABASE_URL`, `SUPABASE_SERVICE_ROLE_KEY`, `GROQ_API_KEY` (+ `OPENROUTER_API_KEY` fallback) |
 | API admin | `ADMIN_API_KEY` |
-| Front-end modo `db` | `DATABASE_URL`, `DIRECT_URL` (Supabase) |
+| Front-end (Next.js/Prisma) | `DATABASE_URL`, `DIRECT_URL` (Supabase); usadas no servidor Next.js |
 | Workflows agendados | os mesmos do motor, via GitHub Secrets |
 
 ### Gaps conhecidos (não bloqueiam dev local)

@@ -32,7 +32,6 @@ Configure pelo menos:
 
 ```env
 NEXT_PUBLIC_SITE_URL=http://localhost:3000
-NEXT_PUBLIC_DATA_SOURCE=db
 NEXT_PUBLIC_USE_MOCK=true          # desenvolvimento sem Supabase
 ```
 
@@ -121,10 +120,9 @@ front-end/
 
 ### Fontes de dados
 
-| Modo | Variável | Fluxo |
-|------|----------|-------|
-| `db` (padrão) | `NEXT_PUBLIC_DATA_SOURCE=db` | Browser → `/api/db/*` → Prisma → Supabase |
-| `fastapi` | `NEXT_PUBLIC_DATA_SOURCE=fastapi` | Browser → `/api/backend/*` → rewrite → motor Python |
+| Variável | Fluxo |
+|----------|-------|
+| `DATABASE_URL` | Browser → `/api/db/*` → route handlers do Next.js → Prisma → Supabase |
 
 Novas rotas de leitura devem seguir o padrão `src/app/api/db/.../route.ts` com `Cache-Control: stale-while-revalidate` quando aplicável.
 
@@ -303,17 +301,17 @@ Documentação do motor: [backend/docs/api-contrato.md](../../backend/docs/api-c
 
 - Build de produção: `npm run build` (inclui `prisma generate`)
 - Variáveis obrigatórias em Netlify/Vercel: `NEXT_PUBLIC_SITE_URL`, `DATABASE_URL`, `DIRECT_URL`
-- `NEXT_PUBLIC_DATA_SOURCE=db` em produção quando Supabase estiver disponível
+- `DATABASE_URL` e `DIRECT_URL` configuradas para o Supabase
 
 ## Reportar bugs
 
 Inclua:
 
 1. URL e rota afetada (`/`, `/historico`, `/rankings`)
-2. Valor de `NEXT_PUBLIC_DATA_SOURCE` e `NEXT_PUBLIC_USE_MOCK`
+2. Valor de `NEXT_PUBLIC_USE_MOCK`
 3. Versão do Node (`node --version`)
 4. Screenshot ou mensagem de erro do console (sem secrets)
-5. Se o problema ocorre com mock, DB ou FastAPI
+5. Se o problema ocorre com mock ou banco
 
 ## Código de conduta
 

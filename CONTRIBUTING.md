@@ -38,6 +38,14 @@ O projeto é um monorepo com duas stacks:
 | `front-end/` | TypeScript + Next.js | ESLint + Prettier |
 | `backend/` | Python 3.11+ | Ruff (lint + format) |
 
+### Acesso a dados do front-end
+
+O navegador deve buscar dados exclusivamente pelas rotas `/api/db/*` do
+Next.js. Esses route handlers consultam o Supabase via Prisma no servidor
+Next.js. Não adicione acesso direto ao banco no navegador nem um fluxo
+alternativo do dashboard via FastAPI. `DATABASE_URL` e `DIRECT_URL` são
+configurações server-side e nunca devem ser expostas como `NEXT_PUBLIC_*`.
+
 - Formate o código antes de abrir o PR:
   ```bash
   npm run format --prefix front-end   # Prettier

@@ -39,4 +39,4 @@ npm run db:seed
 | `GET /api/db/resultado/historico` | `resultados_escatologicos` |
 | `GET /api/db/ranking/[personagem]` | `ranking_probabilistico` |
 
-Configure `NEXT_PUBLIC_DATA_SOURCE=db` (padrão) no `.env.local`.
+O dashboard acessa o banco por meio dos route handlers do Next.js.
