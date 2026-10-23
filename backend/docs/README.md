@@ -11,7 +11,7 @@
 | [api-contrato.md](api-contrato.md) | Contrato REST completo (público + admin) |
 | [fontes-dados.md](fontes-dados.md) | Fontes da ingestão: RSS, GDELT, ACLED, API.Bible, Joshua |
 | [variaveis-ambiente.md](variaveis-ambiente.md) | Referência de todas as env vars do motor |
-| [setup-supabase.md](setup-supabase.md) | Criação do projeto Supabase e migrations |
+| [setup-postgres.md](setup-postgres.md) | Configuração do PostgreSQL com pgvector e migrations |
 | [github-actions.md](github-actions.md) | Workflows, secrets e execução agendada |
 | [schemas-json.md](schemas-json.md) | Contratos JSON Schema e versionamento |
 | [model-providers.md](model-providers.md) | Provedores LLM (Local GGUF, Ollama, Groq, OpenRouter) |
@@ -21,6 +21,6 @@
 ## Leitura recomendada
 
 1. [REQUISITOS_CONTRIBUICAO.md](REQUISITOS_CONTRIBUICAO.md) — antes de abrir um PR
-2. [setup-supabase.md](setup-supabase.md) — para rodar o motor localmente
+2. [setup-postgres.md](setup-postgres.md) — para rodar o motor localmente
 3. [arquitetura.md](arquitetura.md) + [camadas.md](camadas.md) — para entender o pipeline
 4. [api-contrato.md](api-contrato.md) — para consumir dados no dashboard

@@ -125,7 +125,7 @@ próprios — leia-os antes de contribuir:
 |-----------|-----------|
 | [AGENTS.md](AGENTS.md) | Regras e contexto para agentes de IA |
 | [CLOUD.md](CLOUD.md) | Setup para agentes em nuvem e infraestrutura |
-| [backend/docs/](backend/docs/) | Arquitetura, contrato de API, schemas, Supabase, Actions |
+| [backend/docs/](backend/docs/) | Arquitetura, contrato de API, schemas, PostgreSQL, Actions |
 | [front-end/README.md](front-end/README.md) | Visão geral do dashboard |
 | [backend/README.md](backend/README.md) | Visão geral do motor |
 
@@ -139,8 +139,8 @@ próprios — leia-os antes de contribuir:
 - Prompts novos seguem a convenção `prompts/v1/` (PT) + `prompts/v2_en/` (EN),
   selecionados por `PROMPTS_LANG`; markers `{{...}}`, slugs e enums do JSON
   de saída são parte do contrato — não traduza valores de schema.
-- `SUPABASE_SERVICE_ROLE_KEY`, `GROQ_API_KEY` e `ADMIN_API_KEY` só existem no
-  motor batch — nunca no front-end.
+- `DATABASE_URL`, `GROQ_API_KEY` e `ADMIN_API_KEY` são secrets server-side;
+  nunca os exponha no browser ou em variáveis `NEXT_PUBLIC_*`.
 - Se encontrar uma vulnerabilidade, avise em particular antes de abrir uma
   issue pública.
 - Use variáveis de ambiente para credenciais em ambiente de desenvolvimento.

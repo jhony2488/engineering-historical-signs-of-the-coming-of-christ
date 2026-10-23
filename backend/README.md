@@ -47,11 +47,13 @@ python scripts/download_models.py --all   # cascata 7B→3B→1.5B → models_ca
 # LOCAL_LLM_ENABLED=true no .env
 ```
 
-### Supabase (do zero)
+### PostgreSQL com pgvector
 
-1. Crie projeto em [supabase.com](https://supabase.com)
-2. SQL Editor → execute [`supabase/migrations/20260604000001_init_schema.sql`](supabase/migrations/20260604000001_init_schema.sql)
-3. Copie `SUPABASE_URL` e `SUPABASE_SERVICE_ROLE_KEY` para `.env`
+1. Inicie o PostgreSQL com pgvector pelo `docker compose up -d postgres` ou use
+   um servidor PostgreSQL com a extensão pgvector disponível.
+2. Aplique as migrations SQL de [`migrations/`](migrations/).
+3. Configure `DATABASE_URL` em `backend/.env`; o motor e a API conectam
+   diretamente ao PostgreSQL, sem SDK nem credenciais de uma API gerenciada.
 
 ### Redis (opcional)
 
@@ -115,8 +117,7 @@ Workflows em [`.github/workflows/`](../.github/workflows/):
 
 | Secret | Uso |
 |--------|-----|
-| `SUPABASE_URL` | Persistência |
-| `SUPABASE_SERVICE_ROLE_KEY` | Escrita batch |
+| `DATABASE_URL` | Conexão direta do motor e da API ao PostgreSQL com pgvector |
 | `GROQ_API_KEY` | LLM primário |
 | `OPENROUTER_API_KEY` | Fallback |
 | `ADMIN_API_KEY` | API admin |

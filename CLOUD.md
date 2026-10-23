@@ -89,7 +89,7 @@ cd front-end && npm run lint && npm run test && npm run build
   (com versionamento), `tests/`, `docs/`, `front-end/src/` (componentes, lib,
   rotas `api/db/`), `public/`.
 - **Exige discussão prévia**: schema JSON publicado, pesos MCDA, thresholds de
-  fase, migrations Supabase, provedor LLM primário, `src/lib/types.ts`,
+  fase, migrations PostgreSQL, provedor LLM primário, `src/lib/types.ts`,
   `middleware.ts`, remoção do fallback mock.
 - **Proibido**: commitar secrets/`.env`, gravar no banco pelo front-end,
   diretivas de ignore fora de testes, mais de 20 arquivos por PR.
@@ -98,16 +98,16 @@ cd front-end && npm run lint && npm run test && npm run build
 
 ## Parte 2 — Infraestrutura em nuvem
 
-### Supabase (Postgres + pgvector)
+### PostgreSQL + pgvector
 
-- Banco único para persistência — sem S3/cold files.
-- DDL fonte única: [`backend/supabase/migrations/`](backend/supabase/) —
+- Banco PostgreSQL único para persistência, acessado diretamente pelo backend — sem S3/cold files.
+- DDL fonte única: [`backend/migrations/`](backend/migrations/) —
   migration inicial `20260604000001_init_schema.sql`.
 - Schema Prisma do front-end **espelha** as tabelas — nunca criar DDL via
   `prisma migrate dev` sem alinhar com o backend.
-- Setup do zero: [backend/docs/setup-supabase.md](backend/docs/setup-supabase.md).
-- Service role key **apenas** no motor batch; front usa `DATABASE_URL`
-  (pooler :6543) e `DIRECT_URL` (:5432) com permissões de leitura.
+- Setup do zero: [backend/docs/setup-postgres.md](backend/docs/setup-postgres.md).
+- Backend usa somente `DATABASE_URL`; o front-end usa `DATABASE_URL` e
+  `DIRECT_URL` no servidor Next.js.
 
 ### GitHub Actions — batch agendado
 
@@ -128,7 +128,7 @@ cd front-end && npm run lint && npm run test && npm run build
 | `annual-hybrid.yml` | Jan 1 `0 11 1 1 *` | Nível 3 — síntese + híbrido anual |
 | `motor-nivel-3-dispatch.yml` | manual | Disparo manual com janela |
 
-**Secrets de repositório**: `SUPABASE_URL`, `SUPABASE_SERVICE_ROLE_KEY`,
+**Secrets de repositório**: `DATABASE_URL`,
 `GROQ_API_KEY`, `OPENROUTER_API_KEY`, `ADMIN_API_KEY`.
 **Variáveis opcionais (repo `vars`)**: `LLM_DRY_RUN`, `LOCAL_LLM_ENABLED`,
 `PROMPTS_LANG`, `TRANSLATE_NARRATIVES`, `CLASSIFIER_HINTS_ENABLED` — defaults
@@ -137,8 +137,8 @@ no workflow ligam o tier SLM local + prompts EN.
 `backend/models_cache/` (GGUFs do SLM, chave = `local_llm.py`) no workflow
 diário; os GGUFs são baixados por `scripts/download_models.py --all`.
 
-> Não existe workflow de PR/push — lint, testes e build são responsabilidade
-> dos hooks locais + revisor.
+> O CI de PR/push roda os testes de front-end e back-end e valida assinatura
+> SSH dos commits. Lint e build continuam nos hooks locais.
 
 ### Provedores LLM
 

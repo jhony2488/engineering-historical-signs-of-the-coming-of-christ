@@ -56,7 +56,7 @@ Cobertura: `lib/` (cache, api, phases, mock, seo, db, local-ai), `middleware`, c
 
 **Banco:** Browser → rotas `/api/db/*` do Next.js → Prisma → Supabase
 
-1. Migration: `backend/supabase/migrations/...sql`
+1. Migration: `backend/migrations/...sql`
 2. Batch: `python -m motor.cli run-daily --dry-run`
 3. Seed front: `npm run db:seed`
 

@@ -8,7 +8,7 @@ Obrigado por contribuir com o motor de IA. Este documento define o que esperamos
 - **Append-only** — resultados escatológicos nunca são sobrescritos; correções usam `revert-day` ou novo registro.
 - **Schema primeiro** — todo JSON persistido deve passar validação em `motor/schemas/`.
 - **Escritura como âncora** — camadas hermenêuticas devem consultar o corpus teológico (RAG) antes de concluir.
-- **Custo zero no início** — priorize Groq free tier, GitHub Actions e Supabase free; evite infra 24/7 sem necessidade.
+- **Custo zero no início** — priorize Groq free tier, GitHub Actions e PostgreSQL com pgvector; evite infra 24/7 sem necessidade.
 
 ## Ambiente de desenvolvimento
 
@@ -36,8 +36,7 @@ Configure pelo menos:
 
 ```env
 LLM_DRY_RUN=true                # para desenvolvimento sem chaves
-SUPABASE_URL=...
-SUPABASE_SERVICE_ROLE_KEY=...
+DATABASE_URL=postgresql://sinais:sinais@localhost:5433/sinais
 ```
 
 ### Comandos obrigatórios antes do PR
@@ -66,7 +65,7 @@ Todos devem passar sem erros.
 
 - Mudança de contrato JSON publicado no dashboard (`resultado_escatologico.schema.json`)
 - Alteração de pesos MCDA ou thresholds de fase
-- Novas tabelas ou breaking changes em migrations Supabase
+- Novas tabelas ou breaking changes em migrations PostgreSQL
 - Substituição de provedor LLM primário
 - Remoção de camada do pipeline
 
@@ -114,7 +113,7 @@ Prefixos sugeridos: `feat`, `fix`, `docs`, `test`, `refactor`, `chore`.
 - [ ] `.env.example` atualizado se novas variáveis foram introduzidas
 - [ ] `docs/` atualizado se comportamento público mudou
 - [ ] Nenhum secret, token ou credencial no diff
-- [ ] Migrations SQL em `supabase/migrations/` com timestamp no nome
+- [ ] Migrations SQL em `migrations/` com timestamp no nome
 
 ### Título e descrição
 
@@ -156,10 +155,10 @@ Ao alterar campos obrigatórios:
 ## Segurança
 
 - **Não** commitar `.env`
-- **Não** logar `SUPABASE_SERVICE_ROLE_KEY`, `GROQ_API_KEY`, `ADMIN_API_KEY`
+- **Não** logar `DATABASE_URL`, `GROQ_API_KEY`, `ADMIN_API_KEY`
 - Endpoints admin exigem header `X-Admin-Key`
 - Rate limit ativo na API pública (`slowapi`)
-- Service role do Supabase apenas no motor batch — nunca no frontend
+- `DATABASE_URL` somente no servidor — nunca no frontend
 
 ## Testes
 
@@ -199,5 +198,5 @@ Inclua:
 Abra uma issue com a tag `question` ou consulte:
 
 - [arquitetura.md](arquitetura.md)
-- [setup-supabase.md](setup-supabase.md)
+- [setup-postgres.md](setup-postgres.md)
 - [api-contrato.md](api-contrato.md)

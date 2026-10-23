@@ -43,7 +43,7 @@ DIRECT_URL=postgresql://...:5432/postgres
 NEXT_PUBLIC_USE_MOCK=false
 ```
 
-Pré-requisito: migration do backend aplicada (`backend/supabase/migrations/`). Ver [prisma/README.md](../prisma/README.md).
+Pré-requisito: migrations PostgreSQL do backend aplicadas (`backend/migrations/`). Ver [prisma/README.md](../prisma/README.md).
 
 ```bash
 npx prisma generate
@@ -295,7 +295,7 @@ Documentação do motor: [backend/docs/api-contrato.md](../../backend/docs/api-c
 - Schema Prisma espelha tabelas do Supabase — **migrations DDL ficam no backend**.
 - Baseline Prisma: `prisma/migrations/20260605000001_baseline/`
 - Seed detalhado: 90 dias, 20 candidatos, rankings, snapshots — `npm run db:seed`
-- Não rode `prisma migrate dev` que crie DDL conflitante sem alinhar com `backend/supabase/migrations/`
+- Não rode `prisma migrate dev` que crie DDL conflitante sem alinhar com `backend/migrations/`
 
 ## Deploy
 

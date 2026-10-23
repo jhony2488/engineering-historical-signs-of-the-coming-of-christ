@@ -23,7 +23,7 @@ Taxonomia completa: [modelos-locais.md](modelos-locais.md).
 
 | Modelo | Mínimo de dados | Comando | Artefato | Como ativa | Rollback |
 |--------|-----------------|---------|----------|------------|----------|
-| HMM de fases | `HMM_EM_MIN_DAYS` (30) dias de `resultados_escatologicos` | `train-phase-hmm --persist` | linha nova em `parametros_fase` | `ativo=true` manual no Supabase | `ativo=false` na nova / `true` na anterior |
+| HMM de fases | `HMM_EM_MIN_DAYS` (30) dias de `resultados_escatologicos` | `train-phase-hmm --persist` | linha nova em `parametros_fase` | `ativo=true` manual no PostgreSQL | `ativo=false` na nova / `true` na anterior |
 | Classificador de extração | `DISTILL_MIN_ROWS` (300) extrações validadas | `export-extraction-dataset` → `train-event-classifier` | `config/event_classifier/*.joblib` + `meta.json` | `EXTRACTION_MODE=classifier_first` | `EXTRACTION_MODE=llm` |
 | GNN | grafo com arestas acumuladas | `train-gnn` | `config/gnn_weights.pt` | automático no próximo run (`backend=pyg_trained`) | remover o arquivo |
 | Zero-shot / tom espiritual | — | editar JSON | `config/classifier_prototypes.json`, `motor/config/spiritual_tone_weights.json` | imediato (arquivo lido a cada chamada) | `git checkout` do arquivo |
@@ -46,8 +46,8 @@ convergência. Com `--persist`, grava em `parametros_fase` com
 `ativo=false, aprovado=false` e `versao` incrementada.
 
 **Revisão:** compare `emissoes`/`transicoes` da versão nova com a ativa no
-Supabase (Table Editor ou `select * from parametros_fase order by versao
-desc`). Desconfie de transmat degenerada (uma linha com ~1.0 na diagonal e
+PostgreSQL com `psql` (`select * from parametros_fase order by versao desc`).
+Desconfie de transmat degenerada (uma linha com ~1.0 na diagonal e
 o resto zerado = overfitting em série curta).
 
 **Ativação:** `ativo=true` na nova versão (e `false` na antiga). O próximo

@@ -3,13 +3,15 @@
 Referência completa de [`backend/.env.example`](../.env.example). Copie para
 `backend/.env` e ajuste — nunca commite valores reais.
 
-## Supabase
+## PostgreSQL com pgvector
 
 | Variável | Descrição |
 |----------|-----------|
-| `SUPABASE_URL` | URL do projeto |
-| `SUPABASE_SERVICE_ROLE_KEY` | Escrita no batch — **nunca no front-end** |
-| `SUPABASE_ANON_KEY` | Leitura pública (dashboard) |
+| `DATABASE_URL` | String de conexão PostgreSQL usada pelo motor e pela API |
+
+O banco deve ter a extensão `vector` (pgvector) instalada e habilitada. O
+backend conecta diretamente ao PostgreSQL pela `DATABASE_URL`, sem SDK ou API
+de banco intermediária.
 
 ## LLMs
 

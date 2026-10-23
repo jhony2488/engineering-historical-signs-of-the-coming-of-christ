@@ -129,7 +129,7 @@ requirements; read the relevant guide before contributing:
 |----------|-------------|
 | [AGENTS.md](AGENTS.md) | Context and rules for AI agents |
 | [CLOUD.md](CLOUD.md) | Cloud agent setup and infrastructure (Supabase, Actions, deployment) |
-| [backend/docs/](backend/docs/) | Architecture, API contract, schemas, Supabase, and Actions |
+| [backend/docs/](backend/docs/) | Architecture, API contract, schemas, PostgreSQL, and Actions |
 | [front-end/README.md](front-end/README.md) | Dashboard overview |
 | [backend/README.md](backend/README.md) | Engine overview |
 
@@ -143,8 +143,8 @@ requirements; read the relevant guide before contributing:
   (English) convention and are selected by `PROMPTS_LANG`. Markers `{{...}}`,
   slugs, and JSON output schema enums are part of the contract; do not
   translate schema values.
-- `SUPABASE_SERVICE_ROLE_KEY`, `GROQ_API_KEY`, and `ADMIN_API_KEY` are only
-  used by the batch engine and must never be exposed in the front-end.
+- `DATABASE_URL`, `GROQ_API_KEY`, and `ADMIN_API_KEY` are server-side secrets;
+  never expose them in the browser or through `NEXT_PUBLIC_*` variables.
 - If you find a vulnerability, report it privately before opening a public
   issue.
 - Use environment variables for credentials in development.

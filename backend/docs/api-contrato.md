@@ -134,5 +134,5 @@ Header obrigatório: `X-Admin-Key: <ADMIN_API_KEY>` (401 se inválido).
 1. Cache localStorage com expiração diária (mesmo dia = não chamar API)
 2. Buscar `/api/v1/resultado/atual` após horário do batch (~04:00 BRT)
 3. Histórico para gráficos: `/api/v1/resultado/historico?desde=2026-01-01`
-4. Nunca expor `SUPABASE_SERVICE_ROLE_KEY` no frontend — use esta API ou
-   Supabase `anon` com RLS
+4. Nunca expor `DATABASE_URL` ou credenciais do PostgreSQL no frontend; acesso
+   ao banco ocorre apenas no servidor.

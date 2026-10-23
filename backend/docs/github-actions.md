@@ -12,8 +12,7 @@ Workflows na raiz do repositório (`.github/workflows/`), executando comandos em
 
 ### Secrets necessários
 
-- `SUPABASE_URL`
-- `SUPABASE_SERVICE_ROLE_KEY`
+- `DATABASE_URL` (PostgreSQL com pgvector)
 - `GROQ_API_KEY`
 - `OPENROUTER_API_KEY` (fallback)
 

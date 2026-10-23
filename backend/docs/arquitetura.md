@@ -2,7 +2,7 @@
 
 ## Visão geral
 
-O motor executa um pipeline batch diário que transforma documentos brutos em um índice escatológico consolidado, persistido no Supabase.
+O motor executa um pipeline batch diário que transforma documentos brutos em um índice escatológico consolidado, persistido diretamente em PostgreSQL com pgvector.
 
 ```mermaid
 flowchart LR
@@ -22,7 +22,7 @@ flowchart LR
   L13 --> L15
   corr --> L14[Camada14_Proveniencia]
   L15 --> report[Camada9_Relatorios]
-  report --> db[(Supabase)]
+  report --> db[(PostgreSQL + pgvector)]
   report --> globe[Front_Globo3D]
 ```
 
@@ -170,4 +170,4 @@ via `python -m motor.cli train-gnn` → `config/gnn_weights.pt`. Tabelas
 
 ## Persistência
 
-Dados de longo prazo ficam **somente no PostgreSQL (Supabase)** — resultados diários, arquivo profético, snapshots, inscritos, ameaças, ABM, adversarial, proveniência, recomendações e cache Joshua. Cold storage em S3/arquivos locais foi desativado. L14 = ledger local no Postgres (Merkle root no DB).
+Dados de longo prazo ficam **somente no PostgreSQL com pgvector**, acessado diretamente pelo backend — resultados diários, arquivo profético, snapshots, inscritos, ameaças, ABM, adversarial, proveniência, recomendações e cache Joshua. Cold storage em S3/arquivos locais foi desativado. L14 = ledger local no Postgres (Merkle root no DB).

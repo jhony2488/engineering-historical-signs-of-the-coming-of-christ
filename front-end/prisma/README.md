@@ -7,7 +7,7 @@ Leitura direta do **Supabase PostgreSQL** (mesmo banco do `backend/`).
 Execute primeiro a migration do backend:
 
 ```
-backend/supabase/migrations/20260604000001_init_schema.sql
+backend/migrations/20260604000001_init_schema.sql
 ```
 
 ## Setup

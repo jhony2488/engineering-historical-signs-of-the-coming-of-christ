@@ -26,7 +26,7 @@ com profecias e publicação de rankings/fases em um dashboard.
 - **Front-end só lê** — o dashboard nunca executa pipeline de IA, nunca chama
   LLMs **de API** e nunca grava em `resultados_escatologicos`.
   Para dados, o navegador chama somente rotas do Next.js (`/api/db/*`), que
-  consultam o Supabase via Prisma no servidor; o front-end não usa FastAPI como
+  consultam PostgreSQL via Prisma no servidor; o front-end não usa FastAPI como
   fonte de dados alternativa nem acessa o banco diretamente do navegador.
   Exceção: inferência **on-device** (`front-end/src/lib/local-ai/` —
   WebLLM/Transformers.js no navegador do usuário) é permitida porque não usa
@@ -42,16 +42,16 @@ com profecias e publicação de rankings/fases em um dashboard.
 
 | Caminho | Conteúdo |
 |---------|----------|
-| `backend/motor/` | Motor Python — pipeline (ingestão → embeddings/RAG → LLMs → Bayes/HMM/MCDA → relatórios + extensões L10–15). Subpacotes: `pipeline/` (camadas), `domain/` (fases, energias, bestas, falso líder), `math/` (Bayes, HMM, MCDA), `ml/` (relevance, reranker, GNN, classificadores, destilação), `adapters/` (`local_llm.py` SLM GGUF, Groq/OpenRouter/Ollama, Supabase, Redis, e-mail), `i18n/` (tradução EN→PT NLLB), `schemas/`, `prompts/` (`v1/` PT, `v2_en/` EN — `PROMPTS_LANG`) |
+| `backend/motor/` | Motor Python — pipeline (ingestão → embeddings/RAG → LLMs → Bayes/HMM/MCDA → relatórios + extensões L10–15). Subpacotes: `pipeline/` (camadas), `domain/` (fases, energias, bestas, falso líder), `math/` (Bayes, HMM, MCDA), `ml/` (relevance, reranker, GNN, classificadores, destilação), `adapters/` (`postgres.py` PostgreSQL/pgvector, `local_llm.py` SLM GGUF, Groq/OpenRouter/Ollama, Redis, e-mail), `i18n/` (tradução EN→PT NLLB), `schemas/`, `prompts/` (`v1/` PT, `v2_en/` EN — `PROMPTS_LANG`) |
 | `backend/api/` | API FastAPI (`api/main.py`) — ~20 endpoints; manter `docs/api-contrato.md` sincronizado |
 | `backend/config/` | Seeds e feeds (`feeds.yaml`, `candidatos_seed.json`, `corpus_teologico_seed.json`, `countries_focus.json`, `acled_seed.json`, …) |
-| `backend/supabase/migrations/` | DDL do Postgres (fonte única de schema) |
+| `backend/migrations/` | DDL PostgreSQL + pgvector (fonte única de schema) |
 | `backend/tests/` | Testes pytest |
 | `backend/docs/` | Documentação técnica do motor |
-| `front-end/src/app/` | App Router — páginas (`(painel)`, `historico`, `rankings`, `globo`, `grafo`, `profecias`, `simulador`, `revisao`, `joshua`, …) e route handlers `api/db/` (Prisma/Supabase), `api/admin/`, `api/auth/`, `api/joshua/` |
+| `front-end/src/app/` | App Router — páginas (`(painel)`, `historico`, `rankings`, `globo`, `grafo`, `profecias`, `simulador`, `revisao`, `joshua`, …) e route handlers `api/db/` (Prisma/PostgreSQL), `api/admin/`, `api/auth/`, `api/joshua/` |
 | `front-end/src/components/` | Componentes React (dashboard, charts, globo, grafo, ui) |
 | `front-end/src/lib/` | `api.ts`, `cache.ts`, `types.ts`, `db/`, `seo/`, `auth/`, `mock*.ts` |
-| `front-end/prisma/` | Schema Prisma (espelha Supabase — não crie DDL aqui) + seed |
+| `front-end/prisma/` | Schema Prisma (espelha `backend/migrations/` — não crie DDL aqui) + seed |
 | `front-end/docs/` | Documentação do dashboard |
 | `.github/workflows/` | CI de PR para testes e assinaturas SSH + 10 workflows agendados (batch diário, sínteses, drift, híbridos) |
 | `.husky/` + `package.json` raiz | Hooks: `pre-commit` → lint, `pre-push` → test (ambas as stacks) |
@@ -71,7 +71,7 @@ com profecias e publicação de rankings/fases em um dashboard.
 | [backend/docs/fontes-dados.md](backend/docs/fontes-dados.md) | Fontes de ingestão (RSS, GDELT, ACLED, API.Bible, Joshua) |
 | [backend/docs/variaveis-ambiente.md](backend/docs/variaveis-ambiente.md) | Referência de env vars do motor |
 | [backend/docs/schemas-json.md](backend/docs/schemas-json.md) | Contratos JSON Schema e versionamento |
-| [backend/docs/setup-supabase.md](backend/docs/setup-supabase.md) | Setup do Supabase e migrations |
+| [backend/docs/setup-postgres.md](backend/docs/setup-postgres.md) | Setup do PostgreSQL com pgvector e migrations |
 | [backend/docs/model-providers.md](backend/docs/model-providers.md) | Provedores LLM (Local GGUF, Ollama, Groq, OpenRouter) + idioma do pipeline |
 | [backend/docs/modelos-locais.md](backend/docs/modelos-locais.md) | Modelos locais: pré-treinados × paramétricos × treinados |
 | [backend/docs/treino-modelos.md](backend/docs/treino-modelos.md) | Runbook de treino/revisão/ativação dos classificadores/HMM/GNN |
@@ -129,7 +129,7 @@ npm run test   # Vitest + pytest — usado pelo pre-push
    **assinados com SSH**.
 4. **PRs**: máximo 20 arquivos; descrever o quê e o porquê; ≥1 revisor.
 5. **Secrets**: nunca commitar `.env`, tokens ou chaves; nunca expor
-   `SUPABASE_SERVICE_ROLE_KEY`/`GROQ_API_KEY`/`ADMIN_API_KEY` no front-end.
+   `DATABASE_URL`/`GROQ_API_KEY`/`ADMIN_API_KEY` no front-end.
 6. **Diretivas de ignore** (`eslint-disable`, `@ts-ignore`, `# noqa`,
    `# type: ignore`): somente em arquivos de teste.
 7. **Testes**: toda mudança de comportamento toca testes; sem dependência de
@@ -157,9 +157,9 @@ npm run test   # Vitest + pytest — usado pelo pre-push
 
 | Componente | Secrets |
 |------------|---------|
-| Motor (batch real) | `SUPABASE_URL`, `SUPABASE_SERVICE_ROLE_KEY`, `GROQ_API_KEY` (+ `OPENROUTER_API_KEY` fallback) |
+| Motor (batch real) | `DATABASE_URL`, `GROQ_API_KEY` (+ `OPENROUTER_API_KEY` fallback) |
 | API admin | `ADMIN_API_KEY` |
-| Front-end (Next.js/Prisma) | `DATABASE_URL`, `DIRECT_URL` (Supabase); usadas no servidor Next.js |
+| Front-end (Next.js/Prisma) | `DATABASE_URL`, `DIRECT_URL` (PostgreSQL); usadas no servidor Next.js |
 | Workflows agendados | os mesmos do motor, via GitHub Secrets |
 
 ### Gaps conhecidos (não bloqueiam dev local)

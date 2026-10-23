@@ -17,7 +17,7 @@ transforma documentos brutos em um índice escatológico consolidado:
 ```text
 ingestão → pré-processamento → embeddings/RAG → LLMs (extração, timeline,
 raciocínio, hermenêutica) → correlação (Bayes + HMM/Viterbi + MCDA) →
-extensões (ameaças, ecos, ABM, red team, proveniência) → relatório → Supabase
+extensões (ameaças, ecos, ABM, red team, proveniência) → relatório → PostgreSQL
 → dashboard
 ```
 
@@ -87,7 +87,7 @@ Detalhes em [backend/docs/arquitetura.md](backend/docs/arquitetura.md) e
 
 | Pasta | Descrição |
 |-------|-----------|
-| [`backend/`](backend/) | Motor de IA Python, FastAPI, migrations Supabase, testes |
+| [`backend/`](backend/) | Motor de IA Python, FastAPI, PostgreSQL/pgvector, testes |
 | [`front-end/`](front-end/) | Dashboard Next.js — painel escatológico, rankings, histórico, globo 3D, grafo |
 | [`.github/workflows/`](.github/workflows/) | CI de PR para testes e assinaturas SSH + 10 workflows agendados (batch diário, sínteses, drift, híbridos) |
 
@@ -99,7 +99,7 @@ Detalhes em [backend/docs/arquitetura.md](backend/docs/arquitetura.md) e
 | LLMs | Groq Cloud (free tier) → OpenRouter (fallback) → Ollama (opcional) |
 | Embeddings/RAG | BGE-M3, pgvector, reranker BGE, classificadores locais (gate zero-shot, shadow mode, dedup semântico, destilação sklearn) |
 | Matemática | Bayes, HMM/Viterbi, MCDA, GNN v1 (NetworkX) |
-| Banco | PostgreSQL via Supabase (única persistência) |
+| Banco | PostgreSQL com conexão direta via `DATABASE_URL` (única persistência) |
 | Dashboard | Next.js 15, React 19, TypeScript, Tailwind, Recharts, Cytoscape, Three.js |
 | Batch | GitHub Actions (cron) — sem infra 24/7 |
 | Qualidade | Husky: lint no commit, testes no push |
@@ -113,8 +113,8 @@ Detalhes em [backend/docs/arquitetura.md](backend/docs/arquitetura.md) e
 | Batch diário | GitHub Actions | $0 |
 | LLMs | Groq free tier | $0 |
 
-O motor "dorme" o dia todo: o batch executa ~04:00, grava no Supabase e
-encerra. Em escala (~50 mil usuários), estima-se ~$35–45/mês (Supabase Pro +
+O motor "dorme" o dia todo: o batch executa ~04:00, grava no PostgreSQL e
+encerra. Em escala (~50 mil usuários), estima-se ~$35–45/mês (PostgreSQL gerenciado +
 RunPod/Spot).
 
 ## Início rápido
@@ -152,7 +152,7 @@ npm run dev
   [API](backend/docs/api-contrato.md) · [schemas](backend/docs/schemas-json.md) ·
   [variáveis de ambiente](backend/docs/variaveis-ambiente.md) ·
   [fontes de dados](backend/docs/fontes-dados.md) ·
-  [Supabase](backend/docs/setup-supabase.md) ·
+  [PostgreSQL + pgvector](backend/docs/setup-postgres.md) ·
   [Actions](backend/docs/github-actions.md) ·
   [providers LLM](backend/docs/model-providers.md)
 - Front-end: [front-end/README.md](front-end/README.md) ·

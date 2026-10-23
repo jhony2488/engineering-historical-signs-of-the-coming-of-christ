@@ -12,7 +12,7 @@ o que já vem pronto, o que é só configuração de pesos e o que realmente tre
 | Tom espiritual | `cardiffnlp/twitter-xlm-roberta-base-sentiment` (`SENTIMENT_MODEL_NAME`) + keywords | Não | `motor/config/spiritual_tone_weights.json` (blend, mapping, léxico) |
 | Gate de relevância / shadow classifier | Zero-shot sobre BGE-M3 | Não | `config/classifier_prototypes.json` (descrições de rótulos) |
 | Bayes | `motor/math/bayesian.py` | Não | Priors/likelihoods calculados por run |
-| HMM de fases | `motor/math/hmm.py` (Viterbi) | **Opcional** (EM offline) | `parametros_fase` no Supabase ou `train-phase-hmm` |
+| HMM de fases | `motor/math/hmm.py` (Viterbi) | **Opcional** (EM offline) | `parametros_fase` no PostgreSQL ou `train-phase-hmm` |
 | MCDA rankings | `motor/math/mcda.py` | Não | Pesos `WEIGHTS_MAR`/`WEIGHTS_TERRA` (exige issue prévia) |
 | Classificador de extração | sklearn (LogReg/Ridge) sobre BGE-M3 | **Sim** (destilação) | `export-extraction-dataset` → `train-event-classifier` |
 | GNN | SAGEConv 2 camadas | **Opcional** (link prediction) | `train-gnn` → `config/gnn_weights.pt` |
@@ -162,4 +162,4 @@ cascata/perfis do tier SLM (`local_model_map`) e specs de tradução
   via BGE elevam a qualidade, mas aumentam o custo por run.
 - RoBERTa/XLM-R de sentimento é genérico — o eixo expansão/contração é
   mantido pelo léxico escatológico (`blend_weights`).
-- Modelos destilados dependem de volume de runs acumulados no Supabase.
+- Modelos destilados dependem de volume de runs acumulados no PostgreSQL.
