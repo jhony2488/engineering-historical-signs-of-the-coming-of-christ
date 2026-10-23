@@ -1,4 +1,4 @@
--- Joshua Project: dados brutos (BFF) + análise missiológica (motor)
+-- PostgreSQL migration: dados brutos Joshua Project + análise missiológica.
 
 CREATE TABLE IF NOT EXISTS joshua_project_data (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
@@ -49,6 +49,3 @@ CREATE INDEX IF NOT EXISTS idx_missiological_country ON missiological_analysis (
 CREATE INDEX IF NOT EXISTS idx_missiological_phase ON missiological_analysis (inferred_phase);
 CREATE INDEX IF NOT EXISTS idx_missiological_analyzed ON missiological_analysis (analyzed_at DESC);
 CREATE INDEX IF NOT EXISTS idx_missiological_people ON missiological_analysis (people_id);
-
-ALTER TABLE joshua_project_data ENABLE ROW LEVEL SECURITY;
-ALTER TABLE missiological_analysis ENABLE ROW LEVEL SECURITY;

@@ -1,4 +1,4 @@
--- Camada 0 — Baseline histórico (profecias cumpridas antes do monitoramento diário)
+-- PostgreSQL migration: Camada 0 — baseline histórico.
 
 CREATE TABLE IF NOT EXISTS baseline_escatologico (
     id TEXT PRIMARY KEY DEFAULT 'global',
@@ -29,12 +29,3 @@ CREATE TABLE IF NOT EXISTS arquivo_profetico (
 
 CREATE INDEX IF NOT EXISTS idx_arquivo_profetico_status ON arquivo_profetico (status);
 CREATE INDEX IF NOT EXISTS idx_arquivo_profetico_categoria ON arquivo_profetico (categoria);
-
-ALTER TABLE baseline_escatologico ENABLE ROW LEVEL SECURITY;
-ALTER TABLE arquivo_profetico ENABLE ROW LEVEL SECURITY;
-
-CREATE POLICY "anon_read_baseline" ON baseline_escatologico
-    FOR SELECT TO anon USING (true);
-
-CREATE POLICY "anon_read_arquivo_profetico" ON arquivo_profetico
-    FOR SELECT TO anon USING (true);

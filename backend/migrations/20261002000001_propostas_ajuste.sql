@@ -1,4 +1,5 @@
--- Propostas de ajuste de modelos/config geradas por LLM — trilha de
+-- PostgreSQL migration: propostas de ajuste de modelos/config geradas por LLM.
+-- Propostas de ajuste — trilha de
 -- auditoria com revisão humana. A LLM propõe (status='pendente'), o admin
 -- aprova/rejeita via API; aplicação no alvo é manual e registrada em
 -- aplicado_em. Mesmo padrão de governança de parametros_fase.

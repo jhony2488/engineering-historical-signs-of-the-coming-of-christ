@@ -1,4 +1,4 @@
--- Atualizações dinâmicas de profecias cumpridas (detectadas no run diário)
+-- PostgreSQL migration: atualizações dinâmicas de profecias cumpridas.
 
 ALTER TABLE baseline_escatologico
     ADD COLUMN IF NOT EXISTS atualizacoes JSONB NOT NULL DEFAULT '[]';

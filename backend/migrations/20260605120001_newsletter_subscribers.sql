@@ -1,4 +1,4 @@
--- Email marketing / daily update notifications
+-- PostgreSQL migration: email marketing / daily update notifications.
 
 CREATE TABLE IF NOT EXISTS newsletter_subscribers (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
@@ -12,5 +12,3 @@ CREATE TABLE IF NOT EXISTS newsletter_subscribers (
 );
 
 CREATE INDEX IF NOT EXISTS idx_newsletter_subscribers_status ON newsletter_subscribers (status);
-
-ALTER TABLE newsletter_subscribers ENABLE ROW LEVEL SECURITY;

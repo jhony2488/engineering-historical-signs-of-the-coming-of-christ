@@ -1,4 +1,4 @@
--- Camadas 10–15: ameaças por país, ABM, adversarial, proveniência, recomendações adaptativas
+-- PostgreSQL migration: camadas 10–15 (ameaças, ABM, adversarial, proveniência, recomendações).
 
 CREATE TABLE IF NOT EXISTS ameacas_pais (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
@@ -66,9 +66,3 @@ CREATE TABLE IF NOT EXISTS recomendacoes_adaptativas (
 );
 
 CREATE INDEX IF NOT EXISTS idx_recomendacoes_adaptativas_data ON recomendacoes_adaptativas (data_referencia DESC);
-
-ALTER TABLE ameacas_pais ENABLE ROW LEVEL SECURITY;
-ALTER TABLE simulacoes_abm ENABLE ROW LEVEL SECURITY;
-ALTER TABLE adversarial_reviews ENABLE ROW LEVEL SECURITY;
-ALTER TABLE provenance_log ENABLE ROW LEVEL SECURITY;
-ALTER TABLE recomendacoes_adaptativas ENABLE ROW LEVEL SECURITY;

@@ -1,3 +1,4 @@
+-- PostgreSQL schema migration; requires pgvector.
 -- Extensões
 CREATE EXTENSION IF NOT EXISTS vector;
 CREATE EXTENSION IF NOT EXISTS pgcrypto;
@@ -163,13 +164,3 @@ CREATE TABLE IF NOT EXISTS parametros_fase (
     aprovado BOOLEAN DEFAULT FALSE,
     created_at TIMESTAMPTZ DEFAULT NOW()
 );
-
--- RLS read-only para anon (dashboard futuro)
-ALTER TABLE resultados_escatologicos ENABLE ROW LEVEL SECURITY;
-ALTER TABLE ranking_probabilistico ENABLE ROW LEVEL SECURITY;
-
-CREATE POLICY "anon_read_resultados" ON resultados_escatologicos
-    FOR SELECT TO anon USING (true);
-
-CREATE POLICY "anon_read_ranking" ON ranking_probabilistico
-    FOR SELECT TO anon USING (true);
