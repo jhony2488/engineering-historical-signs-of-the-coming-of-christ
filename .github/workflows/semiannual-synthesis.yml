@@ -31,6 +31,9 @@ jobs:
           OPENROUTER_API_KEY: ${{ secrets.OPENROUTER_API_KEY }}
           GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
           DEEPSEEK_API_KEY: ${{ secrets.DEEPSEEK_API_KEY }}
+          EMAIL_FROM: ${{ secrets.EMAIL_FROM }}
+          RESEND_API_KEY: ${{ secrets.RESEND_API_KEY }}
+          EMAIL_DRY_RUN: ${{ vars.EMAIL_DRY_RUN || 'true' }}
           LLM_DRY_RUN: ${{ vars.LLM_DRY_RUN || 'false' }}
           LOCAL_LLM_ENABLED: ${{ vars.LOCAL_LLM_ENABLED || 'true' }}
           PROMPTS_LANG: ${{ vars.PROMPTS_LANG || 'en' }}
