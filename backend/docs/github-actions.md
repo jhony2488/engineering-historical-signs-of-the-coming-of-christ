@@ -17,10 +17,13 @@ Workflows na raiz do repositório (`.github/workflows/`), executando comandos em
 - `OPENROUTER_API_KEY` (fallback)
 - `GEMINI_API_KEY` (Google AI Studio — camadas 4, 5, 7)
 - `DEEPSEEK_API_KEY` (camada 6 — raciocínio)
+- `EMAIL_FROM` (remetente do digest diário)
+- `RESEND_API_KEY` (serviço de e-mail)
 
 ### Variables (configurações opcionais)
 
 - `LLM_DRY_RUN` — `false` (padrão) ou `true` para testes sem consumo de API
+- `EMAIL_DRY_RUN` — `true` (padrão) para simular envio de e-mail sem disparar real
 - `LOCAL_LLM_ENABLED` — `true` (padrão) ou `false` para desabilitar SLM local
 - `PROMPTS_LANG` — `en` (padrão) ou `pt` para idioma dos prompts
 - `TRANSLATE_NARRATIVES` — `true` (padrão) para traduzir narrativas EN→PT
