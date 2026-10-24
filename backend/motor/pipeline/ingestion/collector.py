@@ -168,27 +168,45 @@ class IngestionCollector:
         return docs
 
     async def collect_acled(self) -> list[RawDocument]:
-        if not self.settings.acled_api_key or not self.settings.acled_email:
+        if not self.settings.acled_email or not self.settings.acled_password:
             seed = self._acled_seed_docs()
             if seed:
                 logger.info("acled_using_seed", n=len(seed))
             return seed
 
-        url = "https://api.acleddata.com/acled/read"
-        params = {
-            "key": self.settings.acled_api_key,
-            "email": self.settings.acled_email,
-            "limit": min(20, self.settings.max_documents_per_day),
-            "event_type": "Battles|Explosions/Remote violence|Violence against civilians",
-        }
         docs: list[RawDocument] = []
         try:
             async with httpx.AsyncClient(timeout=30.0) as client:
-                response = await client.get(url, params=params)
-                if response.status_code != 200:
-                    logger.warning("acled_http_error", status=response.status_code)
+                # 1. Autenticação via sessão
+                login_url = "https://acleddata.com/user/login?_format=json"
+                credentials = {
+                    "name": self.settings.acled_email,
+                    "pass": self.settings.acled_password,
+                }
+                login_response = await client.post(login_url, json=credentials)
+
+                if login_response.status_code != 200:
+                    logger.warning(
+                        "acled_login_failed",
+                        status=login_response.status_code,
+                        error=login_response.text[:200],
+                    )
                     return self._acled_seed_docs()
-                payload = response.json()
+
+                # 2. Requisição aos dados do ACLED
+                api_url = "https://acleddata.com/api/acled/read"
+                params = {
+                    "country": "Brazil",
+                    "limit": min(20, self.settings.max_documents_per_day),
+                    "event_type": "Battles|Explosions/Remote violence|Violence against civilians",
+                }
+                data_response = await client.get(api_url, params=params)
+
+                if data_response.status_code != 200:
+                    logger.warning("acled_http_error", status=data_response.status_code)
+                    return self._acled_seed_docs()
+
+                payload = data_response.json()
                 for evt in payload.get("data", [])[: params["limit"]]:
                     titulo = evt.get("event_type", "ACLED") + " — " + evt.get("country", "")
                     conteudo = (

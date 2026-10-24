@@ -36,8 +36,9 @@ MIDDLE_EAST, RELIGION, ECON_CURRENCY, CYBER_ATTACK, UFO, DISINFO
 
 ## ACLED
 
-API de conflitos armados (`api.acleddata.com`). Requer
-`ACLED_API_KEY` + `ACLED_EMAIL` (registro em acleddata.com).
+API de conflitos armados (`acleddata.com`). Requer
+`ACLED_EMAIL` + `ACLED_PASSWORD` (registro em acleddata.com).
+Autenticação via sessão (login com email e senha).
 Sem credenciais ou em caso de falha → seed local
 `config/acled_seed.json` (`fonte: acled:seed`).
 

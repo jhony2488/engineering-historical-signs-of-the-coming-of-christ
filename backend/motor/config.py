@@ -43,8 +43,8 @@ class Settings(BaseSettings):
     weight_hmm: float = 0.35
     weight_llm: float = 0.30
 
-    acled_api_key: str = ""
     acled_email: str = ""
+    acled_password: str = ""
 
     api_bible_key: str = ""
     api_bible_id: str = "de4e12af7f28f599-02"

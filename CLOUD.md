@@ -171,7 +171,7 @@ desenvolvimento.
 | Serviço | Uso | Variáveis |
 |---------|-----|-----------|
 | Resend | Digest diário por e-mail | `RESEND_API_KEY`, `EMAIL_DRY_RUN` |
-| ACLED | Fonte de conflitos | `ACLED_API_KEY`, `ACLED_EMAIL` |
+| ACLED | Fonte de conflitos | `ACLED_EMAIL`, `ACLED_PASSWORD` |
 | API.Bible | Corpus teológico | `API_BIBLE_KEY`, `API_BIBLE_ID` |
 | Joshua Project | Dados de povos (sync via BFF) | `JOSHUA_API_KEY`, `JOSHUA_SYNC_TOKEN` |
 | GA4 | Analytics + métricas em `/insights` | `NEXT_PUBLIC_GA_MEASUREMENT_ID`, `GA_*` |

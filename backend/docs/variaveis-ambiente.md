@@ -119,7 +119,7 @@ Cascata e perfis por modelo: `LOCAL_MODEL_MAP` em
 
 | Variável | Descrição |
 |----------|-----------|
-| `ACLED_API_KEY` + `ACLED_EMAIL` | API de conflitos; sem elas usa `config/acled_seed.json` |
+| `ACLED_EMAIL` + `ACLED_PASSWORD` | API de conflitos; sem elas usa `config/acled_seed.json` |
 | `API_BIBLE_KEY` + `API_BIBLE_ID` | Corpus teológico expandido |
 | `REDDIT_ENABLED` + `REDDIT_USER_AGENT` | Dados micro (Reddit) |
 | `GOOGLE_TRENDS_ENABLED` | Dados micro (Trends) |

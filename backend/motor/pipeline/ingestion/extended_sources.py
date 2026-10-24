@@ -46,7 +46,7 @@ async def collect_api_bible() -> list[RawDocument]:
     async with httpx.AsyncClient(timeout=20.0) as client:
         for ref in passages:
             try:
-                url = f"https://api.scripture.api.bible/v1/bibles/{settings.api_bible_id}/passages/{ref}"
+                url = f"https://rest.api.bible/v1/bibles/{settings.api_bible_id}/passages/{ref}"
                 res = await client.get(url, headers=headers)
                 if res.status_code != 200:
                     continue
