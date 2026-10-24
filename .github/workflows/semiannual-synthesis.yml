@@ -29,5 +29,11 @@ jobs:
           DATABASE_URL: ${{ secrets.DATABASE_URL }}
           GROQ_API_KEY: ${{ secrets.GROQ_API_KEY }}
           OPENROUTER_API_KEY: ${{ secrets.OPENROUTER_API_KEY }}
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+          DEEPSEEK_API_KEY: ${{ secrets.DEEPSEEK_API_KEY }}
           LLM_DRY_RUN: ${{ vars.LLM_DRY_RUN || 'false' }}
+          LOCAL_LLM_ENABLED: ${{ vars.LOCAL_LLM_ENABLED || 'true' }}
+          PROMPTS_LANG: ${{ vars.PROMPTS_LANG || 'en' }}
+          TRANSLATE_NARRATIVES: ${{ vars.TRANSLATE_NARRATIVES || 'true' }}
+          CLASSIFIER_HINTS_ENABLED: ${{ vars.CLASSIFIER_HINTS_ENABLED || 'true' }}
         run: python -m motor.cli run-synthesis --window semiannual

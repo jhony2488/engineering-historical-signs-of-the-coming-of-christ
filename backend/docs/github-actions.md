@@ -15,6 +15,16 @@ Workflows na raiz do repositório (`.github/workflows/`), executando comandos em
 - `DATABASE_URL` (PostgreSQL com pgvector)
 - `GROQ_API_KEY`
 - `OPENROUTER_API_KEY` (fallback)
+- `GEMINI_API_KEY` (Google AI Studio — camadas 4, 5, 7)
+- `DEEPSEEK_API_KEY` (camada 6 — raciocínio)
+
+### Variables (configurações opcionais)
+
+- `LLM_DRY_RUN` — `false` (padrão) ou `true` para testes sem consumo de API
+- `LOCAL_LLM_ENABLED` — `true` (padrão) ou `false` para desabilitar SLM local
+- `PROMPTS_LANG` — `en` (padrão) ou `pt` para idioma dos prompts
+- `TRANSLATE_NARRATIVES` — `true` (padrão) para traduzir narrativas EN→PT
+- `CLASSIFIER_HINTS_ENABLED` — `true` (padrão) para habilitar hints de classificador
 
 ### Disparo manual
 
