@@ -170,7 +170,7 @@ desenvolvimento.
 
 | Serviço | Uso | Variáveis |
 |---------|-----|-----------|
-| Resend / SMTP | Digest diário por e-mail | `RESEND_API_KEY`, `SMTP_*`, `EMAIL_DRY_RUN` |
+| Resend | Digest diário por e-mail | `RESEND_API_KEY`, `EMAIL_DRY_RUN` |
 | ACLED | Fonte de conflitos | `ACLED_API_KEY`, `ACLED_EMAIL` |
 | API.Bible | Corpus teológico | `API_BIBLE_KEY`, `API_BIBLE_ID` |
 | Joshua Project | Dados de povos (sync via BFF) | `JOSHUA_API_KEY`, `JOSHUA_SYNC_TOKEN` |

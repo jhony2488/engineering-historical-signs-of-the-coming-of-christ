@@ -91,7 +91,7 @@ Queries ficam em `src/lib/db/` (`resultados.ts`, `snapshots.ts`,
 | `db/` | Queries Prisma por domínio |
 | `seo/metadata.ts` | `buildPageMetadata`, OG, JSON-LD |
 | `auth/` | Sessão, headers de segurança, rate limit de login |
-| `email/` | Envio de digest (Resend/SMTP) |
+| `email/` | Envio de digest (Resend) |
 | `analytics/` | GA4 (`events.ts`, `ga-data.ts`) |
 | `validation/schemas.ts` | Schemas Zod para inputs |
 | `api-guard.ts`, `rate-limit.ts`, `sanitize.ts` | Guards server-side |
@@ -181,5 +181,5 @@ Flags: `NEXT_PUBLIC_LOCAL_AI=auto|off`, `NEXT_PUBLIC_LOCAL_AI_MODEL_BASE`,
 
 Ver `.env.example`. Principais: `NEXT_PUBLIC_SITE_URL`,
 `NEXT_PUBLIC_USE_MOCK`, `DATABASE_URL`/`DIRECT_URL` (Prisma/Supabase),
-`JOSHUA_API_KEY` + `JOSHUA_SYNC_TOKEN`, `RESEND_API_KEY`/`SMTP_*`,
+`JOSHUA_API_KEY` + `JOSHUA_SYNC_TOKEN`, `RESEND_API_KEY`,
 `NEXT_PUBLIC_GA_*`.

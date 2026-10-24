@@ -172,5 +172,4 @@ paramétricos × treinados): [modelos-locais.md](modelos-locais.md).
 | `SITE_URL` | URL pública do dashboard (links no e-mail) |
 | `EMAIL_FROM` | Remetente |
 | `EMAIL_DRY_RUN` | `true` simula envio |
-| `RESEND_API_KEY` | Resend (recomendado) |
-| `SMTP_HOST`/`SMTP_PORT`/`SMTP_USER`/`SMTP_PASSWORD` | Alternativa SMTP |
+| `RESEND_API_KEY` | Resend (serviço de e-mail) |

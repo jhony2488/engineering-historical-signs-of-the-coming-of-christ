@@ -122,10 +122,6 @@ class Settings(BaseSettings):
     email_from: str = ""
     email_dry_run: bool = True
     resend_api_key: str = ""
-    smtp_host: str = ""
-    smtp_port: int = 587
-    smtp_user: str = ""
-    smtp_password: str = ""
 
     # Retenção: dados ficam no PostgreSQL. Sem S3 / arquivos locais de cold storage.
 

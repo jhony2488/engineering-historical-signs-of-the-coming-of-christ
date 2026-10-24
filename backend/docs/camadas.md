@@ -183,7 +183,7 @@ Saída: `recomendacoes_adaptativas`.
 `resultados_escatologicos` (append-only; correções via `revert-day`).
 Status `pending_review` quando há transição de fase e
 `AUTO_APPROVE_CRITERIA=false` — aprovação via endpoints admin de review.
-Ao final, `newsletter_service.py` envia o digest diário (Resend/SMTP,
+Ao final, `newsletter_service.py` envia o digest diário (Resend,
 `EMAIL_DRY_RUN`).
 
 ## Motores Nível 2 e 3 (fora do run diário)
