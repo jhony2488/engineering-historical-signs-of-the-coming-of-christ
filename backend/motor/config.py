@@ -63,13 +63,13 @@ class Settings(BaseSettings):
     groq_model_reasoning: str = "deepseek-r1-distill"
     groq_model_hermeneutics: str = "gemma2-9b-it"
 
-    # Gemini models (camadas 4, 5, 7 - estratégia híbrida)
-    gemini_model_extraction: str = "gemini-2.5-flash-lite"
-    gemini_model_timeline: str = "gemini-3-flash"
-    gemini_model_hermeneutics: str = "gemini-3-flash"
+    # Gemini models (camadas 4, 5, 7 - estratégia híbrida) - usando gemini-2.5-flash
+    gemini_model_extraction: str = "gemini-2.5-flash"
+    gemini_model_timeline: str = "gemini-2.5-flash"
+    gemini_model_hermeneutics: str = "gemini-2.5-flash"
 
     # DeepSeek models (camada 6 - raciocínio)
-    deepseek_model_reasoning: str = "deepseek-reasoner"
+    deepseek_model_reasoning: str = "deepseek-chat"
 
     ollama_enabled: bool = False
     ollama_base_url: str = "http://localhost:11434"
