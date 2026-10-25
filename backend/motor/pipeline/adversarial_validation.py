@@ -121,9 +121,13 @@ class AdversarialValidationService:
                         .replace("{{resilience}}", str(resilience))
                     )
                     model_name = (
-                        self.settings.deepseek_model_reasoning
-                        if self.settings.deepseek_api_key
-                        else self.settings.groq_model_reasoning
+                        self.settings.gemini_model_timeline
+                        if self.settings.gemini_api_key
+                        else (
+                            self.settings.deepseek_model_reasoning
+                            if self.settings.deepseek_api_key
+                            else self.settings.groq_model_reasoning
+                        )
                     )
                     content, _provider = await router.complete(
                         model_name,

@@ -146,9 +146,13 @@ class HybridAnalysisEngine:
         )
 
         reasoning_model = (
-            self.settings.deepseek_model_reasoning
-            if self.settings.deepseek_api_key
-            else self.settings.groq_model_reasoning
+            self.settings.gemini_model_timeline
+            if self.settings.gemini_api_key
+            else (
+                self.settings.deepseek_model_reasoning
+                if self.settings.deepseek_api_key
+                else self.settings.groq_model_reasoning
+            )
         )
         reasoning_content, reasoning_provider = await self.router.complete(
             reasoning_model,

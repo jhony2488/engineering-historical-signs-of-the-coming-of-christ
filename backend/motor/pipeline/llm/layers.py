@@ -242,9 +242,9 @@ class LLMPipeline:
             try:
                 self.validator.validate("evento_estruturado", parsed)
                 parsed = self._translate_narratives(parsed, "evento")
-                parsed["fonte_id"] = chunk.get("id", "")
+                parsed["fonte_id"] = str(chunk.get("id", ""))
                 row = db.insert(
-                    "eventos_estruturados", {"dados": parsed, "trecho_id": chunk.get("id")}
+                    "eventos_estruturados", {"dados": parsed, "trecho_id": str(chunk.get("id"))}
                 )
                 self._shadow_audit(chunk, parsed, db, model_name)
                 db.log_audit(
@@ -314,9 +314,13 @@ class LLMPipeline:
             {"role": "user", "content": prompt},
         ]
         model_name = (
-            self.settings.deepseek_model_reasoning
-            if self.settings.deepseek_api_key
-            else self.settings.groq_model_reasoning
+            self.settings.gemini_model_timeline
+            if self.settings.gemini_api_key
+            else (
+                self.settings.deepseek_model_reasoning
+                if self.settings.deepseek_api_key
+                else self.settings.groq_model_reasoning
+            )
         )
         content, provider = await self.router.complete(model_name, messages, json_mode=True)
         parsed = self._translate_narratives(
