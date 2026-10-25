@@ -105,6 +105,7 @@ uvicorn api.main:app --reload           # API em :8000
 Aplicar migrations SQL usando o script Python (recomendado):
 
 ```bash
+cd backend
 python scripts/run_migrations.py
 ```
 
@@ -115,6 +116,7 @@ e aplica todas as migrations em ordem alfabética.
 
 **PowerShell (Windows):**
 ```powershell
+cd backend
 Get-ChildItem migrations\*.sql |
   Sort-Object Name |
   ForEach-Object { psql $env:DATABASE_URL -v ON_ERROR_STOP=1 -f $_.FullName }
@@ -122,6 +124,7 @@ Get-ChildItem migrations\*.sql |
 
 **Bash (Linux/Mac/WSL):**
 ```bash
+cd backend
 for f in migrations/*.sql; do
   psql "$DATABASE_URL" -v ON_ERROR_STOP=1 -f "$f"
 done
@@ -129,6 +132,7 @@ done
 
 **Via Docker Compose (local):**
 ```bash
+cd backend
 docker-compose down -v
 docker-compose up -d postgres
 ```
@@ -204,5 +208,3 @@ npm run test   # Vitest + pytest — usado pelo pre-push
   funciona e builds não são reproduzíveis.
 - **`doc.txt`** (especificação original do projeto, ~56KB) existe localmente
   mas não está versionado — referencie o conteúdo nos docs sem linkar o arquivo.
-- **`front-end/.env copy.local`** — arquivo solto não versionado; verificar se
-  não contém segredos antes de qualquer commit.
