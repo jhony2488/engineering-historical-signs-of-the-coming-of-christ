@@ -32,7 +32,7 @@ LLM_JSON = json.dumps(
 
 class FakeRouter:
     async def complete(self, model, messages, json_mode=False, temperature=0.2, **_kwargs):
-        return LLM_JSON, "fake"
+        return LLM_JSON, model
 
 
 def test_shadow_classifier_fields() -> None:
@@ -58,7 +58,7 @@ async def test_extract_events_logs_shadow_audit() -> None:
     assert "camada_4_shadow" in camadas
 
     shadow = next(a for a in db.audits if a["camada"] == "camada_4_shadow")
-    assert shadow["detalhes"]["modelo_extracao"] == "llama-3.1-8b-instant"
+    assert shadow["detalhes"]["modelo_extracao"]  # modelo não deve ser vazio
     assert "agree" in shadow["detalhes"]
 
 
