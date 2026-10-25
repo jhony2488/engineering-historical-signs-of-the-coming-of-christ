@@ -201,5 +201,41 @@ postgres_only), `graph_service.py` (payload do grafo para a API).
 
 ## Fora de escopo
 
-Camadas 16–22 (rede de nós, consenso, tokenomia, DAO, Nostr, mesh) e
+Camadas 17–22 (rede de nós, consenso, tokenomia, DAO, Nostr, mesh) e
 publicação on-chain do Merkle root — não implementadas neste núcleo.
+
+## Camada 16 — Análise de simbolismo (proposta)
+
+**Status**: Proposta — não implementado
+
+|| Item | Valor |
+||------|-------|
+|| Módulo | `motor/pipeline/symbolic_analysis.py` |
+|| Fonte | The Economist (capas + artigos) |
+|| Modelo | Multimodal (GPT-4V, Gemini Vision, ou local com CLIP) |
+|| Prompt | `prompts/v1/symbolic_analysis_pt.md` |
+|| Saída | `analise_simbolismo` (tabela PostgreSQL) + scores para Bestas/Falso Líder |
+
+**Objetivo**: Interpretar simbolismo visual e narrativas ocultas em contexto escatológico cristão.
+
+**Fluxo**:
+1. Ingestão The Economist → OCR da capa (se imagem)
+2. Camada 16 (Symbolic Analysis):
+   - Interpretação simbólica via LLM multimodal
+   - Identificação de agenda narrativa (centralização de poder, controle financeiro, tecnologia de vigilância, etc.)
+   - Correlação com corpus teológico (RAG)
+   - Mapeamento para "bestas" e "falso líder" (se aplicável)
+3. Banco + Dashboard
+
+**Prompts**:
+- Análise visual: "Interprete o simbolismo desta capa em contexto escatológico cristão"
+- Correlação:
+  - Se simbolismo = "besta do mar" (financeiro) → score_bestas.mar
+  - Se simbolismo = "besta da terra" (ideológico/tecnológico) → score_bestas.terra
+  - Se narrativa = "falso líder" → score_falso_líder
+
+**Implementação proposta**:
+- Adapter `the_economist.py` (scraper com BeautifulSoup/Playwright)
+- Schema para `capas_the_economist` (tabela PostgreSQL)
+- CLI: `python -m motor.cli analyze-the-economist`
+- Dashboard: nova página/seção em `front-end/src/app/simbolismo/`

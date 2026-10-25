@@ -32,6 +32,7 @@ dependencies = [
     "PyYAML>=6.0.0",
     "groq>=0.11.0",
     "google-generativeai>=0.8.0",
+    "openai>=1.0.0",
 ]
 
 [project.optional-dependencies]
@@ -44,7 +45,6 @@ ml = [
 ]
 gnn = ["torch-geometric>=2.6.0"]
 pdf = ["pymupdf>=1.24.0"]
-local = ["llama-cpp-python>=0.2.90"]
 ingest = ["pytrends>=4.9.0", "pytesseract>=0.3.10", "Pillow>=10.0.0"]
 archive = ["pyarrow>=17.0.0"]
 dev = [

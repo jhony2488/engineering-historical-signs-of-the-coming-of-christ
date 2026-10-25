@@ -77,6 +77,32 @@ acontece no BFF do front-end (`GET /api/joshua/sync`, protegido por
 essas linhas na análise missiológica (`joshua_analysis.py`), que enriquece a
 Camada 10 por país.
 
+## The Economist — Análise de simbolismo (proposta)
+
+Fonte adicional para análise de simbolismo visual e narrativas ocultas em capas e artigos do The Economist.
+
+**Status**: Proposta — não implementado
+
+**Arquitetura proposta**:
+- Configuração em `feeds.yaml`:
+  ```yaml
+  the_economist:
+    name: "The Economist"
+    type: "custom_scraper"
+    url: "https://www.economist.com"
+    scrape_cover: true  # baixar imagem da capa
+    scrape_articles: true
+    enabled: true
+  ```
+- Adapter: `backend/motor/adapters/the_economist.py`
+  - Scraper para capas (imagem + manchete principal)
+  - Scraper para artigos selecionados
+  - Extração de metadados (título, data, subtítulo)
+- OCR para imagens de capa (se necessário)
+- Integração com Camada 16 (Symbolic Analysis)
+
+**Objetivo**: Interpretar simbolismo visual em contexto escatológico cristão, identificar narrativas ocultas/implícitas e correlacionar com corpus teológico (RAG).
+
 ## Arquivos de seed (`backend/config/`)
 
 | Arquivo | Alimenta |

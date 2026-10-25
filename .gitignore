@@ -1,5 +1,10 @@
 .env
 backend/.env
+backend/.env.secret
+front-end/.env
+front-end/.env.local
+front-end/.env.production
+front-end/.env.secret
 .venv/
 backend/.venv/
 venv/

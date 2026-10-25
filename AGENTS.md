@@ -67,6 +67,8 @@ com profecias e publicação de rankings/fases em um dashboard.
 | [backend/docs/cli.md](backend/docs/cli.md) | Comandos `python -m motor.cli` |
 | [backend/docs/api-contrato.md](backend/docs/api-contrato.md) | Contrato REST consumido pelo dashboard |
 | [backend/docs/fontes-dados.md](backend/docs/fontes-dados.md) | Fontes de ingestão (RSS, GDELT, ACLED, API.Bible, Joshua) |
+| [backend/docs/proposta-the-economist-simbolismo.md](backend/docs/proposta-the-economist-simbolismo.md) | Proposta: The Economist com análise de simbolismo (Camada 16) |
+| [backend/docs/avaliacao-modelos-visao-simbolismo.md](backend/docs/avaliacao-modelos-visao-simbolismo.md) | Avaliação de modelos de visão para análise de simbolismo |
 | [backend/docs/variaveis-ambiente.md](backend/docs/variaveis-ambiente.md) | Referência de env vars do motor |
 | [backend/docs/schemas-json.md](backend/docs/schemas-json.md) | Contratos JSON Schema e versionamento |
 | [backend/docs/setup-postgres.md](backend/docs/setup-postgres.md) | Setup do PostgreSQL com pgvector e migrations |

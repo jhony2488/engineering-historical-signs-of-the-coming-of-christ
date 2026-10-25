@@ -47,6 +47,18 @@ python -m motor.cli run-hybrid-analysis --window annual
 
 Apenas a Camada 1 — coleta documentos de todas as fontes e persiste.
 
+### `analyze-the-economist` (proposta)
+
+**Status**: Proposta — não implementado
+
+Camada 16 — análise de simbolismo visual em capas do The Economist.
+
+```bash
+python -m motor.cli analyze-the-economist [--date YYYY-MM-DD] [--dry-run]
+```
+
+Detalhes em [proposta-the-economist-simbolismo.md](proposta-the-economist-simbolismo.md).
+
 ### `seed-baseline`
 
 Camada 0 — inicializa o overview de profecias cumpridas.

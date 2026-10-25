@@ -3,6 +3,8 @@
 Motor Python de processamento batch para **Engenharia de Sinais Históricos da vinda de Cristo**.
 
 > Documentação completa em [`docs/`](docs/) · Contribuição: [`docs/REQUISITOS_CONTRIBUICAO.md`](docs/REQUISITOS_CONTRIBUICAO.md)
+>
+> **Propostas em avaliação**: [The Economist com análise de simbolismo (Camada 16)](docs/proposta-the-economist-simbolismo.md)
 
 ## Arquitetura (9 camadas)
 

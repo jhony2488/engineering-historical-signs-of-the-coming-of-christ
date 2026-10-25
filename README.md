@@ -147,6 +147,11 @@ npm run dev
 - Contribuição backend: [backend/docs/REQUISITOS_CONTRIBUICAO.md](backend/docs/REQUISITOS_CONTRIBUICAO.md)
 - Contribuição front-end: [front-end/docs/REQUISITOS_CONTRIBUICAO.md](front-end/docs/REQUISITOS_CONTRIBUICAO.md)
 
+## Propostas em avaliação
+
+- [The Economist com análise de simbolismo (Camada 16)](backend/docs/proposta-the-economist-simbolismo.md) — fonte adicional para análise de simbolismo visual e narrativas ocultas em capas e artigos, usando modelos GGUF locais gratuitos (Qwen2-VL, InternVL, LLaVA) via llama.cpp
+- [Avaliação de modelos de visão para análise de simbolismo](backend/docs/avaliacao-modelos-visao-simbolismo.md) — benchmarking detalhado priorizando modelos gratuitos e performáticos (Qwen2-VL-7B GGUF, InternVL2-8B GGUF, LLaVA-1.6-7B GGUF, SigLIP) com fallback opcional para APIs
+
 ## Licença
 
 [GPL-3.0](LICENSE)

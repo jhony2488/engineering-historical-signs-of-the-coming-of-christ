@@ -35,7 +35,7 @@ jobs:
           RESEND_API_KEY: ${{ secrets.RESEND_API_KEY }}
           EMAIL_DRY_RUN: ${{ vars.EMAIL_DRY_RUN || 'true' }}
           LLM_DRY_RUN: ${{ vars.LLM_DRY_RUN || 'false' }}
-          LOCAL_LLM_ENABLED: ${{ vars.LOCAL_LLM_ENABLED || 'true' }}
+          LOCAL_LLM_ENABLED: ${{ vars.LOCAL_LLM_ENABLED || 'false' }}
           PROMPTS_LANG: ${{ vars.PROMPTS_LANG || 'en' }}
           TRANSLATE_NARRATIVES: ${{ vars.TRANSLATE_NARRATIVES || 'true' }}
           CLASSIFIER_HINTS_ENABLED: ${{ vars.CLASSIFIER_HINTS_ENABLED || 'true' }}
