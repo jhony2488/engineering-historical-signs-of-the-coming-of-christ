@@ -51,7 +51,38 @@ python scripts/download_models.py --all   # cascata 7B→3B→1.5B → models_ca
 
 1. Inicie o PostgreSQL com pgvector pelo `docker compose up -d postgres` ou use
    um servidor PostgreSQL com a extensão pgvector disponível.
-2. Aplique as migrations SQL de [`migrations/`](migrations/).
+2. Aplique as migrations SQL de [`migrations/`](migrations/) usando o script Python:
+
+   ```bash
+   python scripts/run_migrations.py
+   ```
+
+   Este script usa a conexão PostgreSQL já configurada via `DATABASE_URL`
+   e aplica todas as migrations em ordem alfabética.
+
+   **Alternativa com psql (se instalado):**
+
+   **PowerShell (Windows):**
+   ```powershell
+   Get-ChildItem migrations\*.sql |
+     Sort-Object Name |
+     ForEach-Object { psql $env:DATABASE_URL -v ON_ERROR_STOP=1 -f $_.FullName }
+   ```
+
+   **Bash (Linux/Mac/WSL):**
+   ```bash
+   for f in migrations/*.sql; do
+     psql "$DATABASE_URL" -v ON_ERROR_STOP=1 -f "$f"
+   done
+   ```
+
+   **Via Docker Compose (local):**
+   As migrations são aplicadas automaticamente ao criar um volume novo:
+   ```bash
+   docker-compose down -v
+   docker-compose up -d postgres
+   ```
+
 3. Configure `DATABASE_URL` em `backend/.env`; o motor e a API conectam
    diretamente ao PostgreSQL, sem SDK nem credenciais de uma API gerenciada.
 

@@ -100,6 +100,39 @@ python -m ruff format motor api tests   # format
 uvicorn api.main:app --reload           # API em :8000
 ```
 
+### Migrations PostgreSQL
+
+Aplicar migrations SQL usando o script Python (recomendado):
+
+```bash
+python scripts/run_migrations.py
+```
+
+Este script usa a conexão PostgreSQL já configurada via `DATABASE_URL`
+e aplica todas as migrations em ordem alfabética.
+
+**Alternativa com psql (se instalado):**
+
+**PowerShell (Windows):**
+```powershell
+Get-ChildItem migrations\*.sql |
+  Sort-Object Name |
+  ForEach-Object { psql $env:DATABASE_URL -v ON_ERROR_STOP=1 -f $_.FullName }
+```
+
+**Bash (Linux/Mac/WSL):**
+```bash
+for f in migrations/*.sql; do
+  psql "$DATABASE_URL" -v ON_ERROR_STOP=1 -f "$f"
+done
+```
+
+**Via Docker Compose (local):**
+```bash
+docker-compose down -v
+docker-compose up -d postgres
+```
+
 ### Front-end (`front-end/`)
 
 ```bash
