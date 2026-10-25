@@ -24,6 +24,35 @@ export function ThreatGlobe({ points, selectedCode, onSelectCountry }: Props) {
   const globeRef = useRef<any>(null);
   const containerRef = useRef<HTMLDivElement>(null);
   const [size, setSize] = useState({ w: 800, h: 520 });
+  const [rendererType, setRendererType] = useState<'webgpu' | 'webgl' | 'none' | null>(null);
+
+  useEffect(() => {
+    // Detectar suporte a WebGPU e WebGL
+    const checkWebGPU = async () => {
+      if ('gpu' in navigator) {
+        try {
+          const adapter = await (navigator as any).gpu.requestAdapter();
+          if (adapter) {
+            setRendererType('webgpu');
+            return;
+          }
+        } catch (e) {
+          // WebGPU não disponível, tentar WebGL
+        }
+      }
+
+      // Fallback para WebGL
+      const canvas = document.createElement('canvas');
+      const gl = canvas.getContext('webgl2') || canvas.getContext('webgl') || canvas.getContext('experimental-webgl');
+      if (gl) {
+        setRendererType('webgl');
+      } else {
+        setRendererType('none');
+      }
+    };
+
+    checkWebGPU();
+  }, []);
 
   useEffect(() => {
     const el = containerRef.current;
@@ -42,6 +71,34 @@ export function ThreatGlobe({ points, selectedCode, onSelectCountry }: Props) {
     if (!p) return;
     g.pointOfView({ lat: p.lat, lng: p.lng, altitude: 1.6 }, 1000);
   }, [selectedCode, points]);
+
+  // Fallback para navegadores sem suporte WebGPU/WebGL
+  if (rendererType === 'none') {
+    return (
+      <div className="flex h-[min(70vh,640px)] items-center justify-center rounded-lg border border-ink-700/50 bg-ink-950/40">
+        <div className="text-center p-6">
+          <p className="mb-2 text-sm text-slate-400">
+            O globo 3D requer aceleração de hardware
+          </p>
+          <p className="text-xs text-slate-500">
+            Seu navegador não suporta WebGPU ou WebGL, ou a aceleração de hardware está desabilitada.
+          </p>
+          <p className="mt-4 text-xs text-slate-600">
+            Tente habilitar hardware acceleration nas configurações do navegador.
+          </p>
+        </div>
+      </div>
+    );
+  }
+
+  // Loading state
+  if (rendererType === null) {
+    return (
+      <div className="flex h-[min(70vh,640px)] items-center justify-center rounded-lg border border-ink-700/50 bg-ink-950/40">
+        <p className="text-sm text-slate-500">Verificando suporte a WebGPU/WebGL…</p>
+      </div>
+    );
+  }
 
   return (
     <div
