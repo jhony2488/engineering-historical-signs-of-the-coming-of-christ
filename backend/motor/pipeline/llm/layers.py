@@ -281,11 +281,8 @@ class LLMPipeline:
             },
             {"role": "user", "content": prompt},
         ]
-        model_name = (
-            self.settings.gemini_model_timeline
-            if self.settings.gemini_api_key
-            else self.settings.groq_model_timeline
-        )
+        # Use Groq model by default for timeline to avoid Gemini quota issues
+        model_name = self.settings.groq_model_timeline
         content, provider = await self.router.complete(model_name, messages, json_mode=True)
         parsed = self._translate_narratives(self._parse_json(content), "timeline")
         row = db.insert("linhas_temporais", {"dados": parsed})
@@ -313,15 +310,7 @@ class LLMPipeline:
             },
             {"role": "user", "content": prompt},
         ]
-        model_name = (
-            self.settings.gemini_model_timeline
-            if self.settings.gemini_api_key
-            else (
-                self.settings.deepseek_model_reasoning
-                if self.settings.deepseek_api_key
-                else self.settings.groq_model_reasoning
-            )
-        )
+        model_name = self.settings.groq_model_reasoning
         content, provider = await self.router.complete(model_name, messages, json_mode=True)
         parsed = self._translate_narratives(
             scrub_payload_narratives(

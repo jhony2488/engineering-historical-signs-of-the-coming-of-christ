@@ -79,11 +79,7 @@ class SynthesisEngine:
             f"Responda em JSON com: padroes (lista), aceleracao_fase (bool), resumo.\n\n"
             f"{json.dumps(snapshot, ensure_ascii=False)}"
         )
-        model_name = (
-            self.settings.gemini_model_timeline
-            if self.settings.gemini_api_key
-            else self.settings.groq_model_timeline
-        )
+        model_name = self.settings.groq_model_timeline
         content, provider = await self.router.complete(
             model_name,
             [{"role": "user", "content": prompt}],
