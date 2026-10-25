@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import Globe from "react-globe.gl";
+import Globe,{GlobeMethods} from "react-globe.gl";
 
 export type GlobePoint = {
   lat: number;
@@ -20,8 +20,7 @@ type Props = {
 };
 
 export function ThreatGlobe({ points, selectedCode, onSelectCountry }: Props) {
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const globeRef = useRef<any>(null);
+  const globeRef = useRef<GlobeMethods | undefined>(undefined);
   const containerRef = useRef<HTMLDivElement>(null);
   const [size, setSize] = useState({ w: 800, h: 520 });
   const [rendererType, setRendererType] = useState<'webgpu' | 'webgl' | 'none' | null>(null);
@@ -31,7 +30,7 @@ export function ThreatGlobe({ points, selectedCode, onSelectCountry }: Props) {
     const checkWebGPU = async () => {
       if ('gpu' in navigator) {
         try {
-          const adapter = await (navigator as any).gpu.requestAdapter();
+          const adapter = await (navigator as Navigator).gpu.requestAdapter();
           if (adapter) {
             setRendererType('webgpu');
             return;
