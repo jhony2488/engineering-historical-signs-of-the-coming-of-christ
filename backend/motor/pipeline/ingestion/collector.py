@@ -330,7 +330,7 @@ class IngestionCollector:
     def persist(self, db: Any, docs: list[RawDocument]) -> list[dict[str, Any]]:
         saved = []
         for doc in docs:
-            row = db.insert(
+            row = db.upsert(
                 "documentos_brutos",
                 {
                     "titulo": doc.titulo,
@@ -341,6 +341,7 @@ class IngestionCollector:
                     "content_hash": doc.content_hash,
                     "coletado_em": doc.coletado_em,
                 },
+                on_conflict="content_hash",
             )
             saved.append(row)
         return saved

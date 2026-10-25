@@ -54,8 +54,16 @@ def run_synthesis(
         "--window",
         help="weekly|monthly|quarterly|semiannual|annual",
     ),
+    dry_run: bool = typer.Option(False, "--dry-run", help="Ativa LLM_DRY_RUN"),
 ) -> None:
     """Motor Nível 2 — síntese de padrões por janela temporal."""
+    if dry_run:
+        import os
+
+        os.environ["LLM_DRY_RUN"] = "true"
+        from motor.config import get_settings
+
+        get_settings.cache_clear()
     engine = SynthesisEngine()
     result = asyncio.run(engine.run(window))
     typer.echo(f"Síntese {window}: {result.get('analise_ia', {}).get('resumo', 'ok')}")
@@ -68,8 +76,16 @@ def run_hybrid_analysis(
         "--window",
         help="quarterly|semiannual|annual",
     ),
+    dry_run: bool = typer.Option(False, "--dry-run", help="Ativa LLM_DRY_RUN"),
 ) -> None:
     """Motor Nível 3 — análise híbrida multi-janela + RAG teológico."""
+    if dry_run:
+        import os
+
+        os.environ["LLM_DRY_RUN"] = "true"
+        from motor.config import get_settings
+
+        get_settings.cache_clear()
     engine = HybridAnalysisEngine()
     result = asyncio.run(engine.run(window))
     panorama = result.get("analise_hibrida", {}).get("panorama", "ok")
@@ -159,8 +175,17 @@ def revert_day(
 
 
 @app.command("run-data-drift")
-def run_data_drift() -> None:
+def run_data_drift(
+    dry_run: bool = typer.Option(False, "--dry-run", help="Ativa LLM_DRY_RUN"),
+) -> None:
     """Refinamento mensal de critérios de fase (data drift / embeddings_curation)."""
+    if dry_run:
+        import os
+
+        os.environ["LLM_DRY_RUN"] = "true"
+        from motor.config import get_settings
+
+        get_settings.cache_clear()
     from motor.pipeline.data_drift import DataDriftEngine
 
     result = asyncio.run(DataDriftEngine().run())
@@ -168,9 +193,11 @@ def run_data_drift() -> None:
 
 
 @app.command("run-drift-recalibration")
-def run_drift_recalibration() -> None:
+def run_drift_recalibration(
+    dry_run: bool = typer.Option(False, "--dry-run", help="Ativa LLM_DRY_RUN"),
+) -> None:
     """Alias de run-data-drift (recalibração de jargões / critérios)."""
-    run_data_drift()
+    run_data_drift(dry_run=dry_run)
 
 
 @app.command("archive-cold-storage")

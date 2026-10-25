@@ -74,7 +74,7 @@ class JoshuaAnalysisService:
         return {
             "people_id": people_id,
             "country_code": country,
-            "joshua_data_id": row.get("id"),
+            "joshua_data_id": str(row.get("id")),
             "energy_classification": {
                 "expansion": expansion_bits,
                 "contraction": contraction_bits,

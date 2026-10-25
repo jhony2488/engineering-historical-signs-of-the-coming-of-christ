@@ -68,6 +68,12 @@ class SynthesisEngine:
 
     async def run(self, window: str = "weekly") -> dict[str, Any]:
         snapshot = self.build_delta(window)
+        # Convert date objects to strings for JSON serialization
+        if "periodo" in snapshot:
+            snapshot["periodo"] = {
+                "inicio": str(snapshot["periodo"].get("inicio")),
+                "fim": str(snapshot["periodo"].get("fim")),
+            }
         prompt = (
             f"Analise a variação destes scores escatológicos e identifique padrões sistêmicos. "
             f"Responda em JSON com: padroes (lista), aceleracao_fase (bool), resumo.\n\n"

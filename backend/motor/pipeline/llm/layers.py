@@ -255,7 +255,7 @@ class LLMPipeline:
                     "ok",
                     {"provider": provider},
                 )
-                results.append({**parsed, "id": row.get("id")})
+                results.append({**parsed, "id": str(row.get("id"))})
             except Exception as exc:
                 db.log_audit(
                     "camada_4",
@@ -297,7 +297,7 @@ class LLMPipeline:
             "ok",
             {"provider": provider},
         )
-        return {**parsed, "id": row.get("id")}
+        return {**parsed, "id": str(row.get("id"))}
 
     async def reason(self, context: dict[str, Any], db) -> dict[str, Any]:
         template = compose_prompt("reasoning.txt")
@@ -336,7 +336,7 @@ class LLMPipeline:
             "ok",
             {"provider": provider},
         )
-        return {**parsed, "id": row.get("id")}
+        return {**parsed, "id": str(row.get("id"))}
 
     async def interpret(self, events: list[dict], rag: list[dict], db) -> dict[str, Any]:
         template = compose_prompt("hermeneutics.txt")
@@ -380,4 +380,4 @@ class LLMPipeline:
             "ok",
             {"provider": provider},
         )
-        return {**parsed, "id": row.get("id")}
+        return {**parsed, "id": str(row.get("id"))}

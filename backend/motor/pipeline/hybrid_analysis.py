@@ -116,6 +116,12 @@ class HybridAnalysisEngine:
     def build_payload(self, window: str = "annual") -> dict[str, Any]:
         cfg = WINDOW_CONFIG.get(window, WINDOW_CONFIG["annual"])
         historico_agg = self._aggregate_historico(cfg["days"])
+        # Convert date objects to strings for JSON serialization
+        if "periodo" in historico_agg:
+            historico_agg["periodo"] = {
+                "inicio": str(historico_agg["periodo"].get("inicio")),
+                "fim": str(historico_agg["periodo"].get("fim")),
+            }
         resumo = historico_agg.get("resumo", {})
         snapshots = self._collect_nivel2_snapshots(cfg["sub_windows"])
         rag = self._rag_context(resumo)
