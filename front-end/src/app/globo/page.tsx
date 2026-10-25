@@ -4,6 +4,7 @@ import dynamic from "next/dynamic";
 import Link from "next/link";
 import { useCallback, useEffect, useMemo, useState } from "react";
 
+import { ErrorBoundary } from "@/components/ui/ErrorBoundary";
 import { Header } from "@/components/ui/Header";
 import { fetchAmeacaDetail, fetchAmeacasPaises, fetchProvenanceDay } from "@/lib/api";
 import type {
@@ -421,11 +422,30 @@ export default function GloboPage() {
             Carregando ameaças…
           </p>
         ) : (
-          <ThreatGlobe
-            points={points}
-            selectedCode={selected}
-            onSelectCountry={onSelect}
-          />
+          <ErrorBoundary
+            fallback={
+              <div className="flex h-[min(70vh,640px)] items-center justify-center rounded-lg border border-ink-700/50 bg-ink-950/40">
+                <div className="text-center">
+                  <p className="mb-2 text-sm text-slate-400">
+                    Erro ao carregar o globo 3D
+                  </p>
+                  <button
+                    type="button"
+                    onClick={() => window.location.reload()}
+                    className="rounded border border-ink-600 px-3 py-1 text-xs text-slate-300 hover:border-cyan-500/50 hover:text-cyan-200"
+                  >
+                    Recarregar
+                  </button>
+                </div>
+              </div>
+            }
+          >
+            <ThreatGlobe
+              points={points}
+              selectedCode={selected}
+              onSelectCountry={onSelect}
+            />
+          </ErrorBoundary>
         )}
 
         {(selected || detailLoading) && (
