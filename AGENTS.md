@@ -21,8 +21,6 @@ com profecias e publicação de rankings/fases em um dashboard.
   `backend/motor/schemas/`.
 - **Escritura como âncora** — camadas hermenêuticas consultam o corpus
   teológico (RAG) antes de concluir.
-- **Custo zero no início** — priorize Groq free tier, GitHub Actions e
-  Supabase free; evite infra 24/7.
 - **Front-end só lê** — o dashboard nunca executa pipeline de IA, nunca chama
   LLMs **de API** e nunca grava em `resultados_escatologicos`.
   Para dados, o navegador chama somente rotas do Next.js (`/api/db/*`), que
@@ -33,8 +31,8 @@ com profecias e publicação de rankings/fases em um dashboard.
   rede, custo ou credenciais; ela só lê dados já exibidos e nunca é
   identificada na UI como "local".
 - **Cadeia de fallback LLM** — `Local GGUF (se LOCAL_LLM_ENABLED) → Ollama →
-  Groq → OpenRouter → dry-run`; dentro do tier local, cascata por alias
-  7B→3B→1.5B com perfis de parâmetros por modelo (`LOCAL_MODEL_MAP` em
+  Gemini → Groq → DeepSeek → OpenRouter → dry-run`; dentro do tier local, cascata
+  por alias 7B→3B→1.5B com perfis de parâmetros por modelo (`LOCAL_MODEL_MAP` em
   `motor/adapters/local_llm.py`). O run diário nunca pode quebrar por falha
   de modelo — degrade, nunca aborte.
 
@@ -194,7 +192,7 @@ npm run test   # Vitest + pytest — usado pelo pre-push
 
 | Componente | Secrets |
 |------------|---------|
-| Motor (batch real) | `DATABASE_URL`, `GROQ_API_KEY` (+ `OPENROUTER_API_KEY` fallback) |
+| Motor (batch real) | `DATABASE_URL`, `GROQ_API_KEY`, `DEEPSEEK_API_KEY`, `GEMINI_API_KEY` (+ `OPENROUTER_API_KEY` fallback) |
 | API admin | `ADMIN_API_KEY` |
 | Front-end (Next.js/Prisma) | `DATABASE_URL`, `DIRECT_URL` (PostgreSQL); usadas no servidor Next.js |
 | Workflows agendados | os mesmos do motor, via GitHub Secrets |

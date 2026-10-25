@@ -8,7 +8,6 @@ Obrigado por contribuir com o motor de IA. Este documento define o que esperamos
 - **Append-only** — resultados escatológicos nunca são sobrescritos; correções usam `revert-day` ou novo registro.
 - **Schema primeiro** — todo JSON persistido deve passar validação em `motor/schemas/`.
 - **Escritura como âncora** — camadas hermenêuticas devem consultar o corpus teológico (RAG) antes de concluir.
-- **Custo zero no início** — priorize Groq free tier, GitHub Actions e PostgreSQL com pgvector; evite infra 24/7 sem necessidade.
 
 ## Ambiente de desenvolvimento
 

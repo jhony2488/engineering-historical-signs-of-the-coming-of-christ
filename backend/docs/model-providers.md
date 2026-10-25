@@ -1,7 +1,7 @@
 # Provedores de modelos (Local GGUF → Ollama → Gemini → Groq → DeepSeek → OpenRouter)
 
 O `doc.txt` original previa **Ollama** local (Llama, Mistral Nemo, DeepSeek-R1, Gemma 2).
-Na fase zero-custo, o motor usa **Groq Cloud** (tier gratuito) com **fallback OpenRouter**.
+Na fase zero-custo, o motor usa **Groq**, **DeepSeek** e **Gemini** (tiers gratuitos) com **fallback OpenRouter**.
 Antes deles, dois tiers locais podem responder primeiro (ambos opcionais):
 **SLM GGUF in-process** (`LocalLlamaClient`, extra `[local]`) e **Ollama**
 (quando `OLLAMA_ENABLED=true`).

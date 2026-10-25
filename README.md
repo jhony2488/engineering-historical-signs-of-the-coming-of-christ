@@ -96,26 +96,13 @@ Detalhes em [backend/docs/arquitetura.md](backend/docs/arquitetura.md) e
 | Componente | Tecnologia |
 |------------|------------|
 | Motor | Python 3.11+, FastAPI, `structlog`, `typer` |
-| LLMs | Groq Cloud (free tier) → OpenRouter (fallback) → Ollama (opcional) |
+| LLMs | Groq → DeepSeek → Gemini → OpenRouter (fallback) → Ollama (opcional) |
 | Embeddings/RAG | BGE-M3, pgvector, reranker BGE, classificadores locais (gate zero-shot, shadow mode, dedup semântico, destilação sklearn) |
 | Matemática | Bayes, HMM/Viterbi, MCDA, GNN v1 (NetworkX) |
 | Banco | PostgreSQL com conexão direta via `DATABASE_URL` (única persistência) |
 | Dashboard | Next.js 15, React 19, TypeScript, Tailwind, Recharts, Cytoscape, Three.js |
 | Batch | GitHub Actions (cron) — sem infra 24/7 |
 | Qualidade | Husky: lint no commit, testes no push |
-
-## Infraestrutura — custo zero no início
-
-| Componente | Ferramenta | Custo |
-|------------|------------|-------|
-| Front-end/API | Netlify (serverless) | $0 |
-| Banco de dados | Supabase free | $0 |
-| Batch diário | GitHub Actions | $0 |
-| LLMs | Groq free tier | $0 |
-
-O motor "dorme" o dia todo: o batch executa ~04:00, grava no PostgreSQL e
-encerra. Em escala (~50 mil usuários), estima-se ~$35–45/mês (PostgreSQL gerenciado +
-RunPod/Spot).
 
 ## Início rápido
 
