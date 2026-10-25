@@ -19,8 +19,11 @@ type Props = {
   onSelectCountry: (code: string) => void;
 };
 
-interface NavigatorWithGPU extends Navigator {
-  gpu: GPU;
+// Define o navigator com a propriedade gpu sem depender do tipo global GPU
+interface NavigatorWithGPU {
+  gpu?: {
+    requestAdapter: (options?: unknown) => Promise<unknown>;
+  };
 }
 
 export function ThreatGlobe({ points, selectedCode, onSelectCountry }: Props) {
@@ -34,7 +37,7 @@ export function ThreatGlobe({ points, selectedCode, onSelectCountry }: Props) {
     const checkWebGPU = async () => {
       if ('gpu' in navigator) {
         try {
-          const adapter = await (navigator as unknown as NavigatorWithGPU).gpu.requestAdapter();
+          const adapter = await (navigator as unknown as NavigatorWithGPU).gpu?.requestAdapter();
           if (adapter) {
             setRendererType('webgpu');
             return;
