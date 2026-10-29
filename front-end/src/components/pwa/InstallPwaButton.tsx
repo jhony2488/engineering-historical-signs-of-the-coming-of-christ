@@ -21,7 +21,7 @@ export function InstallPwaButton() {
 
   useEffect(() => {
     // Detect iOS
-    const ios = /iPad|iPhone|iPod/.test(navigator.userAgent) && !(window as any).MSStream;
+    const ios = /iPad|iPhone|iPod/.test(navigator.userAgent) && !("MSStream" in window);
     setIsIOS(ios);
 
     // Check if already installed
@@ -142,8 +142,8 @@ export function InstallPwaButton() {
           </p>
           <ol className="mb-6 space-y-2 text-sm text-slate-400 list-decimal list-inside">
             <li>Toque no botão Compartilhar</li>
-            <li>Selecione "Adicionar à Tela de Início"</li>
-            <li>Toque "Adicionar" no canto superior direito</li>
+            <li>Selecione &quot;Adicionar à Tela de Início&quot;</li>
+            <li>Toque &quot;Adicionar&quot; no canto superior direito</li>
           </ol>
           <div className="flex gap-3">
             <button

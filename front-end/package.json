@@ -31,7 +31,7 @@
     "android:build": "npm run cap:build:android",
     "tauri:dev": "tauri dev",
     "tauri:build": "TAURI_BUILD=true npm run build && tauri build",
-    "tauri:init": "node scripts/init-tauri.js"
+    "tauri:init": "node scripts/init-tauri.mjs"
   },
   "prisma": {
     "seed": "tsx prisma/seed.ts"

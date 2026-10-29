@@ -58,7 +58,7 @@ export function ThreatGlobe({ points, selectedCode, onSelectCountry }: Props) {
             setRendererType("webgpu");
             return;
           }
-        } catch (e) {
+        } catch {
           // WebGPU não disponível, tentar WebGL
         }
       }
@@ -86,7 +86,7 @@ export function ThreatGlobe({ points, selectedCode, onSelectCountry }: Props) {
             return;
           }
         }
-      } catch (e) {
+      } catch {
         // WebAssembly não disponível, usar Canvas 2D
       }
 
@@ -126,7 +126,7 @@ export function ThreatGlobe({ points, selectedCode, onSelectCountry }: Props) {
 
   // Fallback Canvas 2D quando WebGL/WebAssembly não disponível
   if (rendererType === "canvas") {
-    return <ThreatGlobeCanvas points={points} selectedCode={selectedCode} onSelectCountry={onSelectCountry} />;
+    return <ThreatGlobeCanvas points={points} selectedCode={selectedCode} />;
   }
 
   // WebAssembly fallback quando WebGL não disponível mas WASM sim

@@ -38,7 +38,7 @@ type Props = {
  * without hardware acceleration.
  */
 export function ThreatGlobeWasm({ points, selectedCode, onSelectCountry }: Props) {
-  const globeRef = useRef<any>(undefined);
+  const globeRef = useRef<React.ElementRef<typeof Globe> | undefined>(undefined);
   const containerRef = useRef<HTMLDivElement>(null);
   const [size, setSize] = useState({ w: 800, h: 520 });
   const [error, setError] = useState<string | null>(null);
@@ -99,7 +99,7 @@ export function ThreatGlobeWasm({ points, selectedCode, onSelectCountry }: Props
         atmosphereAltitude={0.18}
         width={size.w}
         height={size.h}
-        onError={(e: any) => {
+        onError={(e: Error) => {
           console.error("Globe rendering error:", e);
           setError("WebAssembly rendering failed");
         }}

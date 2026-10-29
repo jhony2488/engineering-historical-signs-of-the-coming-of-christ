@@ -2,14 +2,6 @@
 
 import { useEffect, useState } from "react";
 
-interface PushSubscriptionJSON {
-  endpoint: string;
-  keys: {
-    p256dh: string;
-    auth: string;
-  };
-}
-
 /**
  * Gerenciador de Push Notifications — solicita permissão, subscribe/unsubscribe
  * e envia subscription para o backend.
@@ -46,6 +38,7 @@ export function PushNotificationManager() {
     return () => {
       navigator.serviceWorker.removeEventListener("message", handleMessage);
     };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const checkExistingSubscription = async () => {
@@ -109,6 +102,7 @@ export function PushNotificationManager() {
     }
   };
 
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const unsubscribeFromPush = async () => {
     setLoading(true);
     try {
