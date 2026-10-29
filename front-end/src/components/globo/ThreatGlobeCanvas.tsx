@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import DottedMap from "@wescld/dotted-map";
+import { DottedMap } from "@wescld/dotted-map";
 
 export type GlobePoint = {
   lat: number;
@@ -16,14 +16,13 @@ export type GlobePoint = {
 type Props = {
   points: GlobePoint[];
   selectedCode: string | null;
-  onSelectCountry: (code: string) => void;
 };
 
 /**
  * Fallback Canvas 2D para o globo — usa @wescld/dotted-map quando WebGL/WebGPU não disponível.
  * Renderiza globo ortográfico em Canvas 2D puro (sem Three.js).
  */
-export function ThreatGlobeCanvas({ points, selectedCode, onSelectCountry }: Props) {
+export function ThreatGlobeCanvas({ points, selectedCode }: Props) {
   const containerRef = useRef<HTMLDivElement>(null);
   const mapRef = useRef<DottedMap | null>(null);
   const [size, setSize] = useState({ w: 800, h: 520 });

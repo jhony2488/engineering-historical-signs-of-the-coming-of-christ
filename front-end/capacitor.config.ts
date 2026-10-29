@@ -24,7 +24,6 @@ const config: CapacitorConfig = {
       androidScaleType: "CENTER_CROP",
       showSpinner: false,
       androidSpinnerStyle: "large",
-      iosSpinnerStyle: "large",
       spinnerColor: "#e2b857",
     },
   },

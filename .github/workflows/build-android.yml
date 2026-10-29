@@ -1,0 +1,88 @@
+name: Build Android APK
+
+on:
+  push:
+    tags:
+      - "v*"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  build-android:
+    name: Build Android APK
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Set up Java JDK
+        uses: actions/setup-java@v4
+        with:
+          distribution: "temurin"
+          java-version: "17"
+
+      - name: Set up Android SDK
+        uses: android-actions/setup-android@v3
+
+      - name: Install dependencies
+        working-directory: front-end
+        run: |
+          npm install --ignore-scripts --no-audit --no-fund --package-lock=false
+          npm run db:generate
+
+      - name: Build Next.js
+        working-directory: front-end
+        run: npm run build
+
+      - name: Install Capacitor
+        working-directory: front-end
+        run: npm install @capacitor/cli @capacitor/android
+
+      - name: Check if Android platform exists
+        id: check-android
+        working-directory: front-end
+        shell: bash
+        run: |
+          if [ -d "android" ]; then
+            echo "exists=true" >> $GITHUB_OUTPUT
+          else
+            echo "exists=false" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Add Android platform
+        if: steps.check-android.outputs.exists == 'false'
+        working-directory: front-end
+        run: npx cap add android
+
+      - name: Sync Capacitor
+        working-directory: front-end
+        run: npx cap sync android
+
+      - name: Build Android APK
+        working-directory: front-end
+        run: npx cap build android
+
+      - name: Upload APK artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: android-apk
+          path: front-end/android/app/build/outputs/apk/**/*.apk
+          retention-days: 30
+
+      - name: Create GitHub Release
+        if: startsWith(github.ref, 'refs/tags/')
+        uses: softprops/action-gh-release@v1
+        with:
+          files: front-end/android/app/build/outputs/apk/**/*.apk
+          draft: false
+          prerelease: false
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

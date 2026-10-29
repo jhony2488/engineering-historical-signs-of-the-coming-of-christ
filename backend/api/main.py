@@ -3,7 +3,6 @@ from __future__ import annotations
 import asyncio
 import json
 from datetime import date, datetime
-from typing import Any
 
 from fastapi import (
     BackgroundTasks,
@@ -659,11 +658,6 @@ async def push_send(
 
         if not subscriptions:
             return {"status": "no_subscribers", "sent": 0}
-
-        vapid_keys = {
-            "auth": settings.vapid_private_key,
-            "p256dh": settings.vapid_public_key,
-        }
 
         payload_dict = {
             "title": title,
