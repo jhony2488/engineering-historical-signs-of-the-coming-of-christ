@@ -123,6 +123,10 @@ class Settings(BaseSettings):
     email_dry_run: bool = True
     resend_api_key: str = ""
 
+    # PWA Push Notifications (VAPID keys)
+    vapid_public_key: str = ""
+    vapid_private_key: str = ""
+
     # Retenção: dados ficam no PostgreSQL. Sem S3 / arquivos locais de cold storage.
 
 

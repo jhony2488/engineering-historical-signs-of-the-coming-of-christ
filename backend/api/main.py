@@ -1,7 +1,9 @@
 from __future__ import annotations
 
 import asyncio
+import json
 from datetime import date, datetime
+from typing import Any
 
 from fastapi import (
     BackgroundTasks,
@@ -14,6 +16,7 @@ from fastapi import (
     Response,
 )
 from fastapi.middleware.cors import CORSMiddleware
+from pywebpush import WebPushException, webpush
 from slowapi import Limiter, _rate_limit_exceeded_handler
 from slowapi.errors import RateLimitExceeded
 from slowapi.util import get_remote_address
@@ -555,3 +558,152 @@ async def admin_run_daily(
 
     background_tasks.add_task(lambda: asyncio.run(_run()))
     return {"status": "accepted", "data_referencia": d.isoformat(), "job_id": job_id}
+
+
+# ==================== Push Notifications ====================
+
+
+@app.post("/api/push/subscribe")
+@limiter.limit("10/minute")
+async def push_subscribe(request: Request) -> dict:
+    """Registra subscription de push notification do cliente."""
+    try:
+        body = await request.json()
+        subscription_data = body.get("subscription")
+        if not subscription_data:
+            raise HTTPException(status_code=400, detail="subscription data required")
+
+        endpoint = subscription_data.get("endpoint")
+        if not endpoint:
+            raise HTTPException(status_code=400, detail="endpoint required")
+
+        db = get_postgres()
+        # Upsert: se já existe, atualiza; se não, insere
+        existing = db.select(
+            "push_subscriptions",
+            filters={"endpoint": endpoint},
+            limit=1,
+        )
+
+        sub_record = {
+            "endpoint": endpoint,
+            "keys_p256dh": subscription_data.get("keys", {}).get("p256dh"),
+            "keys_auth": subscription_data.get("keys", {}).get("auth"),
+            "user_agent": request.headers.get("user-agent", "unknown"),
+            "updated_at": datetime.now().isoformat(),
+        }
+
+        if existing:
+            db.update("push_subscriptions", {"id": existing[0]["id"]}, sub_record)
+        else:
+            sub_record["created_at"] = datetime.now().isoformat()
+            db.insert("push_subscriptions", sub_record)
+
+        return {"status": "subscribed", "endpoint": endpoint}
+    except Exception as exc:
+        raise HTTPException(status_code=500, detail=str(exc)) from exc
+
+
+@app.post("/api/push/unsubscribe")
+@limiter.limit("10/minute")
+async def push_unsubscribe(request: Request) -> dict:
+    """Remove subscription de push notification."""
+    try:
+        body = await request.json()
+        subscription_data = body.get("subscription")
+        if not subscription_data:
+            raise HTTPException(status_code=400, detail="subscription data required")
+
+        endpoint = subscription_data.get("endpoint")
+        if not endpoint:
+            raise HTTPException(status_code=400, detail="endpoint required")
+
+        db = get_postgres()
+        existing = db.select(
+            "push_subscriptions",
+            filters={"endpoint": endpoint},
+            limit=1,
+        )
+
+        if existing:
+            db.delete("push_subscriptions", {"id": existing[0]["id"]})
+            return {"status": "unsubscribed", "endpoint": endpoint}
+
+        return {"status": "not_found", "endpoint": endpoint}
+    except Exception as exc:
+        raise HTTPException(status_code=500, detail=str(exc)) from exc
+
+
+@app.post("/api/push/send")
+@limiter.limit("20/minute")
+async def push_send(
+    request: Request,
+    _: None = Depends(verify_admin),
+) -> dict:
+    """Envia notificação push para todos os subscribers (admin only)."""
+    try:
+        body = await request.json()
+        title = body.get("title", "Atualização")
+        message = body.get("message", "")
+        url = body.get("url", "/")
+        tag = body.get("tag", "sinais-update")
+
+        if not settings.vapid_private_key or not settings.vapid_public_key:
+            raise HTTPException(
+                status_code=500,
+                detail="VAPID keys not configured on server",
+            )
+
+        db = get_postgres()
+        subscriptions = db.select("push_subscriptions")
+
+        if not subscriptions:
+            return {"status": "no_subscribers", "sent": 0}
+
+        vapid_keys = {
+            "auth": settings.vapid_private_key,
+            "p256dh": settings.vapid_public_key,
+        }
+
+        payload_dict = {
+            "title": title,
+            "body": message,
+            "url": url,
+            "tag": tag,
+        }
+        payload = json.dumps(payload_dict)
+
+        success_count = 0
+        error_count = 0
+
+        for sub in subscriptions:
+            try:
+                subscription_info = {
+                    "endpoint": sub["endpoint"],
+                    "keys": {
+                        "p256dh": sub["keys_p256dh"],
+                        "auth": sub["keys_auth"],
+                    },
+                }
+
+                webpush(
+                    subscription_info=subscription_info,
+                    data=payload,
+                    vapid_private_key=settings.vapid_private_key,
+                    vapid_claims={"sub": "mailto:admin@sinaishistoricos.com"},
+                )
+                success_count += 1
+            except WebPushException as exc:
+                error_count += 1
+                # Remover subscription inválida
+                db.delete("push_subscriptions", {"id": sub["id"]})
+                print(f"Push failed for {sub['endpoint']}: {exc}")
+
+        return {
+            "status": "sent",
+            "success": success_count,
+            "errors": error_count,
+            "total": len(subscriptions),
+        }
+    except Exception as exc:
+        raise HTTPException(status_code=500, detail=str(exc)) from exc

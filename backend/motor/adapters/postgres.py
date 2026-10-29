@@ -135,6 +135,17 @@ class PostgresClient:
         )
         return self._execute(statement, params)
 
+    def delete(self, table: str, filters: dict[str, Any]) -> list[dict[str, Any]]:
+        if not filters:
+            raise ValueError("PostgreSQL deletes require at least one filter.")
+        where_clause = sql.SQL(" AND ").join(
+            sql.SQL("{} = %s").format(sql.Identifier(column)) for column in filters
+        )
+        statement = sql.SQL("DELETE FROM {} WHERE {} RETURNING *").format(
+            sql.Identifier(table), where_clause
+        )
+        return self._execute(statement, tuple(filters.values()))
+
     def select(
         self,
         table: str,
