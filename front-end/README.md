@@ -73,6 +73,45 @@ Cobertura: `lib/` (cache, api, phases, mock, seo, db, local-ai), `middleware`, c
 - Publish: `.next` (ou use adapter Netlify para Next.js)
 - Env: `DATABASE_URL` e `DIRECT_URL` apontando para o Supabase
 
+## Deploy Multiplataforma
+
+### Android (Capacitor)
+
+- APK para download direto (sem Play Store)
+- Build: `npm run android:build`
+- CI: workflow em `.github/workflows/build-android.yml` (tags `v*`)
+- Requisitos: Java JDK 17, Android SDK
+- Capacitor config: `capacitor.config.ts`
+- Plataforma `android/` é inicializada apenas no CI/CD (não versionada)
+
+> **Nota:** Não há build automático de iOS via Capacitor. iOS é suportado apenas via PWA (instalação manual no navegador Safari).
+
+### Desktop (Tauri)
+
+- Windows, Linux, macOS via GitHub Releases
+- Build: `npm run tauri:build`
+- CI: workflow em `.github/workflows/build-desktop.yml` (tags `v*`)
+- Requisitos: Rust toolchain
+- **Nota**: Desktop usa SSG + API FastAPI em produção
+- Plataforma `src-tauri/` é inicializada apenas no CI/CD (não versionada)
+- Script de inicialização: `npm run tauri:init`
+
+### Processo de Release
+
+1. Atualize a versão em `package.json`
+2. Commit com mensagem: `chore: bump version to X.Y.Z`
+3. Crie e push a tag: `git tag vX.Y.Z && git push origin vX.Y.Z`
+4. Os workflows de build serão executados automaticamente
+5. Após a conclusão, verifique o GitHub Release com os artefatos
+
+### PWA Features
+
+- **Service Worker**: Caching strategies, offline support, background sync
+- **Push Notifications**: Subscribe/unsubscribe via `/api/push/*` endpoints
+- **Install Prompts**: Detecta beforeinstallprompt, suporta iOS com instruções manuais
+- **Offline Page**: `offline.html` com auto-retry a cada 30 segundos
+- **Globe Fallbacks**: WebGPU → WebGL → WebAssembly → Canvas 2D
+
 ## Estrutura
 
 ```

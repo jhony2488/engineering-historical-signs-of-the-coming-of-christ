@@ -115,3 +115,69 @@ Defina variável de repositório `LLM_DRY_RUN=true` para pipelines de teste sem 
 ## Cache
 
 O workflow diário cacheia `~/.cache/huggingface` para o modelo BGE-M3.
+
+## Workflows de Build Multiplataforma
+
+### build-android.yml
+
+Constrói o APK Android via Capacitor para distribuição.
+
+|| Item | Valor |
+|------|-------|
+| Trigger | Push de tag `v*` (ex: `v1.0.0`) ou `workflow_dispatch` manual |
+| Plataforma | Ubuntu Latest |
+| Saída | APK publicada em GitHub Release |
+| Requisitos | Node.js 22, Java JDK 17, Android SDK |
+
+**Processo:**
+1. Check out repository
+2. Setup Node.js, Java JDK, Android SDK
+3. Install dependencies em `front-end/`
+4. Build Next.js (`npm run build`)
+5. Install Capacitor CLI
+6. Check se `android/` existe; se não, adiciona plataforma
+7. Sync Capacitor (`npx cap sync android`)
+8. Build Android APK (`npx cap build android`)
+9. Upload artifact (30 dias retenção)
+10. Cria GitHub Release com APK
+
+**Build local:**
+```bash
+cd front-end
+npm run android:build
+```
+
+### build-desktop.yml
+
+Constrói binários desktop (Windows, Linux, macOS) via Tauri.
+
+|| Item | Valor |
+|------|-------|
+| Trigger | Push de tag `v*` (ex: `v1.0.0`) ou `workflow_dispatch` manual |
+| Plataforma | Matrix: Ubuntu Latest, macOS Latest, Windows Latest |
+| Saída | Binários publicados em GitHub Release |
+| Requisitos | Node.js 22, Rust toolchain |
+
+**Processo:**
+1. Check out repository
+2. Setup Node.js, Rust toolchain
+3. Install system dependencies (Linux: libwebkit2gtk-4.1-dev)
+4. Install dependencies em `front-end/`
+5. Initialize Tauri (`npm run tauri:init` - verifica se `src-tauri/` existe)
+6. Build desktop app (`npm run tauri:build`)
+7. Upload artifacts por plataforma (30 dias retenção)
+8. Cria GitHub Release (apenas na plataforma Ubuntu)
+
+**Build local:**
+```bash
+cd front-end
+npm run tauri:build
+```
+
+### Notas sobre Plataformas
+
+- As pastas `android/` e `src-tauri/` são inicializadas apenas no CI/CD
+- Não são versionadas no repositório (seguindo preferência do projeto)
+- Isso evita conflitos de versão entre builds locais e CI
+- O script `scripts/init-tauri.js` gerencia a inicialização do Tauri
+- O workflow `build-android.yml` verifica se `android/` existe antes de adicionar

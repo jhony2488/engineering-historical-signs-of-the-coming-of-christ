@@ -166,6 +166,55 @@ desenvolvimento.
 - `next.config.ts` faz rewrite de `/api/backend/*` → FastAPI quando
   `DATA_SOURCE=fastapi`.
 
+### Deploy Multiplataforma
+
+#### Android (Capacitor)
+
+- APK via download direto (sem Play Store)
+- Config: `front-end/capacitor.config.ts`
+- Build local: `cd front-end && npm run android:build`
+- CI: workflow `.github/workflows/build-android.yml` em tags `v*`
+- Requisitos: Node.js 22+, Java JDK 17, Android SDK
+- App usa API FastAPI em produção ou modo mock
+
+> **Nota:** Não há build automático de iOS via Capacitor. iOS é suportado apenas via PWA (instalação manual no navegador Safari).
+
+#### Desktop (Tauri)
+
+- Windows, Linux, macOS via GitHub Releases
+- Config: `front-end/src-tauri/tauri.conf.json`
+- Build local: `cd front-end && npm run tauri:build`
+- CI: workflow `.github/workflows/build-desktop.yml` em tags `v*`
+- Requisitos: Rust toolchain, WebView2 (Windows), webkit2gtk (Linux)
+- SSG obrigatório (`output: 'export'`) — usa API FastAPI em produção
+
+### Requisitos de Ambiente Adicionais
+
+Para builds multiplataforma, os contributors precisam:
+
+| Ferramenta | Uso | Versão mínima |
+|------------|-----|---------------|
+| Rust | Tauri desktop | 1.70+ |
+| Java JDK | Capacitor Android | 17 |
+| Android SDK | Capacitor Android | API 33+ |
+| WebView2 | Tauri Windows | pré-instalado no Win10+ |
+| webkit2gtk | Tauri Linux | via apt-get |
+
+Comando para instalar Rust:
+```bash
+curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh
+cargo install tauri-cli --version "^2.0.0"
+```
+
+### PWA Push Notifications
+
+- VAPID keys obrigatórias para envio de notificações
+- Geração: `npx web-push generate-vapid-keys`
+- `VAPID_PUBLIC_KEY` → front-end (subscribe)
+- `VAPID_PRIVATE_KEY` → backend (env var, secreto)
+- Endpoints: `/api/push/subscribe`, `/api/push/unsubscribe`, `/api/push/send`
+- Tabela: `push_subscriptions` no PostgreSQL
+
 ### Serviços externos opcionais
 
 | Serviço | Uso | Variáveis |

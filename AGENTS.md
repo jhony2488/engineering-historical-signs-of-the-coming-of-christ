@@ -189,6 +189,9 @@ npm run test   # Vitest + pytest — usado pelo pre-push
   `python -m motor.cli run-daily --dry-run`
 - Dashboard completo com mock: `NEXT_PUBLIC_USE_MOCK=true` + `npm run dev`
 - Lint, format e testes de ambas as stacks sem nenhuma chave
+- PWA completo (service worker, offline, install prompts) sem credenciais
+- Builds locais de Android (Capacitor) e Desktop (Tauri) sem credenciais
+- Fallbacks do globo 3D (WebGPU → WebGL → WebAssembly → Canvas 2D) sem credenciais
 
 ### Credenciais necessárias por componente
 

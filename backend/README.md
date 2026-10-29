@@ -157,6 +157,13 @@ Workflows em [`.github/workflows/`](../.github/workflows/):
 
 Variável opcional: `LLM_DRY_RUN=true` para CI sem chaves.
 
+### Workflows de build multiplataforma
+
+Os workflows `build-android.yml` e `build-desktop.yml` constroem o front-end para
+distribuição (Android APK via Capacitor, Desktop via Tauri). Eles não executam
+o backend, mas usam a estrutura do monorepo para acessar o front-end. O backend
+continua sendo executado em servidor separado (GitHub Actions batch diário).
+
 ## Testes
 
 ```bash

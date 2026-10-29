@@ -299,9 +299,46 @@ Documentação do motor: [backend/docs/api-contrato.md](../../backend/docs/api-c
 
 ## Deploy
 
+### Web (PWA)
+
 - Build de produção: `npm run build` (inclui `prisma generate`)
 - Variáveis obrigatórias em Netlify/Vercel: `NEXT_PUBLIC_SITE_URL`, `DATABASE_URL`, `DIRECT_URL`
 - `DATABASE_URL` e `DIRECT_URL` configuradas para o Supabase
+- **PWA**: manifest, service worker, offline page instaláveis
+- **Push Notifications**: endpoints `/api/push/subscribe` e `/api/push/unsubscribe`
+- **Install Prompts**: detecta `beforeinstallprompt`, suporta iOS com instruções manuais
+- **Offline Support**: service worker com caching strategies, background sync
+- **VAPID Keys**: required para push notifications (configure em `NEXT_PUBLIC_VAPID_PUBLIC_KEY`)
+
+### Multiplataforma
+
+#### Android (Capacitor)
+
+- Dependências: `@capacitor/core`, `@capacitor/android`, `@capacitor/cli`
+- Config: `capacitor.config.ts`
+- Build: `npm run android:build` (APK para download direto)
+- CI: workflow `.github/workflows/build-android.yml` em tags `v*`
+- Requer: Node.js 22+, Java JDK 17, Android SDK
+
+> **Nota:** Não há build automático de iOS via Capacitor. iOS é suportado apenas via PWA (instalação manual no navegador Safari).
+
+#### Desktop (Tauri)
+
+- Config: `src-tauri/tauri.conf.json` (inicializar com `npm run tauri:init`)
+- Build: `npm run tauri:build` (Windows, Linux, macOS)
+- SSG obrigatório: `TAURI_BUILD=true npm run build` (output: 'export')
+- CI: workflow `.github/workflows/build-desktop.yml` em tags `v*`
+- Requer: Rust toolchain, WebView2 (Windows), webkit2gtk (Linux)
+- **Nota**: Apps desktop usam API FastAPI em produção (não Prisma no cliente)
+- **Nota**: Plataforma `src-tauri/` é inicializada apenas no CI/CD (não versionada)
+
+#### Globo Fallback
+
+- Cascata de renderização: WebGPU → WebGL → WebAssembly → Canvas 2D
+- Fallback WebAssembly: `ThreatGlobeWasm.tsx` (Three.js com suporte WASM)
+- Fallback Canvas 2D: `@wescld/dotted-map` (sem Three.js)
+- Indicador de modo visível quando usando Canvas ou WebAssembly
+- Detecção automática em `ThreatGlobe.tsx`
 
 ## Reportar bugs
 

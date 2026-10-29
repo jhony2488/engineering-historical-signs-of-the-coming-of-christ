@@ -104,6 +104,18 @@ Detalhes em [backend/docs/arquitetura.md](backend/docs/arquitetura.md) e
 | Batch | GitHub Actions (cron) — sem infra 24/7 |
 | Qualidade | Husky: lint no commit, testes no push |
 
+## Downloads
+
+O projeto disponibiliza builds multiplataforma automaticamente em tags de release:
+
+- **Android APK** — Via Capacitor, para instalação direta (sem Play Store)
+- **Desktop (Windows, Linux, macOS)** — Via Tauri, executáveis nativos
+- **PWA** — Instalável via navegador com suporte offline (funciona em Android, iOS e desktop)
+
+> **Nota:** Não há build automático de iOS via Capacitor. iOS é suportado apenas via PWA (instalação manual no navegador Safari).
+
+Para obter os builds, visite a página de [Releases](https://github.com/seu-usuario/engenharia-sinais-historicos/releases) e baixe a versão mais recente.
+
 ## Início rápido
 
 ### Backend (motor)

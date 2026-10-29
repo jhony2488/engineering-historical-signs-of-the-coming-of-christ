@@ -111,6 +111,51 @@ configurações server-side e nunca devem ser expostas como `NEXT_PUBLIC_*`.
    são aceitos com uma justificativa muito válida descrita no corpo do PR;
    quando possível, divida em entregas menores.
 
+## Builds Multiplataforma
+
+O projeto suporta builds automatizados para Android (via Capacitor) e Desktop
+(Windows, Linux, macOS via Tauri) que são executados automaticamente em tags
+de release. iOS é suportado apenas via PWA (instalação manual no navegador).
+
+### Android (Capacitor)
+
+- **Trigger:** Push de tag `v*` (ex: `v1.0.0`) ou `workflow_dispatch` manual
+- **Workflow:** `.github/workflows/build-android.yml`
+- **Saída:** APK publicada em GitHub Release
+- **Build local:**
+  ```bash
+  cd front-end
+  npm run android:build
+  ```
+- **Requisitos:** Java JDK 17, Android SDK
+
+### Desktop (Tauri)
+
+- **Trigger:** Push de tag `v*` (ex: `v1.0.0`) ou `workflow_dispatch` manual
+- **Workflow:** `.github/workflows/build-desktop.yml`
+- **Saída:** Binários para Windows, Linux e macOS publicados em GitHub Release
+- **Build local:**
+  ```bash
+  cd front-end
+  npm run tauri:build
+  ```
+- **Requisitos:** Rust toolchain, dependências do sistema (Linux: libwebkit2gtk-4.1-dev)
+
+### Processo de Release
+
+1. Atualize a versão em `front-end/package.json` e `backend/pyproject.toml` (se aplicável)
+2. Commit com mensagem: `chore: bump version to X.Y.Z`
+3. Crie e push a tag: `git tag vX.Y.Z && git push origin vX.Y.Z`
+4. Os workflows de build serão executados automaticamente
+5. Após a conclusão, verifique o GitHub Release com os artefatos
+
+### Notas sobre Capacitor e Tauri
+
+- As plataformas `android/` e `src-tauri/` são inicializadas apenas no CI/CD,
+  não são versionadas no repositório (seguindo a preferência do projeto)
+- Para builds locais, use os scripts `npm run android:build` e `npm run tauri:build`
+- O Tauri usa SSG (Static Site Generation) via `TAURI_BUILD=true`
+
 ## Regras específicas de cada stack
 
 Este arquivo cobre as regras globais. Cada parte do monorepo tem requisitos

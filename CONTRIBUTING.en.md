@@ -113,6 +113,50 @@ configuration and must never be exposed as `NEXT_PUBLIC_*`.
    requests require a strong justification in their description; split the
    work into smaller pull requests when possible.
 
+## Multi-platform Builds
+
+The project supports automated builds for Android (via Capacitor) and Desktop
+(Windows, Linux, macOS via Tauri) that run automatically on release tags.
+
+### Android (Capacitor)
+
+- **Trigger:** Push of tag `v*` (e.g., `v1.0.0`) or manual `workflow_dispatch`
+- **Workflow:** `.github/workflows/build-android.yml`
+- **Output:** APK published to GitHub Release
+- **Local build:**
+  ```bash
+  cd front-end
+  npm run android:build
+  ```
+- **Requirements:** Java JDK 17, Android SDK
+
+### Desktop (Tauri)
+
+- **Trigger:** Push of tag `v*` (e.g., `v1.0.0`) or manual `workflow_dispatch`
+- **Workflow:** `.github/workflows/build-desktop.yml`
+- **Output:** Binaries for Windows, Linux, and macOS published to GitHub Release
+- **Local build:**
+  ```bash
+  cd front-end
+  npm run tauri:build
+  ```
+- **Requirements:** Rust toolchain, system dependencies (Linux: libwebkit2gtk-4.1-dev)
+
+### Release Process
+
+1. Update the version in `front-end/package.json` and `backend/pyproject.toml` (if applicable)
+2. Commit with message: `chore: bump version to X.Y.Z`
+3. Create and push the tag: `git tag vX.Y.Z && git push origin vX.Y.Z`
+4. The build workflows will run automatically
+5. After completion, check the GitHub Release with the artifacts
+
+### Notes on Capacitor and Tauri
+
+- The `android/` and `src-tauri/` platforms are initialized only in CI/CD,
+  not versioned in the repository (following project preference)
+- For local builds, use the scripts `npm run android:build` and `npm run tauri:build`
+- Tauri uses SSG (Static Site Generation) via `TAURI_BUILD=true`
+
 ## Stack-specific requirements
 
 This guide covers repository-wide rules. Each part of the monorepo has its own
