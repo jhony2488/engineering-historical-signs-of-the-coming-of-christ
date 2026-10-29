@@ -3,6 +3,7 @@ import type { Metadata, Viewport } from "next";
 import { GoogleAnalytics } from "@/components/analytics/GoogleAnalytics";
 import { BackgroundAudio } from "@/components/audio/BackgroundAudio";
 import { LocalAIHost } from "@/components/local-ai/LocalAIHost";
+import { PushNotificationManager } from "@/components/pwa/PushNotificationManager";
 import { ServiceWorkerRegister } from "@/components/pwa/ServiceWorkerRegister";
 import { SplineCompanionLoader } from "@/components/spline/SplineCompanionLoader";
 import { SiteFooter } from "@/components/ui/SiteFooter";
@@ -58,6 +59,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           <SiteFooter />
           <LocalAIHost />
           <ServiceWorkerRegister />
+          <PushNotificationManager />
         </div>
       </body>
     </html>

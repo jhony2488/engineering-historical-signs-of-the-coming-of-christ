@@ -1,5 +1,7 @@
 import { LogoutButton } from "./LogoutButton";
 import { NavLinks } from "./NavLinks";
+import { ConnectionStatus } from "@/components/pwa/ConnectionStatus";
+import { InstallPwaButton } from "@/components/pwa/InstallPwaButton";
 
 interface HeaderProps {
   dataReferencia?: string;
@@ -53,6 +55,8 @@ export function Header({
           </div>
           <nav className="header-nav flex flex-wrap items-center gap-3 text-sm" aria-label="Navegação principal">
             <NavLinks links={links} />
+            <ConnectionStatus />
+            <InstallPwaButton />
             {variant === "admin" && <LogoutButton />}
             {dataReferencia && (
               <span

@@ -23,16 +23,27 @@
     "ai:gen-icons": "node scripts/gen-pwa-icons.mjs",
     "google-indexing": "dotenv -e .env.local -- tsx scripts/google-indexing.ts",
     "storybook": "storybook dev -p 6006",
-    "build-storybook": "storybook build"
+    "build-storybook": "storybook build",
+    "cap:init": "cap init",
+    "cap:sync": "cap sync",
+    "cap:open:android": "cap open android",
+    "cap:build:android": "npm run build && cap sync android && cap build android",
+    "android:build": "npm run cap:build:android",
+    "tauri:dev": "tauri dev",
+    "tauri:build": "TAURI_BUILD=true npm run build && tauri build",
+    "tauri:init": "node scripts/init-tauri.js"
   },
   "prisma": {
     "seed": "tsx prisma/seed.ts"
   },
   "dependencies": {
+    "@capacitor/android": "^6.0.0",
+    "@capacitor/core": "^6.0.0",
     "@huggingface/transformers": "^4.3.0",
     "@mlc-ai/web-llm": "^0.2.85",
     "@prisma/client": "^6.1.0",
     "@splinetool/react-spline": "^4.1.0",
+    "@wescld/dotted-map": "latest",
     "clsx": "^2.1.1",
     "cytoscape": "^3.30.4",
     "isomorphic-dompurify": "^2.30.0",
@@ -57,7 +68,9 @@
     "image-size": "^2.0.3"
   },
   "devDependencies": {
+    "@capacitor/cli": "^6.0.0",
     "@eslint/eslintrc": "^3.3.1",
+    "@tauri-apps/cli": "^2.0.0",
     "@storybook/addon-essentials": "^8.6.18",
     "@storybook/addon-links": "^8.6.18",
     "@storybook/blocks": "^8.6.18",
