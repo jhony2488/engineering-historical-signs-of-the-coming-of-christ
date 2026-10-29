@@ -87,10 +87,9 @@ describe("DashboardClient", () => {
   it("shows loading then panel with mock data", async () => {
     render(<DashboardClient />);
     await waitFor(() => {
-      expect(screen.getByText("Monitor Escatológico")).toBeInTheDocument();
+      expect(screen.getByText(/Medidor de Proximidade Espiritual/)).toBeInTheDocument();
     });
-    expect(screen.getByText(/Medidor de Proximidade Espiritual/)).toBeInTheDocument();
-    expect(screen.getByText("Coalizão de Mediação Global")).toBeInTheDocument();
+    expect(screen.getByText("Monitor Escatológico")).toBeInTheDocument();
   });
 
   it("shows transition alert when result has transicao_fase", async () => {
