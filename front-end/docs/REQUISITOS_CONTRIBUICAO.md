@@ -225,11 +225,12 @@ Mensagens em português ou inglês, imperativo, focando o **porquê**:
 ```
 feat(historico): exibe snapshot trimestral do Nível 2
 fix(cache): invalida histórico no primeiro acesso do dia
+refactor(globo): extract DottedMap to React component
 test(api): cobre fallback mock quando fetch falha
 docs: atualiza requisitos de contribuição front-end
 ```
 
-Prefixos: `feat`, `fix`, `docs`, `test`, `refactor`, `chore`, `style`.
+Prefixos: `feat`, `fix`, `refactor`, `docs`, `test`, `chore`, `style`.
 
 ## Pull Requests
 

@@ -95,11 +95,12 @@ Use mensagens em português ou inglês, no imperativo, focando o **porquê**:
 ```
 feat(pipeline): adiciona ingestão ACLED com API key opcional
 fix(correlation): corrige threshold de falso líder quando macro=0
+refactor(hermeneutics): extract RAG logic to separate service
 docs: atualiza contrato da API v1
 test(bayes): cobre evidência fraca sem mudança de prior
 ```
 
-Prefixos sugeridos: `feat`, `fix`, `docs`, `test`, `refactor`, `chore`.
+Prefixos sugeridos: `feat`, `fix`, `refactor`, `docs`, `test`, `chore`.
 
 ## Pull Requests
 

@@ -29,6 +29,7 @@ request, please read the guidelines below.
   - `feat:` — new feature — `feat: add OpenRouter fallback`
   - `bug:` — bug fix — `bug: fix false leader threshold when macro is zero`
   - `doc:` — documentation — `doc: update API contract guide`
+  - `refactor:` — code refactoring — `refactor: extract DottedMap to React component`
   - `chore:` — maintenance and configuration — `chore: update dependencies`
 - **All commits must be SSH-signed.** CI verifies each commit submitted in a
   pull request. See GitHub's

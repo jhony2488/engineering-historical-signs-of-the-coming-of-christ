@@ -27,6 +27,7 @@ Obrigado por querer ajudar a construir o projeto. Antes de abrir uma issue ou pu
   - `feat:` — nova funcionalidade — `feat: add OpenRouter fallback`
   - `bug:` — correção de bug — `bug: fix false leader threshold when macro is zero`
   - `doc:` — documentação — `doc: update API contract guide`
+  - `refactor:` — refatoração de código — `refactor: extract DottedMap to React component`
   - `chore:` — manutenção e configuração — `chore: update dependencies`
 - **Todos os commits devem ser assinados com SSH**. O CI verifica as
   assinaturas de cada commit enviado em pull requests. Veja o
