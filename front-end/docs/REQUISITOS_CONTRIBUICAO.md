@@ -220,14 +220,14 @@ Para componentes com `next/link`, o mock já está em `vitest.setup.ts`.
 
 ## Commits
 
-Mensagens em português ou inglês, imperativo, focando o **porquê**:
+**Todos os commits devem ser escritos apenas em inglês**, imperativo, focando o **porquê**:
 
 ```
-feat(historico): exibe snapshot trimestral do Nível 2
-fix(cache): invalida histórico no primeiro acesso do dia
+feat(historico): display quarterly snapshot of Level 2
+fix(cache): invalidate history on first daily access
 refactor(globo): extract DottedMap to React component
-test(api): cobre fallback mock quando fetch falha
-docs: atualiza requisitos de contribuição front-end
+test(api): cover mock fallback when fetch fails
+docs: update front-end contribution requirements
 ```
 
 Prefixos: `feat`, `fix`, `refactor`, `docs`, `test`, `chore`, `style`.

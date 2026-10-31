@@ -163,7 +163,7 @@ npm run test   # Vitest + pytest — usado pelo pre-push
 1. **Leia primeiro**: CONTRIBUTING.md + o REQUISITOS_CONTRIBUICAO.md da stack
    que você vai tocar.
 2. **Branches**: sempre a partir de `master`, padrão `tipo/descricao-resumida`.
-3. **Commits**: inglês, imperativo, prefixo `feat:`/`bug:`/`doc:`/`chore:`,
+3. **Commits**: inglês, imperativo, prefixo `feat:`/`bug:`/`refactor:`/`doc:`/`chore:`,
    **assinados com SSH**.
 4. **PRs**: máximo 20 arquivos; descrever o quê e o porquê; ≥1 revisor.
 5. **Secrets**: nunca commitar `.env`, tokens ou chaves; nunca expor

@@ -90,14 +90,14 @@ Todos devem passar sem erros.
 
 ### Commits
 
-Use mensagens em português ou inglês, no imperativo, focando o **porquê**:
+**Todos os commits devem ser escritos apenas em inglês**, no imperativo, focando o **porquê**:
 
 ```
-feat(pipeline): adiciona ingestão ACLED com API key opcional
-fix(correlation): corrige threshold de falso líder quando macro=0
+feat(pipeline): add ACLED ingestion with optional API key
+fix(correlation): fix false leader threshold when macro=0
 refactor(hermeneutics): extract RAG logic to separate service
-docs: atualiza contrato da API v1
-test(bayes): cobre evidência fraca sem mudança de prior
+docs: update API contract v1
+test(bayes): cover weak evidence without prior change
 ```
 
 Prefixos sugeridos: `feat`, `fix`, `refactor`, `docs`, `test`, `chore`.
