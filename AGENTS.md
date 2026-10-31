@@ -47,7 +47,7 @@ com profecias e publicação de rankings/fases em um dashboard.
 | `backend/tests/` | Testes pytest |
 | `backend/docs/` | Documentação técnica do motor |
 | `front-end/src/app/` | App Router — páginas (`(painel)`, `historico`, `rankings`, `globo`, `grafo`, `profecias`, `simulador`, `revisao`, `joshua`, …) e route handlers `api/db/` (Prisma/PostgreSQL), `api/admin/`, `api/auth/`, `api/joshua/` |
-| `front-end/src/components/` | Componentes React (dashboard, charts, globo, grafo, ui) |
+| `front-end/src/components/` | Componentes React (dashboard, charts, globo/ThreatGlobeWasm/ThreatGlobeCanvas, grafo, ui) |
 | `front-end/src/lib/` | `api.ts`, `cache.ts`, `types.ts`, `db/`, `seo/`, `auth/`, `mock*.ts` |
 | `front-end/prisma/` | Schema Prisma (espelha `backend/migrations/` — não crie DDL aqui) + seed |
 | `front-end/docs/` | Documentação do dashboard |
@@ -146,6 +146,7 @@ cp .env.example .env.local # NEXT_PUBLIC_USE_MOCK=true roda sem Supabase
 npm run dev                # :3000
 npm run lint               # ESLint
 npm run test               # Vitest
+npm run typecheck          # TypeScript check (tsc --noEmit)
 npm run build              # inclui prisma generate
 npm run storybook          # Storybook em :6006
 ```
@@ -179,7 +180,7 @@ npm run test   # Vitest + pytest — usado pelo pre-push
 9. **Docs em pt-BR** — toda a documentação é em português; ao alterar
    endpoints de `api/main.py`, sincronize `backend/docs/api-contrato.md`; ao
    alterar CLI/env vars, sincronize `cli.md`/`variaveis-ambiente.md`.
-10. **Verificação antes de finalizar**: `npm run lint` e `npm run test` na raiz.
+10. **Verificação antes de finalizar**: `npm run lint`, `npm run test` e `npm run typecheck` na raiz.
 
 ## Viabilidade — estado atual do projeto
 

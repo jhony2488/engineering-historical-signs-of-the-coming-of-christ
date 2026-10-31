@@ -58,6 +58,7 @@ Abra [http://localhost:3000](http://localhost:3000).
 ```bash
 npm run lint
 npm run test
+npm run typecheck
 npm run build
 ```
 
@@ -236,7 +237,7 @@ Prefixos: `feat`, `fix`, `docs`, `test`, `refactor`, `chore`, `style`.
 
 - [ ] Branch atualizada a partir da `main` (ou `master`)
 - [ ] Escopo focado — um PR por feature ou correção
-- [ ] `npm run lint`, `npm run test` e `npm run build` passando
+- [ ] `npm run lint`, `npm run test`, `npm run typecheck` e `npm run build` passando
 - [ ] Testes adicionados ou atualizados para comportamento novo
 - [ ] `.env.example` atualizado se novas variáveis `NEXT_PUBLIC_*` ou `DATABASE_URL`
 - [ ] Screenshots ou gravação curta para mudanças visuais
@@ -335,10 +336,11 @@ Documentação do motor: [backend/docs/api-contrato.md](../../backend/docs/api-c
 #### Globo Fallback
 
 - Cascata de renderização: WebGPU → WebGL → WebAssembly → Canvas 2D
-- Fallback WebAssembly: `ThreatGlobeWasm.tsx` (Three.js com suporte WASM)
-- Fallback Canvas 2D: `@wescld/dotted-map` (sem Three.js)
+- Fallback WebAssembly: `ThreatGlobeWasm.tsx` (Three.js com suporte WASM, usa `react-globe.gl`)
+- Fallback Canvas 2D: `ThreatGlobeCanvas.tsx` (usa `@wescld/dotted-map` como componente React)
 - Indicador de modo visível quando usando Canvas ou WebAssembly
 - Detecção automática em `ThreatGlobe.tsx`
+- `ThreatGlobeCanvas` usa a API declarativa do DottedMap (props: `markers`, `defaultViewMode`, `darkMode`, `theme`)
 
 ## Reportar bugs
 

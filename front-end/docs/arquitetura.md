@@ -33,7 +33,7 @@ Browser → lib/api.ts (cache localStorage + fallback mock)
 | `(painel)/` | Painel principal — fase, proximidade, energias, macro/micro, rankings, falso líder |
 | `historico/` | Série temporal + sínteses por janela (Nível 2/3) |
 | `rankings/` | Top-10 Besta do Mar / da Terra com tendência 24h |
-| `globo/` | Globo 3D de ameaças por país (`ThreatGlobe`, Three.js) + drawer com Joshua/proveniência |
+| `globo/` | Globo 3D de ameaças por país (`ThreatGlobe` wrapper, `ThreatGlobeWasm` react-globe.gl, `ThreatGlobeCanvas` @wescld/dotted-map) + drawer com Joshua/proveniência |
 | `grafo/` | Grafo profético (`CytoscapeGraph`) |
 | `profecias/` | Arquivo profético / baseline |
 | `simulador/` | Cenários what-if |
@@ -104,7 +104,7 @@ Queries ficam em `src/lib/db/` (`resultados.ts`, `snapshots.ts`,
 | `charts/` | `ConvictionChart` (Recharts) |
 | `historico/` | `SynthesisPanel` |
 | `baseline/` | `PropheticBaselinePanel` |
-| `globo/` | `ThreatGlobe` (Three.js) |
+| `globo/` | `ThreatGlobe` (wrapper), `ThreatGlobeWasm` (react-globe.gl), `ThreatGlobeCanvas` (@wescld/dotted-map) |
 | `grafo/` | `CytoscapeGraph` |
 | `ui/` | `Header`, `NavLinks`, `PageShell`, `VirtualList`, `ExportPdfButton`, `ReportHtmlButton`, etc. |
 | `newsletter/` | `EmailSignupForm` |
