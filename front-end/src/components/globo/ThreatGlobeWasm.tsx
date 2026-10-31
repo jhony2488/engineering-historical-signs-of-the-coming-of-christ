@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import dynamic from "next/dynamic";
+import type { GlobeMethods } from "react-globe.gl";
 
 // Dynamically import Globe with WebAssembly support
 const Globe = dynamic(
@@ -41,7 +42,6 @@ export function ThreatGlobeWasm({ points, selectedCode, onSelectCountry }: Props
   const globeRef = useRef<GlobeMethods | undefined>(undefined);
   const containerRef = useRef<HTMLDivElement>(null);
   const [size, setSize] = useState({ w: 800, h: 520 });
-  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     const el = containerRef.current;
@@ -64,15 +64,6 @@ export function ThreatGlobeWasm({ points, selectedCode, onSelectCountry }: Props
       console.error("Error rotating globe:", e);
     }
   }, [selectedCode, points]);
-
-  if (error) {
-    // If WASM fails, this will be caught by parent and fall back to Canvas 2D
-    return (
-      <div className="flex h-[min(70vh,640px)] items-center justify-center rounded-lg border border-ink-700/50 bg-ink-950/40">
-        <p className="text-sm text-slate-500">WebAssembly não disponível</p>
-      </div>
-    );
-  }
 
   return (
     <div
@@ -99,10 +90,6 @@ export function ThreatGlobeWasm({ points, selectedCode, onSelectCountry }: Props
         atmosphereAltitude={0.18}
         width={size.w}
         height={size.h}
-        onError={(e: Error) => {
-          console.error("Globe rendering error:", e);
-          setError("WebAssembly rendering failed");
-        }}
       />
       <div className="pointer-events-none absolute bottom-3 left-3 flex gap-3 text-[10px] uppercase tracking-wider text-slate-400">
         <span className="flex items-center gap-1">

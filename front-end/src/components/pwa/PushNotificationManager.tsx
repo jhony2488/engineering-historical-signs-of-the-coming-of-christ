@@ -77,7 +77,7 @@ export function PushNotificationManager() {
 
   const urlBase64ToBufferSource = (base64String: string): ArrayBuffer => {
     const uint8Array = urlBase64ToUint8Array(base64String);
-    return uint8Array.buffer.slice(uint8Array.byteOffset, uint8Array.byteOffset + uint8Array.byteLength);
+    return uint8Array.buffer.slice(uint8Array.byteOffset, uint8Array.byteOffset + uint8Array.byteLength) as ArrayBuffer;
   };
 
   const subscribeToPush = async () => {

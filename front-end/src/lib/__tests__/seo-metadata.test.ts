@@ -8,7 +8,9 @@ describe("seo/metadata", () => {
   it("buildPageMetadata generates canonical and openGraph", () => {
     const meta = buildPageMetadata({ title: "Historico", description: "Serie", path: "/historico" });
     expect(meta.alternates?.canonical).toContain("/historico");
-    expect(meta.openGraph?.images?.[0]).toMatchObject({ url: "/og-default.svg" });
+    const images = meta.openGraph?.images;
+    const firstImage = Array.isArray(images) ? images[0] : images;
+    expect(firstImage).toMatchObject({ url: "/og-default.svg" });
   });
   it("rootMetadata defines title template", () => {
     expect(rootMetadata.title).toMatchObject({ template: expect.stringContaining(siteConfig.name) });

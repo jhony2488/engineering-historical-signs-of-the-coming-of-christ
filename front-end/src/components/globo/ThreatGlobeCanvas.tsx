@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import { DottedMap } from "@wescld/dotted-map";
 
 export type GlobePoint = {
@@ -23,83 +23,44 @@ type Props = {
  * Renderiza globo ortográfico em Canvas 2D puro (sem Three.js).
  */
 export function ThreatGlobeCanvas({ points, selectedCode }: Props) {
-  const containerRef = useRef<HTMLDivElement>(null);
-  const mapRef = useRef<ReturnType<typeof DottedMap> | null>(null);
   const [size, setSize] = useState({ w: 800, h: 520 });
 
   useEffect(() => {
-    const el = containerRef.current;
-    if (!el) return;
-
-    const sync = () => setSize({ w: el.clientWidth || 800, h: el.clientHeight || 520 });
+    const sync = () => setSize({ w: window.innerWidth * 0.8 || 800, h: 520 });
     sync();
     const ro = new ResizeObserver(sync);
-    ro.observe(el);
+    ro.observe(document.body);
     return () => ro.disconnect();
   }, []);
 
-  useEffect(() => {
-    if (!containerRef.current) return;
-
-    // Criar instância do mapa
-    const map = DottedMap({
-      globe: {
-        size: size.w * 0.6,
-        color: "#1e3a5f",
-        dots: 0.7,
-      },
-      background: {
-        color: "#0a0c10",
-      },
-      line: {
-        color: "#e2b857",
-        width: 0.5,
-      },
-    });
-
-    // DottedMap retorna uma função para destruir
-    const destroy = map(containerRef.current);
-
-    mapRef.current = destroy;
-
-    // Adicionar pontos (países com risco)
-    const mapPoints = points.map((p) => ({
-      lat: p.lat,
-      lng: p.lng,
-      size: p.size * 10,
-      color: p.color,
-      data: p,
-    }));
-
-    if (mapPoints.length > 0) {
-      map.addMarkers(mapPoints);
-    }
-
-    return () => {
-      if (mapRef.current) {
-        mapRef.current();
-        mapRef.current = null;
-      }
-    };
-  }, [points, size]);
+  // Converter pontos para o formato esperado pelo DottedMap
+  const markers = points.map((p) => ({
+    id: p.country_code,
+    latitude: p.lat,
+    longitude: p.lng,
+    data: p,
+  }));
 
   // Rotacionar para país selecionado
-  useEffect(() => {
-    if (!mapRef.current || !selectedCode) return;
-
-    const p = points.find((x) => x.country_code === selectedCode);
-    if (!p) return;
-
-    // DottedMap não tem API direta para rotation, então é uma limitação
-    // Em uma implementação completa, você precisaria usar uma biblioteca com mais controle
-    // ou customizar a projeção ortográfica manualmente
-  }, [selectedCode, points]);
+  // DottedMap não tem API direta para rotation, então é uma limitação
+  // Em uma implementação completa, você precisaria usar uma biblioteca com mais controle
+  // ou customizar a projeção ortográfica manualmente
 
   return (
-    <div
-      ref={containerRef}
-      className="relative h-[min(70vh,640px)] w-full overflow-hidden rounded-lg border border-ink-700/50 bg-gradient-to-b from-ink-950 via-[#0a1628] to-ink-950"
-    >
+    <div className="relative h-[min(70vh,640px)] w-full overflow-hidden rounded-lg border border-ink-700/50 bg-gradient-to-b from-ink-950 via-[#0a1628] to-ink-950">
+      <DottedMap
+        markers={markers}
+        defaultViewMode="globe"
+        darkMode={true}
+        theme={{
+          dotColor: "#e2b857",
+          globeFill: "#1e3a5f",
+          outlineColor: "#1e3a5f",
+        }}
+        initialZoom={1.5}
+        zoomRange={[1, 4]}
+        className="h-full w-full"
+      />
       <div className="pointer-events-none absolute bottom-3 left-3 flex gap-3 text-[10px] uppercase tracking-wider text-slate-400">
         <span className="flex items-center gap-1">
           <i className="inline-block h-2 w-2 rounded-full bg-emerald-400" /> Baixo
