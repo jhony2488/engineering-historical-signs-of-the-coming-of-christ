@@ -24,7 +24,7 @@ type Props = {
  */
 export function ThreatGlobeCanvas({ points, selectedCode }: Props) {
   const containerRef = useRef<HTMLDivElement>(null);
-  const mapRef = useRef<DottedMap | null>(null);
+  const mapRef = useRef<ReturnType<typeof DottedMap> | null>(null);
   const [size, setSize] = useState({ w: 800, h: 520 });
 
   useEffect(() => {
@@ -42,8 +42,7 @@ export function ThreatGlobeCanvas({ points, selectedCode }: Props) {
     if (!containerRef.current) return;
 
     // Criar instância do mapa
-    const map = new DottedMap({
-      container: containerRef.current,
+    const map = DottedMap({
       globe: {
         size: size.w * 0.6,
         color: "#1e3a5f",
@@ -58,7 +57,10 @@ export function ThreatGlobeCanvas({ points, selectedCode }: Props) {
       },
     });
 
-    mapRef.current = map;
+    // DottedMap retorna uma função para destruir
+    const destroy = map(containerRef.current);
+
+    mapRef.current = destroy;
 
     // Adicionar pontos (países com risco)
     const mapPoints = points.map((p) => ({
@@ -75,7 +77,7 @@ export function ThreatGlobeCanvas({ points, selectedCode }: Props) {
 
     return () => {
       if (mapRef.current) {
-        mapRef.current.destroy();
+        mapRef.current();
         mapRef.current = null;
       }
     };

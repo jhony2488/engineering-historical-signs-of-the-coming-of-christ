@@ -38,7 +38,7 @@ type Props = {
  * without hardware acceleration.
  */
 export function ThreatGlobeWasm({ points, selectedCode, onSelectCountry }: Props) {
-  const globeRef = useRef<React.ElementRef<typeof Globe> | undefined>(undefined);
+  const globeRef = useRef<GlobeMethods | undefined>(undefined);
   const containerRef = useRef<HTMLDivElement>(null);
   const [size, setSize] = useState({ w: 800, h: 520 });
   const [error, setError] = useState<string | null>(null);

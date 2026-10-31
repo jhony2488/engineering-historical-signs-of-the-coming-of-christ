@@ -25,6 +25,8 @@ describe("Header", () => {
 
     expect(screen.getByRole("link", { name: "Rankings" })).toHaveAttribute("href", "/rankings");
 
+    expect(screen.getByRole("link", { name: "Contribuir no GitHub" })).toHaveAttribute("href", "https://github.com/jhony2488/engineering-historical-signs-of-the-coming-of-christ");
+
     expect(screen.queryByRole("link", { name: "Histórico" })).not.toBeInTheDocument();
 
     expect(screen.queryByRole("link", { name: "Simulador" })).not.toBeInTheDocument();
@@ -48,6 +50,8 @@ describe("Header", () => {
     expect(screen.getByRole("link", { name: "Revisão" })).toHaveAttribute("href", "/revisao");
 
     expect(screen.getByRole("link", { name: "Insights" })).toHaveAttribute("href", "/insights");
+
+    expect(screen.getByRole("link", { name: "Contribuir no GitHub" })).toHaveAttribute("href", "https://github.com/jhony2488/engineering-historical-signs-of-the-coming-of-christ");
 
     expect(screen.getByRole("button", { name: "Sair da área administrativa" })).toBeInTheDocument();
 
