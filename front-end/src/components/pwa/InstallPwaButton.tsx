@@ -74,7 +74,8 @@ export function InstallPwaButton() {
   const handleInstall = async () => {
     if (!prompt) return;
 
-    const { outcome } = await prompt.prompt();
+    await prompt.prompt();
+    const { outcome } = await prompt.userChoice;
     setPrompt(null);
     setShowModal(false);
 

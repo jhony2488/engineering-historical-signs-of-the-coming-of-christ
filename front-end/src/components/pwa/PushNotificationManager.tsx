@@ -75,6 +75,11 @@ export function PushNotificationManager() {
     return outputArray;
   };
 
+  const urlBase64ToBufferSource = (base64String: string): ArrayBuffer => {
+    const uint8Array = urlBase64ToUint8Array(base64String);
+    return uint8Array.buffer.slice(uint8Array.byteOffset, uint8Array.byteOffset + uint8Array.byteLength);
+  };
+
   const subscribeToPush = async () => {
     if (!process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY) {
       console.error("VAPID_PUBLIC_KEY not configured");
@@ -86,7 +91,7 @@ export function PushNotificationManager() {
       const registration = await navigator.serviceWorker.ready;
       const sub = await registration.pushManager.subscribe({
         userVisibleOnly: true,
-        applicationServerKey: urlBase64ToUint8Array(process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY),
+        applicationServerKey: urlBase64ToBufferSource(process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY),
       });
 
       setSubscription(sub);
