@@ -158,7 +158,7 @@ async def test_router_prefers_local_then_falls_to_groq(tmp_path, monkeypatch):
 
 @pytest.mark.asyncio
 async def test_router_falls_to_groq_when_local_exhausted(tmp_path, monkeypatch):
-    """Todos os candidatos falham → router segue a cadeia (groq probe)."""
+    """Todos os candidatos falham → router segue a cadeia (gemini → groq)."""
     from motor.adapters.llm_router import LLMRouter
     from motor.config import get_settings
 
@@ -174,6 +174,12 @@ async def test_router_falls_to_groq_when_local_exhausted(tmp_path, monkeypatch):
 
     mod, _ = _fake_llama_module({str(tmp_path / c["file"]): RuntimeError("x") for c in CANDS})
     monkeypatch.setitem(sys.modules, "llama_cpp", mod)
+
+    # Mock Gemini como não configurado para forçar fallback para Groq
+    class _GeminiProbe:
+        is_configured = False
+
+    router._gemini = _GeminiProbe()
 
     class _GroqProbe:
         is_configured = True
